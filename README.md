@@ -211,18 +211,6 @@ Three distinct profiles were identified:
 
 ## featureCounts Gene Quantification
 
-### Why featureCounts Instead of STAR Counting?
-
-While STAR has built-in read counting (`--quantMode GeneCounts`), featureCounts was chosen for this holobiont analysis because:
-
-| Feature | STAR Counting | featureCounts |
-|---------|---------------|---------------|
-| Multi-mapper handling | Discard or count all | **Fractional counting** (1/n per location) |
-| GFF3 support | Limited (prefers GTF) | **Native GFF3 support** |
-| Attribute flexibility | gene_id only | **Any attribute** (we used `Parent`) |
-
-With 18.8% multi-mapping reads (due to *D. trenchii*'s fragmented genome), fractional counting recovered ~20% more assigned reads compared to discarding multi-mappers.
-
 ### Quantification Summary
 
 | Metric | Value |
