@@ -2,7 +2,7 @@
 
 ## Overview
 
-RNA-seq analysis of *Montipora capitata* coral holobiont response to ocean acidification, following methodology adapted from **Drury et al. (2022)**. This pipeline uses **genome-based alignment with STAR** to quantify gene expression for both the coral host and its algal symbionts (Symbiodiniaceae) simultaneously.
+RNA-seq analysis of *Montipora capitata* coral holobiont response to seawater acidification. This pipeline uses genome-based alignment with STAR to quantify gene expression for both the coral host and its algal symbionts (Symbiodiniaceae) simultaneously.
 
 ## Sequencing Quality Summary
 
@@ -29,12 +29,12 @@ RNA-seq analysis of *Montipora capitata* coral holobiont response to ocean acidi
 
 High-quality reads were retained after adapter removal and quality filtering.
 
-| Metric | Value | Assessment |
-|--------|-------|------------|
-| **Read Retention** | 97.5% - 98.4% | Excellent |
-| **Adapter Detection** | 7.9% - 9.7% | Normal |
-| **Quality Trimmed** | 0.3% of bases | Minimal |
-| **Too Short (<50bp)** | ~2.2% | Normal |
+| Metric | Value |
+|--------|-------|
+| **Read Retention** | 97.5% - 98.4% |
+| **Adapter Detection** | 7.9% - 9.7% |
+| **Quality Trimmed** | 0.3% of bases |
+| **Too Short (<50bp)** | ~2.2% |
 
 ### Per-Sample Trimmed Read Counts
 
@@ -164,12 +164,6 @@ STAR --runMode alignReads \
 samtools sort -@ 64 -m 4G -o sorted.bam unsorted.bam
 ```
 
-## Organism Distribution Analysis
-
-### Overview
-
-Analysis of aligned reads by organism reveals **dramatic variation in symbiont community composition** across samples. This variation explains the observed differences in unique mapping rates.
-
 ### Symbiont Community Profiles
 
 Three distinct profiles were identified:
@@ -209,49 +203,22 @@ Three distinct profiles were identified:
 | 3DS | 54.0 | 0.6 | 35.4 | Dtre-dominant |
 | 3DW | 64.5 | 0.0 | 26.0 | Dtre-dominant |
 
-### Key Findings
+### Summary
 
-1. **D. trenchii dominance**: 79% of samples (19/24) are dominated by Clade D symbionts with essentially no Clade C
-2. **Sample 2AS is an outlier**: 61.8% Clade C with no Clade D - may represent a different coral genotype
-3. **Symbiont composition drives mapping variation**: Samples with more *D. trenchii* show higher multi-mapping rates due to its fragmented genome (44,682 scaffolds)
+1. **D. trenchii dominance**: 79% of samples (19/24) are dominated by Clade D symbionts with no mapping to Clade C
+2. **Sample 2AS**: 61.8% Clade C with no Clade D
+3. **Symbiont composition may contribute to mapping variation**: Samples with more *D. trenchii* show higher multi-mapping rates (fragmented genome? 44,682 scaffolds)
 
-### Biological Interpretation
 
-| Symbiont | Ecological Characteristics |
-|----------|---------------------------|
-| **D. trenchii** (Clade D) | Heat-tolerant, "opportunistic", often associated with stressed or bleaching-recovered corals |
-| **C. goreaui** (Clade C) | Typical healthy symbiont, higher productivity but more heat-sensitive |
-
-The predominance of *D. trenchii* across most samples suggests these corals may have experienced prior thermal stress or represent naturally Clade D-associated colonies.
-
-### Impact on Mapping Rates
-
-| Factor | Impact on Unique Mapping |
-|--------|--------------------------|
-| High host (Mcap) reads | ↑ Higher unique mapping (well-assembled genome) |
-| High Dtre reads | ↓ Lower unique mapping (fragmented genome → more multi-mapping) |
-| High Cgor reads | → Moderate unique mapping |
-
-This explains the 13% variation in unique mapping rates (61-74%): samples with more host reads and Clade C have higher unique mapping, while Dtre-dominant samples show more multi-mapping.
 
 ## Experimental Design
 
-- **Species**: *Montipora capitata* (rice coral)
-- **Treatments**: 4 pCO₂ levels (A, B, C, D)
+- **Species**: *Montipora capitata* (Hawaiian rice coral)
+- **Treatments**: 4 acdification treatment levels (A, B, C, D 'control')
 - **Seasons**: Summer (S) and Winter (W)
 - **Replicates**: 3 biological replicates per treatment × season
 - **Sequencing**: Illumina NovaSeq, 150 bp paired-end
 
-## Holobiont Approach
-
-This pipeline analyzes the complete coral holobiont by mapping reads to a combined reference containing host and symbiont genomes.
-
-**Advantages over host-only analysis:**
-- Quantify both host and symbiont gene expression
-- Detect symbiont community shifts across treatments
-- Calculate host:symbiont expression ratios
-- More comprehensive stress response characterization
-- Improved mapping rates (86.8% vs ~42% with CDS-only transcriptome)
 
 ## Directory Structure
 
@@ -282,20 +249,6 @@ mc_rework/
 └── metadata/               # Sample information
 ```
 
-## Pipeline Steps
-
-### Completed
-- [x] **Step 00**: Setup - directory structure, symlinks, conda environment
-- [x] **Step 01**: Raw QC - FastQC/MultiQC on raw reads
-- [x] **Step 02**: Trimming - Cutadapt adapter/quality trimming (97.8% mean retention)
-- [x] **Step 03**: Trimmed QC - FastQC/MultiQC on trimmed reads
-- [x] **Step 04**: Reference - Holobiont genome + STAR index (53,224 scaffolds)
-- [x] **Step 05**: Alignment - STAR genome alignment (86.8% mean mapping)
-
-### Pending
-- [ ] **Step 06**: Counting - featureCounts gene-level quantification
-- [ ] **Step 07**: DESeq2 - Differential expression analysis
-- [ ] **Step 08**: Functional analysis - GO/KEGG enrichment
 
 ## Reference Sources
 
@@ -319,32 +272,6 @@ mc_rework/
 - **Source**: Dougan et al. 2022 (UQ eSpace)
 - **Citation**: Dougan KE et al. Science Advances. 2024;10:eadn2218
 
-## Key Methods
-
-### Trimming (Cutadapt)
-- Adapter removal: Illumina TruSeq
-- Poly-A/T tail removal: 10+ consecutive bases
-- Quality threshold: Q20
-- Minimum length: 50 bp
-- Mean retention: 97.8%
-
-### Alignment (STAR)
-- Genome-based alignment to holobiont reference
-- Splice-aware alignment with annotated junctions
-- Multi-mapping allowed (max 20 loci)
-- BAM sorting with samtools (for stability)
-- Mean mapping rate: 86.8%
-
-### Counting (featureCounts) - Pending
-- Gene-level quantification
-- Strand-specific counting
-- Separate analysis by organism
-
-### Differential Expression (DESeq2) - Pending
-- Design: `~ season + treatment`
-- Multiple testing: Benjamini-Hochberg FDR
-- Significance: padj < 0.05, |log2FC| > 1
-
 ## Conda Environment
 
 The `mcap_rnaseq` environment includes:
@@ -366,17 +293,6 @@ The holobiont STAR index requires ~50GB RAM to load. Use exclusive node access f
 
 ### Multi-mapping variation
 Variation in unique mapping rates (61-74%) reflects biological differences in symbiont composition, not technical issues. Samples with more *D. trenchii* show higher multi-mapping due to its fragmented genome assembly.
-
-### DESeq2 considerations
-Consider including symbiont ratio as a covariate, or analyze host and symbiont genes separately:
-```R
-# Option 1: Include as covariate
-design(dds) <- ~ symbiont_ratio + season + treatment
-
-# Option 2: Separate analysis
-dds_host <- dds[grep("^Mcap_", rownames(dds)), ]
-dds_symbiont <- dds[grep("^Cgor_|^Dtre_", rownames(dds)), ]
-```
 
 ## References
 
