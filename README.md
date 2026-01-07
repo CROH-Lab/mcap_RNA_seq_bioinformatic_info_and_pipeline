@@ -308,14 +308,9 @@ featureCounts \
 | `assignment_summary.txt` | Per-sample assignment statistics |
 
 ### Notes on Assignment Rates
-
-The ~51% mean assignment rate is typical for holobiont RNA-seq and reflects:
-
-1. **Intergenic/intronic reads** (~35% NoFeatures): Reads mapping outside annotated exons
-2. **Unmapped reads** (~12%): Reads not aligning to the holobiont reference
-3. **Ambiguous reads** (~5%): Reads overlapping multiple features
-
-Higher assignment rates in samples 2AS (58.3%) and 1AW (55.8%) correlate with Cgor-dominant profiles, as the *C. goreaui* genome is potentially better assembled than *D. trenchii*.
+1. **Intergenic/intronic reads** (~35% NoFeatures)
+2. **Unmapped reads** (~12%)
+3. **Ambiguous reads** (~5%)
 
 ## Experimental Design
 
