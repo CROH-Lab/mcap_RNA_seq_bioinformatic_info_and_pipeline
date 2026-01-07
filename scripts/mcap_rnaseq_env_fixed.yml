@@ -1,0 +1,60 @@
+# M. capitata Holobiont RNA-seq Pipeline - Conda Environment
+# 
+# Pipeline: STAR alignment → featureCounts → DESeq2
+#
+# Create with:  conda env create -f mcap_rnaseq_env.yml
+# Update with:  conda env update -n mcap_rnaseq -f mcap_rnaseq_env.yml
+# Activate:     conda activate mcap_rnaseq
+
+name: mcap_rnaseq
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+
+dependencies:
+  # Python (3.10 for compatibility)
+  - python=3.10
+
+  # Quality Control
+  - fastqc=0.12.1
+  - multiqc=1.19
+
+  # Read Processing / Trimming
+  - cutadapt=4.6
+  - fastp=0.23.4
+
+  # Genome Alignment (NEW - replaces Salmon)
+  - star=2.7.11b
+  - samtools=1.19
+  - bamtools=2.5.2
+
+  # Read Counting
+  - subread=2.0.6          # Includes featureCounts
+
+  # Sequence Utilities
+  - seqkit=2.7.0
+  - gffread=0.12.7         # For GFF/GTF manipulation
+  - bedtools=2.31.1
+
+  # General Utilities
+  - pigz=2.8
+  - wget
+  - curl
+
+  # Python packages
+  - pandas=2.0.3
+  - numpy=1.24.4
+  - biopython=1.81
+
+  # R and Bioconductor packages for DESeq2
+  - r-base=4.3.2
+  - r-tidyverse=2.0.0
+  - r-ggplot2=3.4.4
+  - r-pheatmap=1.0.12
+  - r-rcolorbrewer=1.1_3
+  - r-ggrepel=0.9.4
+  - bioconductor-deseq2=1.42.0
+  - bioconductor-enhancedvolcano=1.20.0
+  - bioconductor-annotationhub=3.10.0
+  - r-biocmanager=1.30.22

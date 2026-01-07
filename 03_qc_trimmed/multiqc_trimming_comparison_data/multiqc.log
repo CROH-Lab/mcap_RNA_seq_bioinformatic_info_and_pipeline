@@ -1,0 +1,27 @@
+[2025-12-31 17:07:20,761] multiqc                                            [DEBUG  ]  This is MultiQC v1.19
+[2025-12-31 17:07:21,480] multiqc                                            [DEBUG  ]  Command used: /home/darmstrong4/miniconda3/envs/mcap_rnaseq/bin/multiqc 01_qc_raw 02_trimmed 03_qc_trimmed -o 03_qc_trimmed -n multiqc_trimming_comparison --title M. capitata: Raw vs Trimmed Reads Comparison --force
+[2025-12-31 17:07:24,741] multiqc                                            [WARNING]  MultiQC Version v1.33 now available!
+[2025-12-31 17:07:24,741] multiqc                                            [DEBUG  ]  Working dir : /home/darmstrong4/mc_rework
+[2025-12-31 17:07:24,741] multiqc                                            [DEBUG  ]  Template    : default
+[2025-12-31 17:07:24,742] multiqc                                            [DEBUG  ]  Running Python 3.10.14 | packaged by conda-forge | (main, Mar 20 2024, 12:45:18) [GCC 12.3.0]
+[2025-12-31 17:07:24,742] multiqc                                            [INFO   ]  Report title: M. capitata: Raw vs Trimmed Reads Comparison
+[2025-12-31 17:07:24,742] multiqc                                            [DEBUG  ]  Analysing modules: custom_content, ccs, ngsderive, purple, conpair, lima, peddy, somalier, methylQA, mosdepth, phantompeakqualtools, qualimap, preseq, hifiasm, quast, qorts, rna_seqc, rockhopper, rsem, rseqc, busco, bustools, goleft_indexcov, gffcompare, disambiguate, supernova, deeptools, sargasso, verifybamid, mirtrace, happy, mirtop, sambamba, gopeaks, homer, hops, macs2, theta2, snpeff, gatk, htseq, bcftools, featureCounts, fgbio, dragen, dragen_fastqc, dedup, pbmarkdup, damageprofiler, mapdamage, biobambam2, jcvi, mtnucratio, picard, vep, bakta, prokka, qc3C, nanostat, samblaster, samtools, sexdeterrmine, seqera_cli, eigenstratdatabasetools, bamtools, jellyfish, vcftools, longranger, stacks, varscan2, snippy, umitools, truvari, bbmap, bismark, biscuit, diamond, hicexplorer, hicup, hicpro, salmon, kallisto, slamdunk, star, hisat2, tophat, bowtie2, bowtie1, cellranger, snpsplit, odgi, pangolin, nextclade, freyja, humid, kat, leehom, librarian, adapterRemoval, bbduk, clipandmerge, cutadapt, flexbar, sourmash, kaiju, bracken, kraken, malt, motus, trimmomatic, sickle, skewer, sortmerna, biobloomtools, fastq_screen, afterqc, fastp, fastqc, filtlong, prinseqplusplus, pychopper, porechop, pycoqc, minionqc, anglerfish, multivcfanalyzer, clusterflow, checkqc, bcl2fastq, bclconvert, interop, ivar, flash, seqyclean, optitype, whatshap, xenome, xengsort
+[2025-12-31 17:07:24,742] multiqc                                            [DEBUG  ]  Using temporary directory for creating report: /tmp/tmpioq1e6bn
+[2025-12-31 17:07:26,219] multiqc                                            [INFO   ]  Search path : /home/darmstrong4/mc_rework/01_qc_raw
+[2025-12-31 17:07:26,265] multiqc                                            [INFO   ]  Search path : /home/darmstrong4/mc_rework/02_trimmed
+[2025-12-31 17:07:26,265] multiqc                                            [INFO   ]  Search path : /home/darmstrong4/mc_rework/03_qc_trimmed
+[2025-12-31 17:08:50,837] multiqc                                            [DEBUG  ]  Summary of files that were skipped by the search: [skipped_module_specific_max_filesize: 1431] // [skipped_no_match: 153] // [skipped_ignore_pattern: 49]
+[2025-12-31 17:10:10,820] multiqc.plots.bargraph                             [DEBUG  ]  Using matplotlib version 3.10.1
+[2025-12-31 17:10:11,657] multiqc.plots.linegraph                            [DEBUG  ]  Using matplotlib version 3.10.1
+[2025-12-31 17:10:11,970] multiqc                                            [DEBUG  ]  No samples found: custom_content
+[2025-12-31 17:10:13,268] multiqc                                            [DEBUG  ]  No samples found: htseq
+[2025-12-31 17:10:14,255] multiqc                                            [DEBUG  ]  No samples found: snippy
+[2025-12-31 17:10:17,276] multiqc.modules.cutadapt.cutadapt                  [INFO   ]  Found 24 reports
+[2025-12-31 17:11:00,862] multiqc.modules.fastqc.fastqc                      [INFO   ]  Found 96 reports
+[2025-12-31 17:11:08,586] multiqc.utils.software_versions                    [DEBUG  ]  Reading software versions from config.software_versions
+[2025-12-31 17:11:08,910] multiqc                                            [DEBUG  ]  Compressing plot data
+[2025-12-31 17:11:10,109] multiqc                                            [INFO   ]  Report      : 03_qc_trimmed/multiqc_trimming_comparison.html
+[2025-12-31 17:11:10,109] multiqc                                            [INFO   ]  Data        : 03_qc_trimmed/multiqc_trimming_comparison_data
+[2025-12-31 17:11:10,109] multiqc                                            [DEBUG  ]  Moving data file from '/tmp/tmpioq1e6bn/multiqc_data' to '03_qc_trimmed/multiqc_trimming_comparison_data'
+[2025-12-31 17:11:12,394] multiqc                                            [DEBUG  ]  Full report path: /home/darmstrong4/mc_rework/03_qc_trimmed/multiqc_trimming_comparison.html
+[2025-12-31 17:11:29,492] multiqc                                            [INFO   ]  MultiQC complete

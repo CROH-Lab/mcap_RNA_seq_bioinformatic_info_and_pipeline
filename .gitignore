@@ -1,0 +1,63 @@
+# =============================================================================
+# .gitignore for M. capitata RNA-seq Pipeline
+# =============================================================================
+
+# Large sequencing files
+*.fastq
+*.fastq.gz
+*.fq
+*.fq.gz
+*.bam
+*.bam.bai
+*.sam
+*.cram
+
+# Reference files and indices
+04_reference/*.fa
+04_reference/*.fa.gz
+04_reference/*.fasta
+04_reference/*.fasta.gz
+04_reference/*.gff3
+04_reference/*.gff3.backup
+04_reference/*.gtf
+04_reference/*.tsv
+04_reference/*.gz
+04_reference/star_index_holobiont/
+04_reference/salmon_index*/
+
+# Raw and trimmed data
+00_raw_fastq/
+02_trimmed/
+
+# Alignment files (keep only Log.final.out)
+05_star_align/*/*.bam
+05_star_align/*/*.bam.bai
+05_star_align/*/*.out.tab
+05_star_align/*/*_Log.progress.out
+05_star_align/*/*_Log.out
+05_star_align/*/_STARtmp/
+05_star_align/.alignment.lock
+
+# Large count files
+06_featurecounts/gene_counts_raw.txt
+06_counts/
+
+# Log files
+logs/
+
+# System files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.nfs*
+*.lock
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+test_*.txt
+test_*.txt.summary
+slurm-*.out

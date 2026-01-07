@@ -1,0 +1,68 @@
+M. capitata Holobiont Reference - STAR Pipeline
+================================================
+
+Created: Sat Jan  3 03:49:15 AM CST 2026
+
+GENOME STATISTICS:
+------------------
+Organism                    Scaffolds       Size
+M. capitata (Mcap_)         1699           745M
+C. goreaui (Cgor_)          6843           1.1G
+D. trenchii (Dtre_)         44682           1.6G
+-------------------------------------------------
+TOTAL                       53224           3.4G
+
+ANNOTATION STATISTICS:
+----------------------
+Total genes: 98844
+Total mRNA: 107504
+Total exons: 1991029
+Total CDS: 1965243
+Splice junctions: 1663303
+
+OUTPUT FILES:
+-------------
+holobiont_genome.fa         Combined genome FASTA (all organisms)
+holobiont_genes.gff3        Combined gene annotations (filtered)
+star_index_holobiont/       STAR index directory
+
+INDIVIDUAL PREFIXED FILES:
+--------------------------
+Mcap_genome.fa              M. capitata genome (prefixed)
+Mcap_genes_prefixed.gff3    M. capitata annotations (prefixed, filtered)
+Cgor_genome.fa              C. goreaui genome (prefixed)
+Cgor_genes_prefixed.gff3    C. goreaui annotations (prefixed, filtered)
+Dtre_genome.fa              D. trenchii genome (prefixed)
+Dtre_genes_prefixed.gff3    D. trenchii annotations (prefixed, filtered)
+
+SOURCE DATA:
+------------
+1. HOST: Montipora capitata
+   Genome: Stephens et al. 2022 (GigaDB 102268)
+   Assembly: HIv3 (chromosome-level)
+   Citation: Stephens TG et al. GigaScience. 2022;11:giac098
+
+2. SYMBIONT: Cladocopium goreaui (Clade C)
+   Strain: SCF055
+   Source: Chen et al. 2022 (UQ eSpace)
+   Citation: Chen Y et al. Microorganisms. 2022;10(8):1662
+
+3. SYMBIONT: Durusdinium trenchii (Clade D)
+   Strain: SCF082
+   Source: Dougan et al. 2022 (UQ eSpace)
+   Citation: Dougan KE et al. Science Advances. 2024;10:eadn2218
+
+STAR INDEX PARAMETERS:
+----------------------
+--sjdbOverhang 149                    (read length - 1)
+--genomeSAindexNbases 14
+--sjdbGTFtagExonParentTranscript Parent   (for GFF3 format)
+--limitSjdbInsertNsj 2000000          (increased for holobiont)
+
+USAGE:
+------
+# Alignment
+STAR --genomeDir star_index_holobiont --readFilesIn R1.fq.gz R2.fq.gz ...
+
+# Counting (use -t exon -g Parent for GFF3)
+featureCounts -a holobiont_genes.gff3 -t exon -g Parent -o counts.txt *.bam
