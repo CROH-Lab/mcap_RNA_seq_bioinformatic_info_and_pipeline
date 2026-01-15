@@ -1,390 +1,360 @@
 # ============================================================================
-# M. capitata Holobiont RNA-seq Pipeline - Step 7: DESeq2 Analysis
+# DESeq2 Analysis - Within-Season Treatment Effect (B vs D)
+# ============================================================================
 #
-# Differential expression analysis using DESeq2.
-# Analyzes host and symbiont gene expression separately.
+# Design: ~ treatment (B vs D) within each season
+#   - Summer: B vs D (n=6, 3 vs 3)
+#   - Winter: B vs D (n=6, 3 vs 3)
 #
-# Input:  Count matrices from featureCounts (06_counts/)
-# Output: DE results, figures, normalized counts (07_deseq2/)
+# Treatment B = High CO2 (acidified)
+# Treatment D = Control
 #
-# Usage:
-#   Interactive: Open in RStudio and run sections
-#   Command line: Rscript scripts/07_deseq2.R
 # ============================================================================
 
-# --- Load Libraries ---
-suppressPackageStartupMessages({
-    library(DESeq2)
-    library(tidyverse)
-    library(pheatmap)
-    library(RColorBrewer)
-    library(ggrepel)
-})
+library(DESeq2)
+library(tidyverse)
+library(qvalue)
 
 cat("============================================\n")
-cat("DESeq2 Differential Expression Analysis\n")
+cat("DESeq2 Analysis - Within-Season B vs D\n")
 cat("Date:", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "\n")
 cat("============================================\n\n")
 
 # --- Configuration ---
 BASE_DIR <- "/home/darmstrong4/mc_rework"
-COUNTS_DIR <- file.path(BASE_DIR, "06_counts")
+COUNTS_DIR <- file.path(BASE_DIR, "06_featurecounts")
 OUT_DIR <- file.path(BASE_DIR, "07_deseq2")
 
-# Create output directories
-dir.create(OUT_DIR, showWarnings = FALSE, recursive = TRUE)
 dir.create(file.path(OUT_DIR, "results"), showWarnings = FALSE)
 dir.create(file.path(OUT_DIR, "figures"), showWarnings = FALSE)
-dir.create(file.path(OUT_DIR, "normalized_counts"), showWarnings = FALSE)
 
 # ============================================================================
-# SECTION 1: Load Data
+# SECTION 1: Load and Prepare Data
 # ============================================================================
-cat("=== Loading Data ===\n")
 
-# Load sample metadata
-sample_info <- read.delim(file.path(BASE_DIR, "sample_info.txt"), 
-                          stringsAsFactors = FALSE)
-rownames(sample_info) <- sample_info$sample
+cat("=== SECTION 1: Loading Data ===\n\n")
 
-cat("Sample info loaded:", nrow(sample_info), "samples\n")
-print(table(sample_info$treatment, sample_info$season))
-cat("\n")
+sample_info <- read.delim(file.path(BASE_DIR, "sample_info_with_chemistry.txt"))
+rownames(sample_info) <- sample_info$sample_id
 
-# Load count matrices
-counts_all <- read.delim(file.path(COUNTS_DIR, "gene_counts.txt"), 
-                         row.names = 1)
-counts_mcap <- read.delim(file.path(COUNTS_DIR, "gene_counts_Mcap.txt"), 
-                          row.names = 1)
-counts_cgor <- read.delim(file.path(COUNTS_DIR, "gene_counts_Cgor.txt"), 
-                          row.names = 1)
-counts_dtre <- read.delim(file.path(COUNTS_DIR, "gene_counts_Dtre.txt"), 
-                          row.names = 1)
+# Subset to treatments B and D only (Ocean acidification analysis)
+sample_info_BD <- sample_info %>% filter(treatment %in% c("B", "D"))
 
-cat("Count matrices loaded:\n")
-cat("  All genes:", nrow(counts_all), "genes x", ncol(counts_all), "samples\n")
-cat("  M. capitata:", nrow(counts_mcap), "genes\n")
-cat("  C. goreaui:", nrow(counts_cgor), "genes\n")
-cat("  D. trenchii:", nrow(counts_dtre), "genes\n\n")
+# Set treatment as factor with D as reference (control)
+sample_info_BD$treatment <- factor(sample_info_BD$treatment, levels = c("D", "B"))
+sample_info_BD$season <- factor(sample_info_BD$season, levels = c("Summer", "Winter"))
 
-# Ensure sample order matches
-sample_info <- sample_info[colnames(counts_all), ]
+cat("Samples:", nrow(sample_info_BD), "\n")
+cat("  Treatment D (control):", sum(sample_info_BD$treatment == "D"), "\n")
+cat("  Treatment B (high CO2):", sum(sample_info_BD$treatment == "B"), "\n\n")
 
-# Convert factors
-sample_info$treatment <- factor(sample_info$treatment, 
-                                 levels = c("D", "C", "B", "A"))  # D = control
-sample_info$season <- factor(sample_info$season, 
-                              levels = c("Summer", "Winter"))
-sample_info$genotype <- factor(sample_info$genotype)
+# Show design
+cat("=== Experimental Design ===\n\n")
+print(table(sample_info_BD$treatment, sample_info_BD$season))
 
-# ============================================================================
-# SECTION 2: DESeq2 Analysis - Host (M. capitata)
-# ============================================================================
-cat("=== DESeq2 Analysis: Host (M. capitata) ===\n")
+cat("\n\n=== Chemistry by Group ===\n\n")
+sample_info_BD %>%
+    group_by(treatment, season) %>%
+    summarise(
+        n = n(),
+        H_nmol = round(mean(H_nmol), 2),
+        pH = round(-log10(mean(H_nmol) * 1e-9), 2),
+        DIC = round(mean(DIC), 0),
+        .groups = "drop"
+    ) %>%
+    print()
 
-# Create DESeq2 dataset
-dds_mcap <- DESeqDataSetFromMatrix(
-    countData = counts_mcap,
-    colData = sample_info,
-    design = ~ genotype + season + treatment
-)
+# Load counts
+counts_mcap <- read.delim(file.path(COUNTS_DIR, "Mcap_counts.txt"),
+                          row.names = 1, check.names = FALSE)
+counts_dtre <- read.delim(file.path(COUNTS_DIR, "Dtre_counts.txt"),
+                          row.names = 1, check.names = FALSE)
 
-# Filter low-count genes (at least 10 reads in at least 3 samples)
-keep <- rowSums(counts(dds_mcap) >= 10) >= 3
-dds_mcap <- dds_mcap[keep, ]
-cat("Genes after filtering:", nrow(dds_mcap), "\n")
+# Subset to B+D samples
+BD_samples <- rownames(sample_info_BD)
+counts_mcap_BD <- counts_mcap[, BD_samples]
+counts_dtre_BD <- counts_dtre[, BD_samples]
 
-# Run DESeq2
-dds_mcap <- DESeq(dds_mcap)
-cat("DESeq2 analysis complete\n\n")
-
-# --- Results: Treatment effect (A vs D, B vs D, C vs D) ---
-cat("Extracting treatment contrasts (vs control D)...\n")
-
-# Treatment A vs D (control)
-res_mcap_AvD <- results(dds_mcap, contrast = c("treatment", "A", "D"), 
-                        alpha = 0.05)
-res_mcap_AvD <- res_mcap_AvD[order(res_mcap_AvD$padj), ]
-cat("  A vs D: ", sum(res_mcap_AvD$padj < 0.05, na.rm = TRUE), "DEGs (padj < 0.05)\n")
-
-# Treatment B vs D (control)
-res_mcap_BvD <- results(dds_mcap, contrast = c("treatment", "B", "D"), 
-                        alpha = 0.05)
-res_mcap_BvD <- res_mcap_BvD[order(res_mcap_BvD$padj), ]
-cat("  B vs D: ", sum(res_mcap_BvD$padj < 0.05, na.rm = TRUE), "DEGs (padj < 0.05)\n")
-
-# Treatment C vs D (control)
-res_mcap_CvD <- results(dds_mcap, contrast = c("treatment", "C", "D"), 
-                        alpha = 0.05)
-res_mcap_CvD <- res_mcap_CvD[order(res_mcap_CvD$padj), ]
-cat("  C vs D: ", sum(res_mcap_CvD$padj < 0.05, na.rm = TRUE), "DEGs (padj < 0.05)\n")
-
-# Season effect
-res_mcap_season <- results(dds_mcap, contrast = c("season", "Winter", "Summer"), 
-                           alpha = 0.05)
-res_mcap_season <- res_mcap_season[order(res_mcap_season$padj), ]
-cat("  Winter vs Summer: ", sum(res_mcap_season$padj < 0.05, na.rm = TRUE), "DEGs\n\n")
-
-# Save results
-write.csv(as.data.frame(res_mcap_AvD), 
-          file.path(OUT_DIR, "results", "Mcap_AvD_results.csv"))
-write.csv(as.data.frame(res_mcap_BvD), 
-          file.path(OUT_DIR, "results", "Mcap_BvD_results.csv"))
-write.csv(as.data.frame(res_mcap_CvD), 
-          file.path(OUT_DIR, "results", "Mcap_CvD_results.csv"))
-write.csv(as.data.frame(res_mcap_season), 
-          file.path(OUT_DIR, "results", "Mcap_WinterVsSummer_results.csv"))
-
-# Get normalized counts
-norm_counts_mcap <- counts(dds_mcap, normalized = TRUE)
-write.csv(norm_counts_mcap, 
-          file.path(OUT_DIR, "normalized_counts", "Mcap_normalized_counts.csv"))
+cat("\n\nCount matrices (B+D only):\n")
+cat("  M. capitata:", nrow(counts_mcap_BD), "genes ×", ncol(counts_mcap_BD), "samples\n")
+cat("  D. trenchii:", nrow(counts_dtre_BD), "genes ×", ncol(counts_dtre_BD), "samples\n\n")
 
 # ============================================================================
-# SECTION 3: DESeq2 Analysis - Symbionts (if sufficient reads)
+# SECTION 2: Within-Season Analysis (B vs D)
 # ============================================================================
-cat("=== DESeq2 Analysis: Symbionts ===\n")
 
-# --- C. goreaui (Clade C) ---
-cat("\nC. goreaui (Clade C):\n")
+cat("============================================\n")
+cat("WITHIN-SEASON ANALYSIS: ~ treatment (B vs D)\n")
+cat("============================================\n\n")
 
-# Check which samples have enough Clade C reads
-cgor_totals <- colSums(counts_cgor)
-cgor_samples <- names(cgor_totals[cgor_totals > 100000])  # Min 100k reads
-cat("  Samples with >100k Clade C reads:", length(cgor_samples), "\n")
-
-if (length(cgor_samples) >= 6) {
-    dds_cgor <- DESeqDataSetFromMatrix(
-        countData = counts_cgor[, cgor_samples],
-        colData = sample_info[cgor_samples, ],
-        design = ~ season + treatment
-    )
-    keep <- rowSums(counts(dds_cgor) >= 10) >= 3
-    dds_cgor <- dds_cgor[keep, ]
-    cat("  Genes after filtering:", nrow(dds_cgor), "\n")
+run_season_analysis <- function(counts, sample_info, season_name, organism) {
     
-    dds_cgor <- DESeq(dds_cgor)
-    norm_counts_cgor <- counts(dds_cgor, normalized = TRUE)
-    write.csv(norm_counts_cgor, 
-              file.path(OUT_DIR, "normalized_counts", "Cgor_normalized_counts.csv"))
-    cat("  Analysis complete\n")
-} else {
-    cat("  Insufficient samples for Clade C analysis\n")
+    cat("--- ", organism, " - ", season_name, " ---\n\n", sep = "")
+    
+    # Subset to season
+    season_samples <- rownames(sample_info)[sample_info$season == season_name]
+    counts_season <- counts[, season_samples]
+    info_season <- sample_info[season_samples, ]
+    
+    cat("Samples:", nrow(info_season), "\n")
+    cat("  Treatment D (control):", sum(info_season$treatment == "D"), "\n")
+    cat("  Treatment B (high CO2):", sum(info_season$treatment == "B"), "\n\n")
+    
+    # Design: just treatment
+    dds <- DESeqDataSetFromMatrix(
+        countData = counts_season,
+        colData = info_season,
+        design = ~ treatment
+    )
+    
+    keep <- rowSums(counts(dds) >= 10) >= 3
+    dds <- dds[keep, ]
+    cat("Genes after filtering:", nrow(dds), "\n")
+    
+    cat("Running DESeq2...\n")
+    dds <- DESeq(dds)
+    cat("Complete.\n\n")
+    
+    # Results
+    res <- results(dds, name = "treatment_B_vs_D", alpha = 0.05)
+    res <- res[order(res$padj), ]
+    
+    cat("Treatment effect (B vs D):\n")
+    cat("  p < 0.01:", sum(res$pvalue < 0.01, na.rm = TRUE), "\n")
+    cat("  p < 0.05:", sum(res$pvalue < 0.05, na.rm = TRUE), "\n")
+    cat("  padj < 0.05:", sum(res$padj < 0.05, na.rm = TRUE), "\n")
+    cat("  padj < 0.10:", sum(res$padj < 0.10, na.rm = TRUE), "\n")
+    
+    if (sum(res$padj < 0.05, na.rm = TRUE) > 0) {
+        cat("    Up in B:", sum(res$padj < 0.05 & res$log2FoldChange > 0, na.rm = TRUE), "\n")
+        cat("    Down in B:", sum(res$padj < 0.05 & res$log2FoldChange < 0, na.rm = TRUE), "\n")
+    }
+    
+    n_genes <- sum(!is.na(res$pvalue))
+    cat("  Expected by chance: p<0.01 =", round(n_genes * 0.01),
+        ", p<0.05 =", round(n_genes * 0.05), "\n\n")
+    
+    return(list(dds = dds, res = res, info = info_season))
 }
 
-# --- D. trenchii (Clade D) ---
-cat("\nD. trenchii (Clade D):\n")
+# M. capitata
+mcap_summer <- run_season_analysis(counts_mcap_BD, sample_info_BD, "Summer", "M. capitata")
+mcap_winter <- run_season_analysis(counts_mcap_BD, sample_info_BD, "Winter", "M. capitata")
 
-# Check which samples have enough Clade D reads
-dtre_totals <- colSums(counts_dtre)
-dtre_samples <- names(dtre_totals[dtre_totals > 100000])
-cat("  Samples with >100k Clade D reads:", length(dtre_samples), "\n")
+# D. trenchii
+dtre_summer <- run_season_analysis(counts_dtre_BD, sample_info_BD, "Summer", "D. trenchii")
+dtre_winter <- run_season_analysis(counts_dtre_BD, sample_info_BD, "Winter", "D. trenchii")
 
-if (length(dtre_samples) >= 6) {
-    dds_dtre <- DESeqDataSetFromMatrix(
-        countData = counts_dtre[, dtre_samples],
-        colData = sample_info[dtre_samples, ],
-        design = ~ season + treatment
-    )
-    keep <- rowSums(counts(dds_dtre) >= 10) >= 3
-    dds_dtre <- dds_dtre[keep, ]
-    cat("  Genes after filtering:", nrow(dds_dtre), "\n")
-    
-    dds_dtre <- DESeq(dds_dtre)
-    norm_counts_dtre <- counts(dds_dtre, normalized = TRUE)
-    write.csv(norm_counts_dtre, 
-              file.path(OUT_DIR, "normalized_counts", "Dtre_normalized_counts.csv"))
-    cat("  Analysis complete\n")
-} else {
-    cat("  Insufficient samples for Clade D analysis\n")
+# ============================================================================
+# SECTION 3: Save Results
+# ============================================================================
+
+cat("============================================\n")
+cat("Saving Results\n")
+cat("============================================\n\n")
+
+# M. capitata
+write.csv(as.data.frame(mcap_summer$res),
+          file.path(OUT_DIR, "results", "Mcap_Summer_BvsD.csv"))
+write.csv(as.data.frame(mcap_winter$res),
+          file.path(OUT_DIR, "results", "Mcap_Winter_BvsD.csv"))
+
+# D. trenchii
+write.csv(as.data.frame(dtre_summer$res),
+          file.path(OUT_DIR, "results", "Dtre_Summer_BvsD.csv"))
+write.csv(as.data.frame(dtre_winter$res),
+          file.path(OUT_DIR, "results", "Dtre_Winter_BvsD.csv"))
+
+cat("Saved CSV results to: 07_deseq2/results/\n\n")
+
+# ============================================================================
+# SECTION 4: Pi0 Estimation
+# ============================================================================
+
+cat("============================================\n")
+cat("Pi0 Estimation\n")
+cat("============================================\n\n")
+
+estimate_pi0 <- function(res, label) {
+    res_df <- as.data.frame(res) %>% filter(!is.na(pvalue))
+    if (nrow(res_df) > 100) {
+        qobj <- tryCatch(qvalue(res_df$pvalue), error = function(e) NULL)
+        if (!is.null(qobj)) {
+            cat(label, ":\n", sep = "")
+            cat("  Pi0:", round(qobj$pi0, 3), "\n")
+            cat("  Estimated true DEGs:", round((1 - qobj$pi0) * nrow(res_df)), "\n\n")
+            return(qobj$pi0)
+        }
+    }
+    return(NA)
 }
 
-cat("\n")
+pi0_mcap_summer <- estimate_pi0(mcap_summer$res, "M. capitata Summer")
+pi0_mcap_winter <- estimate_pi0(mcap_winter$res, "M. capitata Winter")
+pi0_dtre_summer <- estimate_pi0(dtre_summer$res, "D. trenchii Summer")
+pi0_dtre_winter <- estimate_pi0(dtre_winter$res, "D. trenchii Winter")
 
 # ============================================================================
-# SECTION 4: Visualization - Host
+# SECTION 5: Summary Table
 # ============================================================================
-cat("=== Creating Visualizations ===\n")
 
-# --- PCA Plot ---
-cat("Creating PCA plot...\n")
-vsd_mcap <- vst(dds_mcap, blind = FALSE)
+cat("============================================\n")
+cat("SUMMARY\n")
+cat("============================================\n\n")
 
-pca_data <- plotPCA(vsd_mcap, intgroup = c("treatment", "season"), 
-                    returnData = TRUE)
-pca_var <- round(100 * attr(pca_data, "percentVar"))
-
-pca_plot <- ggplot(pca_data, aes(x = PC1, y = PC2, 
-                                  color = treatment, shape = season)) +
-    geom_point(size = 4, alpha = 0.8) +
-    scale_color_brewer(palette = "Set1") +
-    labs(
-        title = "PCA: M. capitata Host Gene Expression",
-        x = paste0("PC1 (", pca_var[1], "% variance)"),
-        y = paste0("PC2 (", pca_var[2], "% variance)")
-    ) +
-    theme_bw() +
-    theme(
-        plot.title = element_text(hjust = 0.5, face = "bold"),
-        legend.position = "right"
-    )
-
-ggsave(file.path(OUT_DIR, "figures", "PCA_Mcap_host.pdf"), 
-       pca_plot, width = 8, height = 6)
-ggsave(file.path(OUT_DIR, "figures", "PCA_Mcap_host.png"), 
-       pca_plot, width = 8, height = 6, dpi = 300)
-
-# --- Sample Distance Heatmap ---
-cat("Creating sample distance heatmap...\n")
-sample_dists <- dist(t(assay(vsd_mcap)))
-sample_dist_matrix <- as.matrix(sample_dists)
-
-rownames(sample_dist_matrix) <- paste(vsd_mcap$treatment, vsd_mcap$season, 
-                                       vsd_mcap$genotype, sep = "_")
-colnames(sample_dist_matrix) <- NULL
-
-colors <- colorRampPalette(rev(brewer.pal(9, "Blues")))(255)
-
-pdf(file.path(OUT_DIR, "figures", "sample_distance_heatmap.pdf"), 
-    width = 10, height = 8)
-pheatmap(sample_dist_matrix,
-         clustering_distance_rows = sample_dists,
-         clustering_distance_cols = sample_dists,
-         col = colors,
-         main = "Sample Distance Matrix - M. capitata Host")
-dev.off()
-
-# --- Volcano Plot (Treatment A vs D) ---
-cat("Creating volcano plot (A vs D)...\n")
-
-volcano_data <- as.data.frame(res_mcap_AvD) %>%
-    rownames_to_column("gene") %>%
-    mutate(
-        significance = case_when(
-            padj < 0.05 & log2FoldChange > 1 ~ "Up",
-            padj < 0.05 & log2FoldChange < -1 ~ "Down",
-            TRUE ~ "NS"
-        )
-    )
-
-volcano_plot <- ggplot(volcano_data, aes(x = log2FoldChange, y = -log10(padj), 
-                                          color = significance)) +
-    geom_point(alpha = 0.6, size = 1.5) +
-    scale_color_manual(values = c("Up" = "red", "Down" = "blue", "NS" = "gray60")) +
-    geom_hline(yintercept = -log10(0.05), linetype = "dashed", color = "gray40") +
-    geom_vline(xintercept = c(-1, 1), linetype = "dashed", color = "gray40") +
-    labs(
-        title = "Volcano Plot: Treatment A vs Control D",
-        subtitle = "M. capitata Host",
-        x = "log2 Fold Change",
-        y = "-log10(adjusted p-value)"
-    ) +
-    theme_bw() +
-    theme(
-        plot.title = element_text(hjust = 0.5, face = "bold"),
-        legend.position = "right"
-    )
-
-ggsave(file.path(OUT_DIR, "figures", "volcano_Mcap_AvD.pdf"), 
-       volcano_plot, width = 8, height = 6)
-ggsave(file.path(OUT_DIR, "figures", "volcano_Mcap_AvD.png"), 
-       volcano_plot, width = 8, height = 6, dpi = 300)
-
-# --- Top DEGs Heatmap ---
-cat("Creating top DEGs heatmap...\n")
-
-# Get top 50 DEGs by adjusted p-value
-top_genes <- head(rownames(res_mcap_AvD[order(res_mcap_AvD$padj), ]), 50)
-top_genes <- top_genes[!is.na(top_genes)]
-
-if (length(top_genes) > 5) {
-    mat <- assay(vsd_mcap)[top_genes, ]
-    mat <- t(scale(t(mat)))  # Z-score normalize
-    
-    annotation_col <- data.frame(
-        Treatment = sample_info$treatment,
-        Season = sample_info$season,
-        row.names = colnames(mat)
-    )
-    
-    pdf(file.path(OUT_DIR, "figures", "heatmap_top50_DEGs_AvD.pdf"), 
-        width = 12, height = 10)
-    pheatmap(mat,
-             annotation_col = annotation_col,
-             show_rownames = FALSE,
-             cluster_cols = TRUE,
-             cluster_rows = TRUE,
-             main = "Top 50 DEGs: Treatment A vs Control D")
-    dev.off()
-}
-
-# ============================================================================
-# SECTION 5: Summary Statistics
-# ============================================================================
-cat("\n=== Summary Statistics ===\n")
-
-# Create summary table
 summary_df <- data.frame(
-    Comparison = c("A vs D", "B vs D", "C vs D", "Winter vs Summer"),
-    Total_Tested = c(
-        sum(!is.na(res_mcap_AvD$padj)),
-        sum(!is.na(res_mcap_BvD$padj)),
-        sum(!is.na(res_mcap_CvD$padj)),
-        sum(!is.na(res_mcap_season$padj))
+    Organism = c("M. capitata", "M. capitata", "D. trenchii", "D. trenchii"),
+    Season = c("Summer", "Winter", "Summer", "Winter"),
+    n = c(6, 6, 6, 6),
+    p_01 = c(
+        sum(mcap_summer$res$pvalue < 0.01, na.rm = TRUE),
+        sum(mcap_winter$res$pvalue < 0.01, na.rm = TRUE),
+        sum(dtre_summer$res$pvalue < 0.01, na.rm = TRUE),
+        sum(dtre_winter$res$pvalue < 0.01, na.rm = TRUE)
     ),
-    DEGs_padj05 = c(
-        sum(res_mcap_AvD$padj < 0.05, na.rm = TRUE),
-        sum(res_mcap_BvD$padj < 0.05, na.rm = TRUE),
-        sum(res_mcap_CvD$padj < 0.05, na.rm = TRUE),
-        sum(res_mcap_season$padj < 0.05, na.rm = TRUE)
+    p_05 = c(
+        sum(mcap_summer$res$pvalue < 0.05, na.rm = TRUE),
+        sum(mcap_winter$res$pvalue < 0.05, na.rm = TRUE),
+        sum(dtre_summer$res$pvalue < 0.05, na.rm = TRUE),
+        sum(dtre_winter$res$pvalue < 0.05, na.rm = TRUE)
     ),
-    Upregulated = c(
-        sum(res_mcap_AvD$padj < 0.05 & res_mcap_AvD$log2FoldChange > 0, na.rm = TRUE),
-        sum(res_mcap_BvD$padj < 0.05 & res_mcap_BvD$log2FoldChange > 0, na.rm = TRUE),
-        sum(res_mcap_CvD$padj < 0.05 & res_mcap_CvD$log2FoldChange > 0, na.rm = TRUE),
-        sum(res_mcap_season$padj < 0.05 & res_mcap_season$log2FoldChange > 0, na.rm = TRUE)
+    padj_05 = c(
+        sum(mcap_summer$res$padj < 0.05, na.rm = TRUE),
+        sum(mcap_winter$res$padj < 0.05, na.rm = TRUE),
+        sum(dtre_summer$res$padj < 0.05, na.rm = TRUE),
+        sum(dtre_winter$res$padj < 0.05, na.rm = TRUE)
     ),
-    Downregulated = c(
-        sum(res_mcap_AvD$padj < 0.05 & res_mcap_AvD$log2FoldChange < 0, na.rm = TRUE),
-        sum(res_mcap_BvD$padj < 0.05 & res_mcap_BvD$log2FoldChange < 0, na.rm = TRUE),
-        sum(res_mcap_CvD$padj < 0.05 & res_mcap_CvD$log2FoldChange < 0, na.rm = TRUE),
-        sum(res_mcap_season$padj < 0.05 & res_mcap_season$log2FoldChange < 0, na.rm = TRUE)
+    padj_10 = c(
+        sum(mcap_summer$res$padj < 0.10, na.rm = TRUE),
+        sum(mcap_winter$res$padj < 0.10, na.rm = TRUE),
+        sum(dtre_summer$res$padj < 0.10, na.rm = TRUE),
+        sum(dtre_winter$res$padj < 0.10, na.rm = TRUE)
     )
 )
 
-print(summary_df)
+print(summary_df, row.names = FALSE)
 
-write.csv(summary_df, file.path(OUT_DIR, "results", "DEG_summary.csv"), 
+write.csv(summary_df,
+          file.path(OUT_DIR, "results", "DEG_summary.csv"),
           row.names = FALSE)
 
 # ============================================================================
-# SECTION 6: Save R Objects
+# SECTION 6: P-value Histograms
 # ============================================================================
-cat("\n=== Saving R Objects ===\n")
 
-save(dds_mcap, res_mcap_AvD, res_mcap_BvD, res_mcap_CvD, res_mcap_season,
-     file = file.path(OUT_DIR, "Mcap_DESeq2_objects.RData"))
-cat("Saved: Mcap_DESeq2_objects.RData\n")
+cat("\n=== Creating P-value Histograms ===\n\n")
+
+pdf(file.path(OUT_DIR, "figures", "pvalue_histograms.pdf"), width = 10, height = 8)
+par(mfrow = c(2, 2), mar = c(4, 4, 3, 1))
+
+hist(mcap_summer$res$pvalue, breaks = 50, main = "M. capitata Summer - B vs D",
+     xlab = "p-value", col = "steelblue", border = "white")
+abline(h = sum(!is.na(mcap_summer$res$pvalue))/50, col = "red", lty = 2)
+
+hist(mcap_winter$res$pvalue, breaks = 50, main = "M. capitata Winter - B vs D",
+     xlab = "p-value", col = "steelblue", border = "white")
+abline(h = sum(!is.na(mcap_winter$res$pvalue))/50, col = "red", lty = 2)
+
+hist(dtre_summer$res$pvalue, breaks = 50, main = "D. trenchii Summer - B vs D",
+     xlab = "p-value", col = "darkgreen", border = "white")
+abline(h = sum(!is.na(dtre_summer$res$pvalue))/50, col = "red", lty = 2)
+
+hist(dtre_winter$res$pvalue, breaks = 50, main = "D. trenchii Winter - B vs D",
+     xlab = "p-value", col = "darkgreen", border = "white")
+abline(h = sum(!is.na(dtre_winter$res$pvalue))/50, col = "red", lty = 2)
+
+dev.off()
+cat("Saved: figures/pvalue_histograms.pdf\n")
 
 # ============================================================================
-# Final Summary
+# SECTION 7: Volcano Plots
 # ============================================================================
+
+cat("\n=== Creating Volcano Plots ===\n\n")
+
+make_volcano <- function(res, title, filename) {
+    df <- as.data.frame(res) %>%
+        rownames_to_column("gene") %>%
+        filter(!is.na(padj)) %>%
+        mutate(
+            direction = case_when(
+                padj < 0.05 & log2FoldChange > 0 ~ "Up",
+                padj < 0.05 & log2FoldChange < 0 ~ "Down",
+                TRUE ~ "NS"
+            )
+        )
+    
+    n_up <- sum(df$direction == "Up")
+    n_down <- sum(df$direction == "Down")
+    
+    p <- ggplot(df, aes(x = log2FoldChange, y = -log10(pvalue))) +
+        geom_point(aes(color = direction), alpha = 0.5, size = 1) +
+        scale_color_manual(values = c("Up" = "#d73027", "Down" = "#4575b4", "NS" = "grey70")) +
+        geom_hline(yintercept = -log10(0.05), linetype = "dashed", color = "grey40") +
+        labs(
+            title = title,
+            subtitle = paste0("DEGs (padj < 0.05): ", n_up, " up, ", n_down, " down"),
+            x = "log2 Fold Change (B vs D)",
+            y = "-log10(p-value)"
+        ) +
+        theme_bw() +
+        theme(
+            plot.title = element_text(hjust = 0.5, face = "bold"),
+            plot.subtitle = element_text(hjust = 0.5)
+        )
+    
+    ggsave(file.path(OUT_DIR, "figures", filename), p, width = 8, height = 6)
+}
+
+make_volcano(mcap_summer$res, "M. capitata Summer - B vs D", "volcano_Mcap_Summer.pdf")
+make_volcano(mcap_winter$res, "M. capitata Winter - B vs D", "volcano_Mcap_Winter.pdf")
+make_volcano(dtre_summer$res, "D. trenchii Summer - B vs D", "volcano_Dtre_Summer.pdf")
+make_volcano(dtre_winter$res, "D. trenchii Winter - B vs D", "volcano_Dtre_Winter.pdf")
+
+cat("Saved volcano plots to: figures/\n")
+
+# ============================================================================
+# SECTION 8: Top DEGs
+# ============================================================================
+
+cat("\n=== Top DEGs ===\n\n")
+
+print_top_degs <- function(res, label, n = 10) {
+    n_sig <- sum(res$padj < 0.05, na.rm = TRUE)
+    if (n_sig > 0) {
+        cat(label, " (", n_sig, " DEGs at padj < 0.05):\n\n", sep = "")
+        top <- as.data.frame(res) %>%
+            rownames_to_column("gene") %>%
+            filter(padj < 0.05) %>%
+            arrange(padj) %>%
+            head(n)
+        print(top[, c("gene", "log2FoldChange", "pvalue", "padj")], row.names = FALSE)
+        cat("\n")
+    } else {
+        cat(label, ": No DEGs at padj < 0.05\n\n", sep = "")
+    }
+}
+
+print_top_degs(mcap_summer$res, "M. capitata Summer")
+print_top_degs(mcap_winter$res, "M. capitata Winter")
+print_top_degs(dtre_summer$res, "D. trenchii Summer")
+print_top_degs(dtre_winter$res, "D. trenchii Winter")
+
+cat("Positive LFC = higher expression in B (high CO2/acidified)\n")
+cat("Negative LFC = lower expression in B (high CO2/acidified)\n")
+
+# ============================================================================
+# SECTION 9: Save R Objects
+# ============================================================================
+
+save(mcap_summer, mcap_winter,
+     file = file.path(OUT_DIR, "Mcap_DESeq2.RData"))
+
+save(dtre_summer, dtre_winter,
+     file = file.path(OUT_DIR, "Dtre_DESeq2.RData"))
+
+cat("\n\nSaved R objects to: 07_deseq2/\n")
+
 cat("\n============================================\n")
-cat("DESeq2 Analysis Complete!\n")
-cat("============================================\n\n")
-
-cat("Output directory:", OUT_DIR, "\n\n")
-
-cat("Results files:\n")
-list.files(file.path(OUT_DIR, "results"), full.names = FALSE)
-
-cat("\nFigures:\n")
-list.files(file.path(OUT_DIR, "figures"), full.names = FALSE)
-
-cat("\nNormalized counts:\n")
-list.files(file.path(OUT_DIR, "normalized_counts"), full.names = FALSE)
-
-cat("\n\nTo load results in R:\n")
-cat('  load("', file.path(OUT_DIR, "Mcap_DESeq2_objects.RData"), '")\n', sep = "")
-
-cat("\nEnd time:", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "\n")
+cat("Analysis Complete!\n")
+cat("============================================\n")
