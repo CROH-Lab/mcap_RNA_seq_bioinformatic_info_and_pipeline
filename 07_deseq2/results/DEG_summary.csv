@@ -1,5 +1,5 @@
-"Organism","Season","n","p_01","p_05","padj_05","padj_10"
-"M. capitata","Summer",6,1234,2343,772,944
-"M. capitata","Winter",6,623,1579,215,270
-"D. trenchii","Summer",6,253,1088,2,2
-"D. trenchii","Winter",6,1409,3772,279,579
+"Organism","Season","n","Genes_Tested","p_01","p_05","padj_05","padj_10","Pi0"
+"M. capitata","Summer",6,23105,1234,2343,772,944,0.959062504333633
+"M. capitata","Winter",6,22899,623,1579,215,270,1
+"D. trenchii","Summer",6,34998,253,1088,2,2,1
+"D. trenchii","Winter",6,35139,1409,3772,279,579,0.887217796456976
