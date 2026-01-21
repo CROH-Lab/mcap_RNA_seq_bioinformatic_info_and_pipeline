@@ -1,0 +1,561 @@
+gene_id	uniprot_acc	uniprot_entry	pident	align_length	mismatch	gapopen	qstart	qend	sstart	send	evalue	bitscore	qlen	slen	qcovs	quality_tier	description
+Montipora_capitata_HIv3___RNAseq.g37193.t1	P58158	B3GA3_MOUSE	50.189	265	120	3	325	1092	74	335	1.63e-84	263	1095	335	70	HIGH	Galactosylgalactosylxylosylprotein 3-beta-glucuronosyltransferase 3
+Montipora_capitata_HIv3___RNAseq.g37354.t1	O15439	MRP4_HUMAN	45.886	316	169	1	1	942	940	1255	3.25e-97	316	1014	1325	95	HIGH	ATP-binding cassette sub-family C member 4
+Montipora_capitata_HIv3___TS.g29878.t2	Q58A42	DD3_DICDI	33.028	654	287	25	37	1860	14	562	1.22e-76	259	1965	616	93	MEDIUM	Protein DD3-3
+Montipora_capitata_HIv3___RNAseq.g37450.t2	Q17QK8	SPRE_BOVIN	37.118	229	139	2	103	780	40	266	2.56e-51	171	786	267	86	MEDIUM	Sepiapterin reductase
+Montipora_capitata_HIv3___RNAseq.g37469.t1	Q80YA8	CRUM2_MOUSE	28.492	179	93	9	280	798	1057	1206	8.59e-09	62.0	1365	1282	38	LOW	Protein crumbs homolog 2
+Montipora_capitata_HIv3___RNAseq.g37645.t1	O73888	HPGDS_CHICK	37.963	216	111	6	13	651	4	199	7.16e-38	133	654	199	98	MEDIUM	Hematopoietic prostaglandin D synthase
+Montipora_capitata_HIv3___RNAseq.g37806.t1	Q8CFL8	ZSWM3_MOUSE	20.522	268	203	7	190	984	156	416	1.46e-08	62.8	2838	695	28	LOW	Zinc finger SWIM domain-containing protein 3
+Montipora_capitata_HIv3___RNAseq.g38848.t1	Q5RFW0	SCAR5_DANRE	57.426	101	43	0	655	957	398	498	3.23e-32	128	972	499	31	LOW	Scavenger receptor class A member 5
+Montipora_capitata_HIv3___RNAseq.g39044.t3	O75751	S22A3_HUMAN	36.111	108	59	3	19	336	82	181	3.36e-09	57.4	435	556	73	LOW	Solute carrier family 22 member 3
+Montipora_capitata_HIv3___RNAseq.g39502.t1	Q9DBW0	CP4V2_MOUSE	46.667	510	259	5	10	1533	22	520	4.11e-160	468	1539	525	99	HIGH	Cytochrome P450 4V2
+Montipora_capitata_HIv3___RNAseq.g39503.t1	O19132	NOS1_RABIT	49.156	1125	501	9	220	3438	304	1409	0.0	1077	3480	1435	93	HIGH	Nitric oxide synthase 1
+Montipora_capitata_HIv3___RNAseq.g39517.t1	P35555	FBN1_HUMAN	47.619	84	44	0	2031	2282	1322	1405	9.79e-14	79.7	2283	2871	11	LOW	Fibrillin-1
+Montipora_capitata_HIv3___TS.g32048.t1	F8W3R9	ALK_DANRE	39.423	104	55	2	64	360	684	784	1.83e-06	53.1	930	1705	32	LOW	ALK tyrosine kinase receptor
+Montipora_capitata_HIv3___RNAseq.g39535.t1	Q9DER7	TLL1_CHICK	30.738	244	134	9	22	687	666	896	3.67e-22	99.0	759	1008	88	MEDIUM	Tolloid-like protein 1
+Montipora_capitata_HIv3___RNAseq.g39648.t1	A6QLU6	AGRD1_BOVIN	40.000	90	52	1	76	339	762	851	1.36e-16	79.7	492	902	54	MEDIUM	Adhesion G-protein coupled receptor D1
+Montipora_capitata_HIv3___TS.g32176.t1	P10978	POLX_TOBAC	30.517	580	355	15	49	1740	5	552	3.00e-57	213	1872	1328	90	MEDIUM	Retrovirus-related Pol polyprotein from transposon TNT 1-94
+Montipora_capitata_HIv3___RNAseq.g39706.t2	P09958	FURIN_HUMAN	39.965	578	317	12	34	1710	7	573	1.17e-125	396	2223	794	75	MEDIUM	Furin
+Montipora_capitata_HIv3___RNAseq.g39887.t1	Q9D6T1	TBE_MOUSE	66.531	490	144	3	1	1458	1	474	0.0	621	1461	475	99	HIGH	Tubulin epsilon chain
+Montipora_capitata_HIv3___RNAseq.g39905.t1	P14198	AAC4_DICDI	42.515	167	83	3	205	669	504	669	2.80e-33	130	702	678	66	HIGH	AAC-rich mRNA clone AAC4 protein
+Montipora_capitata_HIv3___TS.g32424.t1	Q460N3	PAR15_HUMAN	46.305	203	104	4	5842	6438	475	676	1.55e-45	180	6441	678	41	LOW	Protein mono-ADP-ribosyltransferase PARP15
+Montipora_capitata_HIv3___RNAseq.g39915.t1	Q460N5	PAR14_HUMAN	31.425	716	424	16	2686	4671	1097	1799	1.96e-90	329	4674	1801	70	MEDIUM	Protein mono-ADP-ribosyltransferase PARP14
+Montipora_capitata_HIv3___RNAseq.g39917.t1	Q460N5	PAR14_HUMAN	30.961	801	478	24	2398	4695	1039	1799	3.05e-95	345	4698	1801	49	LOW	Protein mono-ADP-ribosyltransferase PARP14
+Montipora_capitata_HIv3___RNAseq.42097_t	Q460N5	PAR14_HUMAN	31.698	795	481	21	2584	4884	1039	1799	1.23e-102	368	4887	1801	77	MEDIUM	Protein mono-ADP-ribosyltransferase PARP14
+Montipora_capitata_HIv3___RNAseq.g39922.t1	Q460N5	PAR14_HUMAN	31.187	792	438	20	3358	5505	1039	1799	2.24e-92	337	5508	1801	76	MEDIUM	Protein mono-ADP-ribosyltransferase PARP14
+Montipora_capitata_HIv3___RNAseq.g39974.t1	Q9QYC7	VKGC_MOUSE	46.112	733	325	14	58	2109	45	756	0.0	642	2115	757	97	HIGH	Vitamin K-dependent gamma-carboxylase
+Montipora_capitata_HIv3___TS.g32593.t2	Q5FWH7	S39AC_MOUSE	31.177	603	318	19	421	2157	158	687	6.22e-56	206	2175	689	80	MEDIUM	Zinc transporter ZIP12
+Montipora_capitata_HIv3___TS.g32614.t2	Q9DCT6	BAP18_MOUSE	52.083	96	36	1	1	288	1	86	7.85e-26	101	657	171	44	LOW	BPTF-associated chromatin complex component 1
+Montipora_capitata_HIv3___RNAseq.g19089.t1	Q9HBI5	CEP15_HUMAN	33.673	98	64	1	22	315	2	98	8.01e-11	58.2	324	128	91	MEDIUM	Centrosomal protein 15
+Montipora_capitata_HIv3___RNAseq.g19114.t1b	Q96MU8	KREM1_HUMAN	37.363	91	54	2	1798	2061	110	200	3.45e-10	67.8	3714	473	7	LOW	Kremen protein 1
+Montipora_capitata_HIv3___RNAseq.g19323.t1	A1L314	MPEG1_MOUSE	38.579	718	371	15	100	2214	43	703	2.24e-156	474	2241	713	94	MEDIUM	Macrophage-expressed gene 1 protein
+Montipora_capitata_HIv3___RNAseq.g19432.t1	P51538	CP3A9_RAT	32.581	399	241	11	268	1428	84	466	1.18e-55	197	1530	503	76	MEDIUM	Cytochrome P450 3A9
+Montipora_capitata_HIv3___RNAseq.g19544.t1	Q9BWV3	CDAC1_HUMAN	28.571	455	260	13	25	1224	25	469	5.08e-32	130	1323	514	91	LOW	Cytidine and dCMP deaminase domain-containing protein 1
+Montipora_capitata_HIv3___TS.g33283.t2	P00606	PA2A_BUNMU	48.649	111	55	1	160	492	28	136	1.11e-31	114	516	145	65	HIGH	Acidic phospholipase A2
+Montipora_capitata_HIv3___RNAseq.g19731.t1	Q9FT74	RQL1_ARATH	28.922	204	119	6	1171	1770	356	537	1.99e-15	84.3	2424	606	25	LOW	ATP-dependent DNA helicase Q-like 1
+Montipora_capitata_HIv3___RNAseq.g19793.t1	Q87PP5	BCCT1_VIBPA	35.963	431	230	7	109	1383	167	557	9.85e-81	268	1803	562	71	MEDIUM	Glycine betaine/proline/choline/ectoine transporter VP1456
+Montipora_capitata_HIv3___RNAseq.g19823.t1	Q5UQ60	YL662_MIMIV	23.929	280	188	8	181	993	8	271	4.62e-16	83.2	1206	462	67	LOW	Uncharacterized protein L662
+Montipora_capitata_HIv3___RNAseq.g19905.t1	Q9JLB4	CUBN_MOUSE	34.146	123	68	3	100	468	932	1041	1.58e-09	63.9	1182	3623	31	LOW	Cubilin
+Montipora_capitata_HIv3___TS.g33523.t1	P14207	FOLR2_HUMAN	33.333	216	128	5	22	624	6	220	8.46e-39	138	702	255	86	MEDIUM	Folate receptor beta
+Montipora_capitata_HIv3___RNAseq.g19982.t1a	P21328	RTJK_DROME	25.054	459	300	14	1618	2910	438	880	5.77e-27	122	3069	916	42	LOW	RNA-directed DNA polymerase from mobile element jockey
+Montipora_capitata_HIv3___TS.g33589.t1	P48304	REG1B_HUMAN	33.333	138	84	4	3157	3558	30	163	2.97e-14	75.5	3783	166	11	LOW	Lithostathine-1-beta
+Montipora_capitata_HIv3___RNAseq.g20093.t1	Q8QG61	CRY1_CHICK	65.932	499	169	1	67	1560	4	502	0.0	724	1644	621	91	HIGH	Cryptochrome-1
+Montipora_capitata_HIv3___RNAseq.g20224.t1	Q3T1H8	TMM79_RAT	31.056	161	109	2	58	537	200	359	7.64e-13	69.3	576	391	83	MEDIUM	Transmembrane protein 79
+Montipora_capitata_HIv3___RNAseq.g20246.t1	Q5F4A1	G2E3_CHICK	34.715	193	121	4	970	1548	389	576	7.21e-22	103	1596	742	36	LOW	G2/M phase-specific E3 ubiquitin-protein ligase
+Montipora_capitata_HIv3___RNAseq.g20250.t1	Q75V66	ANO5_HUMAN	42.049	849	441	14	382	2880	63	876	0.0	640	2955	913	85	HIGH	Anoctamin-5
+Montipora_capitata_HIv3___RNAseq.g20763.t1	P55264	ADK_MOUSE	57.983	357	145	2	4	1059	4	360	9.29e-152	434	1065	361	99	HIGH	Adenosine kinase
+Montipora_capitata_HIv3___RNAseq.g20766.t1	Q2KIR0	SMIP2_BOVIN	40.566	106	60	2	76	384	18	123	2.47e-16	77.0	624	197	50	MEDIUM	Protein SPMIP2
+Montipora_capitata_HIv3___RNAseq.g20771.t1	O35409	FOLH1_MOUSE	32.990	97	65	0	481	771	57	153	1.84e-10	64.3	774	752	38	LOW	Glutamate carboxypeptidase 2
+Montipora_capitata_HIv3___RNAseq.g20804.t1	Q5G269	NETR_PONPY	28.384	229	141	7	64	729	389	601	3.91e-20	92.8	768	877	91	LOW	Neurotrypsin
+Montipora_capitata_HIv3___RNAseq.g20807.t2	F7J220	SRCR1_PATPE	33.696	184	105	3	295	846	33	199	6.97e-28	117	921	1128	71	MEDIUM	Scavenger receptor cysteine-rich domain superfamily protein
+Montipora_capitata_HIv3___RNAseq.g20813.t1	Q6NY73	L3BPB_DANRE	40.351	114	54	2	25	366	11	110	7.93e-17	86.7	1428	572	24	LOW	Galectin-3-binding protein B
+Montipora_capitata_HIv3___TS.g34490.t2	Q9P0K9	FRS1L_HUMAN	28.221	163	108	6	748	1224	96	253	1.40e-11	69.3	1650	293	50	LOW	DOMON domain-containing protein FRRS1L
+Montipora_capitata_HIv3___RNAseq.g20959.t1	P86854	PLCL_MYTGA	31.250	144	88	3	94	522	23	156	6.92e-12	63.5	537	156	80	MEDIUM	Perlucin-like protein
+Montipora_capitata_HIv3___RNAseq.24234_t	Q3T1L0	A16A1_RAT	42.892	823	439	10	70	2526	7	802	0.0	629	2541	802	97	HIGH	Aldehyde dehydrogenase family 16 member A1
+Montipora_capitata_HIv3___RNAseq.g21284.t1	P58912	TX60B_PHYSE	32.673	404	258	9	79	1269	38	434	4.41e-58	203	1497	488	80	MEDIUM	DELTA-alicitoxin-Pse2b
+Montipora_capitata_HIv3___RNAseq.g21374.t1	Q8K0U4	HS12A_MOUSE	55.031	636	255	4	583	2409	43	674	0.0	736	2415	675	76	HIGH	Heat shock 70 kDa protein 12A
+Montipora_capitata_HIv3___TS.g35163.t1	Q06194	FA8_MOUSE	36.250	160	89	4	3475	3945	2163	2312	1.06e-22	110	5325	2319	18	LOW	Coagulation factor VIII
+Montipora_capitata_HIv3___TS.g35289.t2	P41827	HSP74_ANOAL	77.577	553	124	0	13	1671	1	553	0.0	889	1782	640	93	HIGH	Heat shock protein 70 B2
+Montipora_capitata_HIv3___RNAseq.g21911.t1	Q5R959	SPY2_PONAB	53.247	77	32	2	613	843	205	277	7.92e-20	91.3	906	315	25	LOW	Protein sprouty homolog 2
+Montipora_capitata_HIv3___RNAseq.g22408.t1	Q4V8Y6	ERGI1_DANRE	62.069	290	107	2	1	861	1	290	7.64e-137	391	864	290	99	HIGH	Endoplasmic reticulum-Golgi intermediate compartment protein 1
+Montipora_capitata_HIv3___RNAseq.g22485.t1	Q86WI1	PKHL1_HUMAN	36.425	4291	2467	92	79	12618	32	4172	0.0	2360	19737	4243	64	MEDIUM	Fibrocystin-L
+Montipora_capitata_HIv3___TS.g36124.t1	Q4UMH6	Y381_RICFE	38.971	136	83	0	796	1203	954	1089	2.75e-21	100	1329	1179	39	LOW	Putative ankyrin repeat protein RF_0381
+Montipora_capitata_HIv3___RNAseq.g22512.t1	B3EWZ3	CADN_ACRMI	25.431	232	130	6	337	915	516	743	1.50e-12	72.4	1017	1675	64	LOW	Coadhesin (Fragment)
+Montipora_capitata_HIv3___RNAseq.g22553.t1c	Q9Y225	RNF24_HUMAN	31.356	118	61	4	85	414	35	140	2.97e-15	71.2	441	148	75	MEDIUM	RING finger protein 24
+Montipora_capitata_HIv3___RNAseq.g22618.t1	Q5DU56	NLRC3_MOUSE	44.737	228	124	1	241	924	702	927	1.43e-42	160	930	1064	75	HIGH	Protein NLRC3
+Montipora_capitata_HIv3___RNAseq.g22626.t1	Q7RTR2	NLRC3_HUMAN	43.182	264	146	2	145	924	639	902	3.56e-47	173	933	1065	84	HIGH	NLR family CARD domain-containing protein 3
+Montipora_capitata_HIv3___RNAseq.g22747.t1	Q08DA5	PANK3_BOVIN	60.000	360	140	2	10	1080	8	366	3.32e-151	434	1125	370	95	HIGH	Pantothenate kinase 3
+Montipora_capitata_HIv3___RNAseq.g22853.t1	Q6DIM3	TBD_XENTR	52.854	473	201	7	1	1419	1	451	9.23e-178	508	1422	451	99	HIGH	Tubulin delta chain
+Montipora_capitata_HIv3___RNAseq.g22865.t1	B5FYQ0	ARL3_TAEGU	64.474	76	25	1	7	228	106	181	8.44e-28	101	234	182	95	HIGH	ADP-ribosylation factor-like protein 3
+Montipora_capitata_HIv3___TS.g36789.t1	Q6UVY6	MOXD1_HUMAN	30.952	126	80	4	97	471	29	148	5.79e-10	65.5	1512	613	50	LOW	DBH-like monooxygenase protein 1
+Montipora_capitata_HIv3___RNAseq.g23169.t1	Q5TZ24	MOXD1_DANRE	26.174	149	101	5	109	552	35	175	2.08e-08	57.8	720	614	62	LOW	DBH-like monooxygenase protein 1 homolog
+Montipora_capitata_HIv3___RNAseq.g23247.t1	A1A4R8	CDC23_BOVIN	56.076	576	241	6	25	1737	29	597	0.0	645	1740	597	98	HIGH	Cell division cycle protein 23 homolog
+Montipora_capitata_HIv3___RNAseq.g23366.t1	P63138	GBRB2_RAT	34.437	302	163	5	103	906	26	326	7.97e-60	204	1194	474	67	MEDIUM	Gamma-aminobutyric acid receptor subunit beta-2
+Montipora_capitata_HIv3___RNAseq.g23464.t1	P97717	ADA1B_MOUSE	37.079	178	103	3	136	663	18	188	4.04e-26	108	696	514	76	MEDIUM	Alpha-1B adrenergic receptor
+Montipora_capitata_HIv3___RNAseq.g34949.t1	Q94887	NRX4_DROME	29.167	120	78	3	562	912	70	185	4.60e-10	64.3	915	1284	38	LOW	Neurexin-4
+Montipora_capitata_HIv3___RNAseq.g34983.t1	O60462	NRP2_HUMAN	36.025	161	89	6	472	927	274	429	1.10e-18	90.1	933	931	49	LOW	Neuropilin-2
+Montipora_capitata_HIv3___RNAseq.g34997.t1	P98169	ZXDB_HUMAN	46.732	306	153	5	1177	2070	271	574	3.06e-84	293	3171	803	28	LOW	Zinc finger X-linked protein ZXDB
+Montipora_capitata_HIv3___TS.g5047.t1	Q6AYM1	CE034_RAT	24.118	680	371	20	49	1800	9	639	4.42e-42	164	1824	640	96	LOW	Uncharacterized protein C5orf34 homolog
+Montipora_capitata_HIv3___RNAseq.g35008.t1	Q13467	FZD5_HUMAN	35.252	139	86	2	784	1191	25	162	1.64e-20	99.4	1833	585	56	MEDIUM	Frizzled-5
+Montipora_capitata_HIv3___RNAseq.g35024.t1	Q52L45	ILEU_XENLA	40.921	391	209	9	1	1149	1	377	7.38e-89	276	1161	377	99	HIGH	Leukocyte elastase inhibitor
+Montipora_capitata_HIv3___RNAseq.g35219.t1	Q7L0X2	ERIP6_HUMAN	27.147	361	226	7	1309	2358	238	572	1.02e-24	114	2616	663	40	LOW	Glutamate-rich protein 6
+Montipora_capitata_HIv3___RNAseq.g35299.t1	A6H7H7	FBX3_BOVIN	42.012	338	185	4	22	1020	13	344	1.05e-78	253	1164	469	86	HIGH	F-box only protein 3
+Montipora_capitata_HIv3___RNAseq.g35333.t1	P22607	FGFR3_HUMAN	43.299	291	161	2	2764	3636	464	750	2.34e-67	247	3702	806	24	LOW	Fibroblast growth factor receptor 3
+Montipora_capitata_HIv3___TS.g5595.t1	Q9C0G6	DYH6_HUMAN	56.604	53	22	1	418	573	2560	2612	4.43e-14	75.5	765	4158	52	MEDIUM	Dynein axonemal heavy chain 6
+Montipora_capitata_HIv3___TS.g5653.t1	Q9C0G6	DYH6_HUMAN	41.304	92	54	0	268	543	3658	3749	3.33e-14	75.1	678	4158	41	LOW	Dynein axonemal heavy chain 6
+Montipora_capitata_HIv3___RNAseq.g35621.t1	P98069	BMPH_STRPU	32.804	189	111	8	2401	2937	288	470	4.15e-18	95.1	7650	639	7	LOW	Bone morphogenetic protein 1 homolog
+Montipora_capitata_HIv3___TS.g5751.t5a	Q8BIK4	DOCK9_MOUSE	37.500	984	510	22	682	3405	60	1014	0.0	594	3465	2055	79	MEDIUM	Dedicator of cytokinesis protein 9
+Montipora_capitata_HIv3___RNAseq.g35718.t1	Q9BZ29	DOCK9_HUMAN	45.455	297	108	3	1	729	1772	2068	1.27e-65	224	777	2069	94	HIGH	Dedicator of cytokinesis protein 9
+Montipora_capitata_HIv3___RNAseq.g35720.t1	Q9BZ29	DOCK9_HUMAN	42.367	904	465	22	121	2742	233	1110	0.0	654	2817	2069	93	HIGH	Dedicator of cytokinesis protein 9
+Montipora_capitata_HIv3___RNAseq.g35804.t1	Q8BIK4	DOCK9_MOUSE	51.419	599	272	4	1	1746	1458	2054	0.0	601	1794	2055	97	HIGH	Dedicator of cytokinesis protein 9
+Montipora_capitata_HIv3___RNAseq.g35897.t1	Q15485	FCN2_HUMAN	59.794	97	38	1	490	777	216	312	4.70e-32	123	810	313	36	LOW	Ficolin-2
+Montipora_capitata_HIv3___RNAseq.g36135.t1	O42871	ING1_SCHPO	44.444	54	29	1	1399	1560	226	278	1.01e-08	60.5	1596	283	10	LOW	Chromatin modification-related protein png1
+Montipora_capitata_HIv3___RNAseq.g36203.t1	Q27312	NADA_APLKU	36.226	265	147	10	70	831	23	276	4.03e-46	161	1008	282	76	MEDIUM	ADP-ribosyl cyclase/cyclic ADP-ribose hydrolase
+Montipora_capitata_HIv3___RNAseq.g36297.t1	P39429	TRAF2_MOUSE	31.469	143	91	6	130	543	107	247	4.43e-08	58.2	969	501	43	LOW	TNF receptor-associated factor 2
+Montipora_capitata_HIv3___TS.g6600.t1	Q96RW7	HMCN1_HUMAN	37.063	143	78	4	1309	1716	4124	4261	6.61e-14	79.7	1971	5635	25	LOW	Hemicentin-1
+Montipora_capitata_HIv3___RNAseq.g36658.t1b	Q8WZ42	TITIN_HUMAN	26.065	399	255	18	25	1140	17740	18125	1.64e-16	87.8	1782	34350	67	LOW	Titin
+Montipora_capitata_HIv3___RNAseq.g36665.t1	P34457	YMD3_CAEEL	38.919	185	95	4	1	540	16	187	9.72e-31	126	2685	286	20	LOW	Putative uncharacterized transposon-derived protein F54H12.3
+Montipora_capitata_HIv3___RNAseq.g36707.t1	O73792	TIE1_DANRE	49.655	145	70	1	1306	1740	21	162	6.22e-44	159	2010	184	22	LOW	Tyrosine-protein kinase receptor Tie-1 (Fragment)
+Montipora_capitata_HIv3___TS.g6765.t1	O73792	TIE1_DANRE	36.145	83	53	0	1285	1533	96	178	3.60e-14	74.3	1548	184	16	LOW	Tyrosine-protein kinase receptor Tie-1 (Fragment)
+Montipora_capitata_HIv3___TS.g6766.t1	O73792	TIE1_DANRE	38.542	96	59	0	1516	1803	83	178	2.49e-20	92.4	1818	184	16	LOW	Tyrosine-protein kinase receptor Tie-1 (Fragment)
+Montipora_capitata_HIv3___RNAseq.g36752.t1	Q9VBW3	CAD96_DROME	36.250	80	22	1	490	642	463	542	4.57e-06	52.0	978	773	16	LOW	Tyrosine kinase receptor Cad96Ca
+Montipora_capitata_HIv3___RNAseq.g36779.t1	Q7RTR2	NLRC3_HUMAN	39.437	355	186	5	2059	3120	680	1006	1.78e-41	169	3165	1065	42	LOW	NLR family CARD domain-containing protein 3
+Montipora_capitata_HIv3___RNAseq.g36836.t1	Q8VDI9	ALG9_MOUSE	55.240	563	247	3	118	1803	52	610	0.0	604	1830	611	92	HIGH	Alpha-1,2-mannosyltransferase ALG9
+Montipora_capitata_HIv3___RNAseq.g36838.t1	Q9C0G6	DYH6_HUMAN	52.632	95	45	0	25	309	3503	3597	4.84e-25	105	597	4158	88	HIGH	Dynein axonemal heavy chain 6
+Montipora_capitata_HIv3___RNAseq.g36845.t1	Q767F1	JHAMT_BOMMO	31.690	142	86	3	112	510	35	174	9.07e-15	75.9	840	278	48	LOW	Juvenile hormone acid O-methyltransferase
+Montipora_capitata_HIv3___TS.g6904.t1	Q87TH4	UBIE_VIBPA	31.892	185	103	9	118	612	64	245	9.83e-14	74.3	1185	259	42	LOW	Ubiquinone/menaquinone biosynthesis C-methyltransferase UbiE
+Montipora_capitata_HIv3___RNAseq.g36907.t1	Q6PEH9	S39AA_DANRE	44.025	159	81	4	439	900	686	841	4.20e-31	126	918	847	50	MEDIUM	Zinc transporter ZIP10
+Montipora_capitata_HIv3___RNAseq.g36918.t1	Q91XQ0	DYH8_MOUSE	65.342	4631	1549	17	148	13977	136	4731	0.0	6106	13980	4731	99	HIGH	Dynein axonemal heavy chain 8
+Montipora_capitata_HIv3___RNAseq.g36935.t1	Q8K1K9	HINFP_MOUSE	50.128	391	187	3	10	1179	15	398	9.59e-130	390	1560	503	75	HIGH	Histone H4 transcription factor
+Montipora_capitata_HIv3___RNAseq.g37043.t1	Q9CZJ2	HS12B_MOUSE	34.579	642	353	11	22	1797	60	684	2.07e-105	336	1827	685	97	MEDIUM	Heat shock 70 kDa protein 12B
+Montipora_capitata_HIv3___RNAseq.g27709.t1	P18433	PTPRA_HUMAN	53.659	41	19	0	3	125	735	775	1.06e-07	57.4	1074	802	11	LOW	Receptor-type tyrosine-protein phosphatase alpha
+Montipora_capitata_HIv3___RNAseq.g27716.t1	A2VDD2	DYL5B_XENLA	34.615	104	62	3	934	1245	73	170	5.23e-11	64.7	1263	176	25	LOW	Dynein light chain Tctex-type 5-B (Fragment)
+Montipora_capitata_HIv3___RNAseq.g27719.t1	A0A5F9C6I2	RN123_RABIT	39.873	158	75	6	3019	3483	121	261	3.43e-26	121	4440	1314	10	LOW	E3 ubiquitin-protein ligase RNF123
+Montipora_capitata_HIv3___RNAseq.g27720.t1	B0UYI1	TEAN2_DANRE	43.810	210	112	4	1	627	1	205	2.90e-42	145	651	210	96	HIGH	Transcription elongation factor A N-terminal and central domain-containing protein 2
+Montipora_capitata_HIv3___TS.g24268.t2	P42566	EPS15_HUMAN	33.862	189	98	5	4	546	119	288	6.81e-21	103	4224	896	13	LOW	Epidermal growth factor receptor substrate 15
+Montipora_capitata_HIv3___RNAseq.g28116.t1	Q9VBW3	CAD96_DROME	39.706	136	82	0	1015	1422	628	763	6.21e-32	134	1638	773	25	LOW	Tyrosine kinase receptor Cad96Ca
+Montipora_capitata_HIv3___RNAseq.g28405.t2	Q8R151	ZNFX1_MOUSE	41.372	1501	675	30	901	4971	324	1763	0.0	1055	5169	1909	79	HIGH	NFX1-type zinc finger-containing protein 1
+Montipora_capitata_HIv3___RNAseq.g28902.t1	P70490	MFGM_RAT	34.579	321	191	6	4291	5208	111	427	1.15e-49	188	14211	427	97	MEDIUM	Lactadherin
+Montipora_capitata_HIv3___TS.g25596.t1	P70191	TRAF5_MOUSE	28.571	168	108	4	10	492	55	217	2.46e-10	64.7	894	558	54	LOW	TNF receptor-associated factor 5
+Montipora_capitata_HIv3___RNAseq.g29212.t1	Q8N0U7	CA087_HUMAN	42.188	64	37	0	1657	1848	470	533	7.37e-07	56.2	1896	546	10	LOW	Uncharacterized protein C1orf87
+Montipora_capitata_HIv3___TS.g25865.t1a	P16425	Y2R2_DROME	27.273	231	136	10	1879	2532	339	550	3.27e-08	61.6	2763	1021	24	LOW	Putative 115 kDa protein in type-1 retrotransposable element R1DM
+Montipora_capitata_HIv3___RNAseq.g29402.t1	Q9JLB4	CUBN_MOUSE	27.178	287	177	10	10	849	1021	1282	1.55e-14	79.0	1032	3623	82	LOW	Cubilin
+Montipora_capitata_HIv3___RNAseq.g29489.t1	Q5IS75	ACHB3_PANTR	33.030	330	211	4	16	1005	7	326	2.05e-58	201	1314	458	75	MEDIUM	Neuronal acetylcholine receptor subunit beta-3
+Montipora_capitata_HIv3___TS.g20805.t1	P20785	CO6A1_CHICK	29.843	191	102	12	220	723	824	1005	1.68e-07	55.8	828	1019	61	LOW	Collagen alpha-1(VI) chain
+Montipora_capitata_HIv3___TS.g20814.t1	Q923Q2	STA13_MOUSE	29.891	184	114	7	49	588	911	1083	1.06e-10	65.1	768	1113	70	LOW	StAR-related lipid transfer protein 13
+Montipora_capitata_HIv3___RNAseq.g12736.t1	Q6PCL9	PAPOG_MOUSE	66.533	499	159	4	25	1512	14	507	0.0	682	2376	739	63	HIGH	Poly(A) polymerase gamma
+Montipora_capitata_HIv3___RNAseq.g12807.t1	P0DP43	CTSRE_MOUSE	29.518	332	208	12	67	1035	617	931	1.45e-39	153	1149	985	84	LOW	Cation channel sperm-associated auxiliary subunit epsilon
+Montipora_capitata_HIv3___RNAseq.g12882.t1	Q61382	TRAF4_MOUSE	27.815	302	163	5	169	1050	208	462	2.01e-36	140	1056	470	97	LOW	TNF receptor-associated factor 4
+Montipora_capitata_HIv3___RNAseq.g12947.t1	P16537	SPC3_STRPU	44.000	75	42	0	427	651	113	187	5.52e-17	79.7	696	208	32	LOW	Protein SPEC3
+Montipora_capitata_HIv3___RNAseq.g13022.t1	Q9NZJ4	SACS_HUMAN	31.640	4665	2735	127	19	13179	86	4574	0.0	1992	13188	4579	99	MEDIUM	Sacsin
+Montipora_capitata_HIv3___RNAseq.g13056.t1	G8XYX6	MOT8_DANRE	26.562	192	135	4	4	570	317	505	8.45e-14	73.6	717	526	79	LOW	Monocarboxylate transporter 8
+Montipora_capitata_HIv3___RNAseq.g13057.t1	P57788	MOT4_CHICK	25.771	454	315	10	40	1371	17	458	1.53e-37	146	1419	473	94	LOW	Monocarboxylate transporter 4
+Montipora_capitata_HIv3___RNAseq.g13058.t1	P57788	MOT4_CHICK	25.942	451	313	10	1	1323	4	443	4.01e-35	143	2238	473	89	LOW	Monocarboxylate transporter 4
+Montipora_capitata_HIv3___RNAseq.g13130.t1	Q4R9C4	G2E3_MACFA	24.927	341	236	11	1165	2169	357	683	2.10e-18	93.6	2217	706	45	LOW	G2/M phase-specific E3 ubiquitin-protein ligase
+Montipora_capitata_HIv3___TS.g21293.t1	B3QT42	THIM_CHLT3	44.444	207	100	3	22	642	45	236	6.48e-46	160	1035	267	60	HIGH	Hydroxyethylthiazole kinase
+Montipora_capitata_HIv3___RNAseq.g13558.t1	O62826	TRPC2_BOVIN	24.880	209	131	5	1420	2007	61	256	5.21e-13	76.3	3171	432	19	LOW	Short transient receptor potential channel 2 homolog
+Montipora_capitata_HIv3___RNAseq.g13613.t1	Q60803	TRAF3_MOUSE	38.139	548	310	9	28	1650	39	564	5.23e-127	386	1671	567	97	MEDIUM	TNF receptor-associated factor 3
+Montipora_capitata_HIv3___TS.g21895.t1	P08537	TBA_XENLA	94.805	77	4	0	1	231	1	77	2.96e-46	166	990	449	23	LOW	Tubulin alpha chain
+Montipora_capitata_HIv3___RNAseq.g13826.t1	P18258	TBA1_PARLI	97.059	340	10	0	1	1020	93	432	0.0	671	1083	452	94	HIGH	Tubulin alpha-1 chain
+Montipora_capitata_HIv3___RNAseq.g13857.t1	Q8R0G9	NU133_MOUSE	37.138	1104	639	28	160	3387	72	1148	4.17e-176	551	3420	1155	94	MEDIUM	Nuclear pore complex protein Nup133
+Montipora_capitata_HIv3___RNAseq.g13870.t1	Q9NZJ4	SACS_HUMAN	31.909	4682	2704	143	10	13278	84	4540	0.0	1919	13359	4579	99	MEDIUM	Sacsin
+Montipora_capitata_HIv3___RNAseq.g14155.t1	Q6AZN8	ZNT6A_XENLA	54.545	330	148	1	280	1269	11	338	9.55e-114	346	1431	464	69	HIGH	Zinc transporter 6-A
+Montipora_capitata_HIv3___TS.g22430.t1	P17972	KCNAW_DROME	36.961	441	226	11	661	1896	75	492	2.73e-79	264	2058	498	60	MEDIUM	Potassium voltage-gated channel protein Shaw
+Montipora_capitata_HIv3___RNAseq.g14488.t1	Q2KJ64	ARGI1_BOVIN	47.651	298	148	5	103	990	10	301	5.25e-88	271	1074	322	83	HIGH	Arginase-1
+Montipora_capitata_HIv3___RNAseq.g14515.t1	Q5ZIF1	APMAP_CHICK	40.441	136	75	2	16	411	280	413	1.81e-27	108	417	415	95	HIGH	Adipocyte plasma membrane-associated protein
+Montipora_capitata_HIv3___RNAseq.g14599.t1	B8VIU6	USOM5_ACRMI	52.258	155	72	1	28	492	35	187	7.56e-48	166	1113	256	42	LOW	Uncharacterized skeletal organic matrix protein 5
+Montipora_capitata_HIv3___RNAseq.g14624.t1	A7SXG9	NEP8_NEMVE	46.795	156	74	6	211	654	53	207	9.57e-37	138	1089	313	41	LOW	Nematocyst expressed protein 8
+Montipora_capitata_HIv3___RNAseq.g14625.t1	Q9DBI0	TMPS6_MOUSE	39.552	268	143	5	469	1269	562	811	2.45e-54	196	1296	811	62	MEDIUM	Transmembrane protease serine 6
+Montipora_capitata_HIv3___RNAseq.g14655.t1	P54120	IAN8_ARATH	31.301	246	139	8	1090	1812	45	265	1.21e-21	101	2658	353	27	LOW	Immune-associated nucleotide-binding protein 8
+Montipora_capitata_HIv3___RNAseq.g14940.t1	Q9WV75	SPON2_RAT	32.751	229	136	5	649	1293	16	240	7.32e-26	111	1407	330	91	MEDIUM	Spondin-2
+Montipora_capitata_HIv3___RNAseq.g14942.t1	Q56X76	RH39_ARATH	37.788	434	241	10	358	1638	111	522	2.61e-79	265	1731	621	74	MEDIUM	DEAD-box ATP-dependent RNA helicase 39
+Montipora_capitata_HIv3___RNAseq.g14946.t1	P86854	PLCL_MYTGA	34.375	128	80	4	208	585	30	155	3.42e-22	91.3	618	156	61	MEDIUM	Perlucin-like protein
+Montipora_capitata_HIv3___RNAseq.g14947.t1	P86854	PLCL_MYTGA	33.071	127	79	4	208	585	30	151	1.46e-19	84.7	636	156	59	MEDIUM	Perlucin-like protein
+Montipora_capitata_HIv3___RNAseq.g14956.t1	I3PB37	4CL1_PETHY	36.567	536	327	8	1	1587	12	541	3.75e-115	356	1764	544	90	MEDIUM	4-coumarate:CoA ligase 1
+Montipora_capitata_HIv3___RNAseq.g14960.t1	O24145	4CL1_TOBAC	43.346	526	287	7	7	1563	17	538	2.09e-132	416	3348	547	90	HIGH	4-coumarate--CoA ligase 1
+Montipora_capitata_HIv3___RNAseq.g14965.t1	Q9HAW4	CLSPN_HUMAN	33.451	565	255	22	1831	3324	827	1337	1.24e-42	174	3327	1339	45	LOW	Claspin
+Montipora_capitata_HIv3___RNAseq.g15029.t1b	A7Z063	WASH1_BOVIN	54.128	436	195	4	28	1323	13	447	6.74e-111	338	1410	471	92	HIGH	WASH complex subunit 1
+Montipora_capitata_HIv3___TS.g23127.t1	Q9ZSK4	ADF3_ARATH	31.933	119	70	3	532	885	10	118	7.66e-11	62.8	963	139	74	MEDIUM	Actin-depolymerizing factor 3
+Montipora_capitata_HIv3___RNAseq.g15043.t1	O44001	HSP90_EIMTE	67.560	709	219	3	73	2190	13	713	0.0	876	2193	713	97	HIGH	Heat shock protein 90
+Montipora_capitata_HIv3___RNAseq.g15052.t1	O00463	TRAF5_HUMAN	27.273	264	187	4	34	810	35	298	5.86e-19	92.0	1113	557	70	LOW	TNF receptor-associated factor 5
+Montipora_capitata_HIv3___TS.g23193.t1	P13466	GELA_DICDI	26.718	131	79	3	271	621	568	695	5.31e-06	53.1	1476	857	24	LOW	Gelation factor
+Montipora_capitata_HIv3___RNAseq.g15140.t1	Q6PC60	H2B3_DANRE	94.382	89	5	0	103	369	38	126	1.08e-57	177	372	126	72	HIGH	Histone H2B 3
+Montipora_capitata_HIv3___RNAseq.g15153.t1	Q9BUH8	BEGIN_HUMAN	27.536	138	95	2	274	681	40	174	2.47e-11	67.0	762	593	54	LOW	Brain-enriched guanylate kinase-associated protein
+Montipora_capitata_HIv3___TS.g23246.t1	Q8NHS3	MFSD8_HUMAN	30.968	155	96	5	10	450	33	184	6.58e-11	63.5	531	518	83	MEDIUM	Major facilitator superfamily domain-containing protein 8
+Montipora_capitata_HIv3___RNAseq.g15186.t1	Q9NW38	FANCL_HUMAN	49.194	372	183	4	34	1146	8	374	1.80e-121	359	1149	375	97	HIGH	E3 ubiquitin-protein ligase FANCL
+Montipora_capitata_HIv3___RNAseq.g15188.t1	Q9DBY1	SYVN1_MOUSE	80.180	333	66	0	4	1002	3	335	0.0	578	1947	612	60	HIGH	E3 ubiquitin-protein ligase synoviolin
+Montipora_capitata_HIv3___RNAseq.g15213.t1b	B8V7S0	CPP1_ACRMI	50.267	187	77	2	214	774	264	434	3.24e-43	166	2367	435	35	LOW	CUB and peptidase domain-containing protein 1 (Fragment)
+Montipora_capitata_HIv3___RNAseq.g4625.t1	Q9K7A0	CSD_HALH5	28.607	402	259	12	142	1332	22	400	9.23e-29	122	1788	406	67	LOW	Probable cysteine desulfurase
+Montipora_capitata_HIv3___RNAseq.97_t	A0A481NV25	TYRDC_ENTFC	29.068	633	358	15	148	2004	10	565	2.79e-76	265	2859	611	65	LOW	L-tyrosine decarboxylase
+Montipora_capitata_HIv3___RNAseq.259_t	Q96CG8	CTHR1_HUMAN	41.584	202	93	3	124	711	61	243	5.37e-40	141	723	243	81	HIGH	Collagen triple helix repeat-containing protein 1
+Montipora_capitata_HIv3___RNAseq.262_t	Q8CG08	CTHR1_RAT	40.237	169	92	3	232	714	78	245	1.75e-34	127	726	245	67	HIGH	Collagen triple helix repeat-containing protein 1
+Montipora_capitata_HIv3___RNAseq.g4861.t1	Q9Y2C9	TLR6_HUMAN	24.176	182	119	4	688	1176	570	751	2.20e-11	70.1	1359	796	36	LOW	Toll-like receptor 6
+Montipora_capitata_HIv3___TS.g26714.t1	O60290	ZN862_HUMAN	30.000	160	111	1	1	477	701	860	2.89e-19	88.2	555	1169	86	MEDIUM	Zinc finger protein 862
+Montipora_capitata_HIv3___RNAseq.g5179.t1	Q8IVV2	LOXH1_HUMAN	27.027	111	49	1	508	744	810	920	3.44e-08	57.8	786	2067	32	LOW	Lipoxygenase homology domain-containing protein 1
+Montipora_capitata_HIv3___TS.g26916.t2	Q8C9V1	TB10C_MOUSE	27.778	342	155	10	46	1050	36	292	6.81e-35	140	1911	444	53	LOW	Carabin
+Montipora_capitata_HIv3___RNAseq.g5197.t1	Q5M7D8	CM2CB_XENLA	41.216	148	79	5	25	462	11	152	4.47e-28	107	645	155	68	HIGH	Ciliary microtubule inner protein 2C
+Montipora_capitata_HIv3___TS.g26936.t1a	O94813	SLIT2_HUMAN	26.702	191	114	6	136	675	1064	1239	1.41e-09	62.0	768	1529	71	LOW	Slit homolog 2 protein
+Montipora_capitata_HIv3___RNAseq.g5348.t1	Q7Z494	NPHP3_HUMAN	25.600	375	243	6	133	1164	961	1330	4.47e-26	115	1383	1330	87	LOW	Nephrocystin-3
+Montipora_capitata_HIv3___RNAseq.g5355.t1	Q9C091	GRB1L_HUMAN	32.203	177	99	9	967	1461	671	838	5.95e-07	57.0	1866	1923	27	LOW	GREB1-like protein
+Montipora_capitata_HIv3___RNAseq.g5395.t1	Q15256	PTPRR_HUMAN	40.695	489	235	16	565	1929	180	647	7.28e-92	301	2001	657	68	HIGH	Receptor-type tyrosine-protein phosphatase R
+Montipora_capitata_HIv3___TS.g27115.t1	Q7RTR2	NLRC3_HUMAN	39.907	431	245	5	1897	3171	596	1018	1.04e-51	202	3417	1065	44	LOW	NLR family CARD domain-containing protein 3
+Montipora_capitata_HIv3___RNAseq.g5498.t1	Q9FT74	RQL1_ARATH	28.185	259	147	10	7	711	250	493	4.80e-18	87.0	801	606	88	LOW	ATP-dependent DNA helicase Q-like 1
+Montipora_capitata_HIv3___RNAseq.g6055.t1	P15043	RECQ_ECOLI	27.107	439	240	16	34	1278	22	404	5.50e-29	125	1755	609	71	LOW	ATP-dependent DNA helicase RecQ
+Montipora_capitata_HIv3___TS.g28207.t1a	Q71RS6	NCKX5_HUMAN	40.043	462	254	5	226	1548	39	498	1.18e-122	372	1557	500	85	HIGH	Sodium/potassium/calcium exchanger 5
+Montipora_capitata_HIv3___RNAseq.g6475.t1	Q7RTR2	NLRC3_HUMAN	43.350	203	104	8	286	894	670	861	3.25e-23	103	918	1065	68	HIGH	NLR family CARD domain-containing protein 3
+Montipora_capitata_HIv3___RNAseq.g6531.t1	Q00690	LYAM2_MOUSE	35.294	102	51	5	511	798	47	139	1.60e-06	54.3	1248	612	23	LOW	E-selectin
+Montipora_capitata_HIv3___RNAseq.g6561.t1	Q9UNL4	ING4_HUMAN	43.750	80	33	3	1603	1809	166	244	3.39e-13	73.6	1812	249	11	LOW	Inhibitor of growth protein 4
+Montipora_capitata_HIv3___RNAseq.g6602.t1	Q96CG8	CTHR1_HUMAN	44.262	183	91	4	145	660	61	243	4.41e-43	148	669	243	77	HIGH	Collagen triple helix repeat-containing protein 1
+Montipora_capitata_HIv3___TS.g28387.t1	Q96CG8	CTHR1_HUMAN	43.716	183	92	4	520	1035	61	243	6.62e-41	146	1044	243	49	LOW	Collagen triple helix repeat-containing protein 1
+Montipora_capitata_HIv3___RNAseq.g6712.t1	Q01528	HAAF_LIMPO	37.500	168	91	3	202	687	12	171	5.55e-27	105	705	172	70	MEDIUM	Hemagglutinin/amebocyte aggregation factor
+Montipora_capitata_HIv3___TS.g28497.t1	Q8IY33	MILK2_HUMAN	36.567	268	139	3	103	906	2	238	9.27e-50	196	5634	904	19	LOW	MICAL-like protein 2
+Montipora_capitata_HIv3___TS.g28649.t1	Q9BYK8	HELZ2_HUMAN	30.655	1618	984	43	3298	8007	1354	2881	0.0	638	8034	2896	84	MEDIUM	3'-5' exoribonuclease HELZ2
+Montipora_capitata_HIv3___RNAseq.g6907.t1	Q6NYU2	HELZ_DANRE	35.523	746	403	19	55	2109	351	1079	1.73e-126	416	2115	1860	97	MEDIUM	Probable helicase with zinc finger domain
+Montipora_capitata_HIv3___RNAseq.g6908.t1	Q9BYK8	HELZ2_HUMAN	34.740	616	348	18	2710	4521	2128	2701	9.56e-81	299	4524	2896	85	MEDIUM	3'-5' exoribonuclease HELZ2
+Montipora_capitata_HIv3___RNAseq.g6934.t1	Q9JL55	GDE1_RAT	41.729	266	148	5	91	882	66	326	1.21e-58	194	897	331	88	HIGH	Glycerophosphodiester phosphodiesterase 1
+Montipora_capitata_HIv3___RNAseq.g6978.t1	O94806	KPCD3_HUMAN	52.941	68	29	1	70	264	432	499	2.02e-15	75.5	444	890	44	LOW	Serine/threonine-protein kinase D3
+Montipora_capitata_HIv3___RNAseq.g7049.t1	Q29RU2	OIT3_BOVIN	30.189	371	229	15	472	1536	190	546	3.12e-39	154	1740	547	61	MEDIUM	Oncoprotein-induced transcript 3 protein
+Montipora_capitata_HIv3___TS.g28822.t2	Q12767	TMM94_HUMAN	34.967	898	464	16	1774	4386	552	1356	2.80e-147	488	4389	1356	87	MEDIUM	Transmembrane protein 94
+Montipora_capitata_HIv3___RNAseq.g7098.t1	P98161	PKD1_HUMAN	22.231	1210	737	50	2884	6384	1515	2563	2.34e-32	143	6540	4303	61	LOW	Polycystin-1
+Montipora_capitata_HIv3___TS.g28908.t1	Q8C2A2	SEN54_MOUSE	38.583	127	76	2	175	552	43	168	1.37e-19	93.6	1083	525	69	MEDIUM	tRNA-splicing endonuclease subunit Sen54
+Montipora_capitata_HIv3___TS.g28995.t1	P38446	NUCA_NOSS1	35.652	115	68	2	589	930	122	231	4.03e-09	60.8	1131	274	30	LOW	Nuclease
+Montipora_capitata_HIv3___RNAseq.g30230.t1	Q5R2J2	G3P_PELSI	74.763	317	78	2	4	954	1	315	1.21e-173	488	1032	333	92	HIGH	Glyceraldehyde-3-phosphate dehydrogenase
+Montipora_capitata_HIv3___RNAseq.g30392.t1	O70628	PDE9A_MOUSE	43.636	495	262	8	10	1476	11	494	3.44e-137	410	1596	534	92	HIGH	High affinity cGMP-specific 3',5'-cyclic phosphodiesterase 9A
+Montipora_capitata_HIv3___RNAseq.g30422.t1	A8XJN7	FKH02_CAEBR	52.941	85	38	1	307	555	95	179	8.40e-22	96.7	1035	279	24	LOW	Forkhead box protein fkh-2
+Montipora_capitata_HIv3___RNAseq.g30427.t1	Q9H3D4	P63_HUMAN	36.226	265	155	9	397	1167	166	424	4.46e-38	151	1485	680	52	MEDIUM	Tumor protein 63
+Montipora_capitata_HIv3___RNAseq.g30434.t1	Q7TNS2	MIC10_MOUSE	56.338	71	27	1	19	219	2	72	2.31e-15	69.3	402	76	50	MEDIUM	MICOS complex subunit Mic10
+Montipora_capitata_HIv3___TS.g14965.t1	Q9JHX4	CASP8_RAT	34.483	261	132	7	1	699	230	479	2.79e-39	144	702	482	99	MEDIUM	Caspase-8
+Montipora_capitata_HIv3___RNAseq.g30553.t1	V5BCL0	PLP1_TOXGV	24.096	332	194	8	37	891	465	785	7.14e-09	62.8	1665	1161	51	LOW	Perforin-like protein 1
+Montipora_capitata_HIv3___RNAseq.29872_t	Q94464	DYNA_DICDI	24.561	513	314	15	112	1581	23	485	9.91e-16	85.1	2118	853	69	LOW	Dynamin-A
+Montipora_capitata_HIv3___RNAseq.g30609.t1	Q7RTR2	NLRC3_HUMAN	40.639	219	121	3	142	771	639	857	5.10e-31	125	798	1065	79	HIGH	NLR family CARD domain-containing protein 3
+Montipora_capitata_HIv3___RNAseq.g30678.t1b	Q9CR50	ZN363_MOUSE	42.537	134	65	5	775	1164	63	188	2.20e-21	95.9	1191	261	33	LOW	RING finger and CHY zinc finger domain-containing protein 1
+Montipora_capitata_HIv3___RNAseq.g30833.t1	Q5DU56	NLRC3_MOUSE	43.866	269	151	0	821	15	684	952	6.18e-46	174	1365	1064	68	HIGH	Protein NLRC3
+Montipora_capitata_HIv3___RNAseq.g30839.t1	Q7RTR2	NLRC3_HUMAN	41.509	371	189	1	1798	2826	673	1043	2.52e-47	187	2865	1065	59	MEDIUM	NLR family CARD domain-containing protein 3
+Montipora_capitata_HIv3___RNAseq.g30844.t1	Q7RTR2	NLRC3_HUMAN	39.608	255	126	1	109	789	706	960	3.53e-40	152	834	1065	82	MEDIUM	NLR family CARD domain-containing protein 3
+Montipora_capitata_HIv3___TS.g15339.t1	Q5DU56	NLRC3_MOUSE	46.667	225	120	0	1429	2103	761	985	4.44e-43	171	2151	1064	34	LOW	Protein NLRC3
+Montipora_capitata_HIv3___TS.g15341.t1	Q5DU56	NLRC3_MOUSE	43.537	147	83	0	1267	1707	802	948	1.85e-24	112	1725	1064	26	LOW	Protein NLRC3
+Montipora_capitata_HIv3___RNAseq.g30901.t1	B1VEI4	MSHA_CORU7	25.837	418	256	21	724	1860	22	424	4.51e-14	79.0	2601	424	44	LOW	D-inositol 3-phosphate glycosyltransferase
+Montipora_capitata_HIv3___RNAseq.g30913.t1	Q55E58	PATS1_DICDI	27.007	274	128	10	958	1734	1787	2003	3.35e-16	88.2	2847	3184	27	LOW	Probable serine/threonine-protein kinase pats1
+Montipora_capitata_HIv3___RNAseq.g30925.t1	Q8MVR1	GBPC_DICDI	23.774	265	147	7	1552	2322	392	609	4.05e-10	67.8	2382	2631	32	LOW	Cyclic GMP-binding protein C
+Montipora_capitata_HIv3___RNAseq.g30993.t1	P30437	CP17A_ONCMY	35.275	309	190	6	34	942	199	503	1.67e-56	194	951	514	96	MEDIUM	Steroid 17-alpha-hydroxylase/17,20 lyase
+Montipora_capitata_HIv3___RNAseq.g31152.t1	P54735	SPKD_SYNY3	29.940	167	97	7	82	570	63	213	1.65e-10	63.9	690	505	71	LOW	Serine/threonine-protein kinase D
+Montipora_capitata_HIv3___RNAseq.g31228.t1	Q8CDF7	EXD1_MOUSE	37.895	95	59	0	82	366	151	245	7.83e-13	72.8	1002	570	28	LOW	piRNA biogenesis protein EXD1
+Montipora_capitata_HIv3___RNAseq.g31229.t1	Q9WVK8	CP46A_MOUSE	34.667	75	46	2	73	291	21	94	1.08e-08	55.8	438	500	50	LOW	Cholesterol 24-hydroxylase
+Montipora_capitata_HIv3___RNAseq.g31504.t1	Q8R4V5	OIT3_MOUSE	34.069	317	189	11	460	1389	220	523	4.88e-45	170	1623	546	57	MEDIUM	Oncoprotein-induced transcript 3 protein
+Montipora_capitata_HIv3___RNAseq.g31717.t1	Q09575	YRD6_CAEEL	27.068	399	261	9	1489	2631	714	1100	4.98e-36	152	2898	1268	39	LOW	Uncharacterized protein K02A2.6
+Montipora_capitata_HIv3___RNAseq.g32149.t1	Q9BWF2	TRAIP_HUMAN	27.397	438	265	12	4	1188	3	430	9.46e-32	129	1311	469	90	LOW	E3 ubiquitin-protein ligase TRAIP
+Montipora_capitata_HIv3___RNAseq.g32219.t1	Q9H8Y1	VRTN_HUMAN	27.219	169	108	5	4	498	91	248	1.14e-07	59.3	2205	702	22	LOW	Vertnin
+Montipora_capitata_HIv3___TS.g17173.t1	Q19269	NAS14_CAEEL	53.731	134	59	2	1906	2304	180	311	1.45e-37	151	2487	503	16	LOW	Zinc metalloproteinase nas-14
+Montipora_capitata_HIv3___RNAseq.g33271.t1	O88917	AGRL1_RAT	40.816	98	54	2	85	372	35	130	1.58e-15	82.4	1146	1515	25	LOW	Adhesion G protein-coupled receptor L1
+Montipora_capitata_HIv3___TS.g17943.t1	P86982	IMSP1_RUDPH	41.085	129	64	2	436	822	16	132	5.10e-21	93.6	2511	148	15	LOW	Insoluble matrix shell protein 1 (Fragment)
+Montipora_capitata_HIv3___RNAseq.g33449.t1	P09487	PPBT_BOVIN	48.156	488	233	8	157	1596	19	494	1.39e-146	435	1653	524	87	HIGH	Alkaline phosphatase, tissue-nonspecific isozyme
+Montipora_capitata_HIv3___RNAseq.g33467.t1	Q6IR68	THA11_XENLA	53.488	86	33	1	25	261	3	88	1.16e-17	87.0	1434	298	17	LOW	THAP domain-containing protein 11
+Montipora_capitata_HIv3___RNAseq.g33643.t1	P83858	QRFPR_RAT	28.037	107	65	2	13	297	234	340	1.25e-08	54.7	360	433	79	LOW	Pyroglutamylated RF-amide peptide receptor
+Montipora_capitata_HIv3___RNAseq.g33912.t1	P21872	PUR2_CHICK	54.520	719	290	7	10	2154	317	1002	0.0	686	2163	1003	99	HIGH	Trifunctional purine biosynthetic protein adenosine-3
+Montipora_capitata_HIv3___RNAseq.g33934.t1	P79393	PI2R_BOVIN	30.189	212	139	4	754	1380	97	302	2.47e-16	84.7	1596	385	39	LOW	Prostacyclin receptor
+Montipora_capitata_HIv3___RNAseq.g33940.t1	P79393	PI2R_BOVIN	28.188	298	200	7	70	942	12	302	5.24e-21	97.1	1158	385	75	LOW	Prostacyclin receptor
+Montipora_capitata_HIv3___RNAseq.g33991.t1	P80010	PLMN_HORSE	39.773	264	135	6	43	792	79	332	5.64e-49	168	816	338	92	MEDIUM	Plasminogen (Fragment)
+Montipora_capitata_HIv3___RNAseq.g33992.t1	P80010	PLMN_HORSE	39.773	264	135	6	46	795	79	332	1.02e-48	168	867	338	87	MEDIUM	Plasminogen (Fragment)
+Montipora_capitata_HIv3___TS.g18509.t1	Q5UAW9	GP157_HUMAN	41.429	210	110	4	43	645	79	284	1.00e-39	144	831	335	73	HIGH	G-protein coupled receptor 157
+Montipora_capitata_HIv3___RNAseq.g33997.t1	A7S5D9	IYD_NEMVE	69.412	255	77	1	106	870	11	264	2.51e-130	374	873	264	88	HIGH	Iodotyrosine deiodinase
+Montipora_capitata_HIv3___RNAseq.33535_t	Q8IVG5	SAM9L_HUMAN	26.084	1522	896	61	2338	6591	186	1582	1.19e-83	309	6903	1584	62	LOW	Sterile alpha motif domain-containing protein 9-like
+Montipora_capitata_HIv3___RNAseq.g34072.t1	O75762	TRPA1_HUMAN	29.140	1081	705	23	898	4071	38	1080	3.13e-115	392	4170	1119	76	LOW	Transient receptor potential cation channel subfamily A member 1
+Montipora_capitata_HIv3___RNAseq.g34092.t1	P78417	GSTO1_HUMAN	42.105	228	123	7	16	678	11	236	2.30e-50	167	708	241	94	HIGH	Glutathione S-transferase omega-1
+Montipora_capitata_HIv3___RNAseq.g34299.t1	Q9XWB9	BAT36_CAEEL	29.697	165	103	6	109	597	151	304	3.29e-08	57.8	939	320	52	LOW	BTB and MATH domain-containing protein 36
+Montipora_capitata_HIv3___RNAseq.g34374.t1	Q6I6M7	FGF1_CYNPY	32.836	134	85	2	436	831	18	148	5.09e-16	76.6	843	148	47	LOW	Fibroblast growth factor 1 (Fragment)
+Montipora_capitata_HIv3___RNAseq.g34571.t1	Q24133	DNAJ1_DROME	50.581	344	158	7	1	1026	1	334	6.47e-101	303	1029	334	99	HIGH	DnaJ protein homolog 1
+Montipora_capitata_HIv3___RNAseq.g34640.t1	O61267	LOK_DROME	28.102	274	143	10	82	870	169	399	1.05e-16	89.0	4524	476	17	LOW	Ovarian-specific serine/threonine-protein kinase Lok
+Montipora_capitata_HIv3___RNAseq.34213_t	O15247	CLIC2_HUMAN	30.769	234	138	3	19	663	12	240	3.35e-16	78.6	696	247	93	MEDIUM	Chloride intracellular channel protein 2
+Montipora_capitata_HIv3___TS.g7286.t1	Q09575	YRD6_CAEEL	28.696	230	117	5	1327	1881	452	679	4.12e-24	112	1992	1268	28	LOW	Uncharacterized protein K02A2.6
+Montipora_capitata_HIv3___RNAseq.g24139.t1	Q924A5	S36A1_RAT	44.366	426	211	4	217	1425	38	460	8.79e-108	331	1449	475	83	HIGH	Proton-coupled amino acid transporter 1
+Montipora_capitata_HIv3___RNAseq.g24143.t1	Q6GMK0	MGT4B_DANRE	50.787	508	234	4	154	1656	45	543	0.0	525	1677	547	90	HIGH	Alpha-1,3-mannosyl-glycoprotein 4-beta-N-acetylglucosaminyltransferase B
+Montipora_capitata_HIv3___TS.g7322.t1	Q1EHB4	SC5AC_HUMAN	37.479	603	351	11	16	1803	5	588	5.57e-107	338	1806	618	99	MEDIUM	Sodium-coupled monocarboxylate transporter 2
+Montipora_capitata_HIv3___RNAseq.g24303.t1	O00468	AGRIN_HUMAN	33.229	319	177	11	511	1422	461	758	1.04e-36	148	1467	2068	66	MEDIUM	Agrin
+Montipora_capitata_HIv3___RNAseq.g24510.t1	A9KNW4	IF2_LACP7	40.000	175	95	6	35	559	246	410	8.46e-15	75.9	603	1131	88	MEDIUM	Translation initiation factor IF-2
+Montipora_capitata_HIv3___RNAseq.g24524.t1	Q8VE88	F1142_MOUSE	33.724	427	230	11	766	1971	89	487	2.59e-51	188	1974	497	61	MEDIUM	Protein FAM114A2
+Montipora_capitata_HIv3___RNAseq.g24595.t1	P54289	CA2D1_HUMAN	29.580	1119	669	33	97	3261	33	1096	1.95e-139	451	3273	1103	97	LOW	Voltage-dependent calcium channel subunit alpha-2/delta-1
+Montipora_capitata_HIv3___RNAseq.g24606.t1	P34892	KIN16_CAEEL	32.404	287	113	9	469	1116	173	449	9.20e-34	135	1302	495	50	MEDIUM	Receptor-like tyrosine-protein kinase kin-16
+Montipora_capitata_HIv3___RNAseq.g24728.t1	Q7TN88	PK1L2_MOUSE	28.980	735	461	15	4816	6945	923	1621	2.06e-80	302	10419	2461	39	LOW	Polycystin-1-like protein 2
+Montipora_capitata_HIv3___RNAseq.g24730.t1	P07207	NOTCH_DROME	37.960	1196	581	32	3244	6417	197	1369	0.0	703	6837	2703	49	LOW	Neurogenic locus Notch protein
+Montipora_capitata_HIv3___RNAseq.g24836.t1	O42449	IOD1_ORENI	42.328	189	107	2	34	600	59	245	2.96e-48	161	645	248	88	HIGH	Type I iodothyronine deiodinase
+Montipora_capitata_HIv3___TS.g8021.t1	Q29599	OAS1_PIG	30.031	323	198	10	421	1323	11	327	2.09e-39	148	1374	349	66	MEDIUM	2'-5'-oligoadenylate synthase 1
+Montipora_capitata_HIv3___RNAseq.g24858.t1	P11928	OAS1A_MOUSE	30.960	323	191	9	292	1182	13	329	2.20e-36	139	1233	367	72	MEDIUM	2'-5'-oligoadenylate synthase 1A
+Montipora_capitata_HIv3___RNAseq.g24942.t1	Q7L576	CYFP1_HUMAN	61.609	1193	439	8	1342	4893	70	1252	0.0	1439	4902	1253	99	HIGH	Cytoplasmic FMR1-interacting protein 1
+Montipora_capitata_HIv3___RNAseq.g24945.t1	Q6NWH0	CK068_DANRE	50.521	192	78	6	460	1008	47	230	7.29e-56	186	1056	249	52	MEDIUM	UPF0696 protein C11orf68 homolog
+Montipora_capitata_HIv3___RNAseq.g24974.t1	B2RQR8	ECE2_MOUSE	39.306	692	399	13	229	2280	85	763	1.17e-177	531	2304	763	89	MEDIUM	Endothelin-converting enzyme 2
+Montipora_capitata_HIv3___RNAseq.g25047.t1	P24731	AN_NPVAC	27.632	228	137	10	928	1566	48	262	1.80e-07	57.8	1803	419	35	LOW	Alkaline nuclease
+Montipora_capitata_HIv3___RNAseq.g25083.t1	O14522	PTPRT_HUMAN	25.223	337	218	8	58	1026	502	818	3.20e-16	84.3	1167	1441	83	LOW	Receptor-type tyrosine-protein phosphatase T
+Montipora_capitata_HIv3___RNAseq.g25137.t1	P47970	NPTX2_CAVPO	33.333	183	118	2	151	693	221	401	1.34e-35	134	756	427	72	MEDIUM	Neuronal pentraxin-2
+Montipora_capitata_HIv3___RNAseq.g25143.t1	P47970	NPTX2_CAVPO	32.240	183	120	2	100	642	221	401	1.32e-34	131	729	427	74	MEDIUM	Neuronal pentraxin-2
+Montipora_capitata_HIv3___RNAseq.g25176.t1	O70244	CUBN_RAT	30.151	398	218	18	121	1293	1291	1635	9.16e-27	119	1608	3623	74	MEDIUM	Cubilin
+Montipora_capitata_HIv3___RNAseq.g25591.t1	Q16720	AT2B3_HUMAN	40.210	572	317	11	1951	3645	508	1061	1.24e-115	394	3864	1220	89	HIGH	Plasma membrane calcium-transporting ATPase 3
+Montipora_capitata_HIv3___RNAseq.g26051.t1	P98133	FBN1_BOVIN	42.609	115	64	2	2140	2484	1322	1434	5.19e-16	87.4	2658	2871	18	LOW	Fibrillin-1
+Montipora_capitata_HIv3___RNAseq.g26412.t1	A6H603	NWD1_MOUSE	31.848	920	566	24	496	3177	4	888	4.16e-100	360	5253	1563	51	MEDIUM	NACHT domain- and WD repeat-containing protein 1
+Montipora_capitata_HIv3___RNAseq.g26525.t1	Q8VHK7	HDGF_RAT	56.977	86	34	2	16	270	13	96	6.96e-16	79.7	1134	237	22	LOW	Hepatoma-derived growth factor
+Montipora_capitata_HIv3___RNAseq.g26562.t1	Q8RB32	GDPD_CALS4	33.889	180	109	4	157	696	2	171	8.37e-19	88.2	1155	243	47	LOW	Glycerophosphodiester phosphodiesterase
+Montipora_capitata_HIv3___RNAseq.g26580.t1	Q2KIK0	SGT1_BOVIN	55.906	127	48	2	1	378	219	338	4.36e-32	118	387	338	98	HIGH	Protein SGT1 homolog
+Montipora_capitata_HIv3___RNAseq.g26595.t1	A2AAE1	BLTP1_MOUSE	33.785	2507	1288	74	7588	14613	2693	4992	0.0	1058	14646	5005	82	MEDIUM	Bridge-like lipid transfer protein family member 1
+Montipora_capitata_HIv3___TS.g9841.t2	O70511	ANK3_RAT	35.612	278	161	3	244	1077	448	707	3.81e-37	148	1278	2622	67	MEDIUM	Ankyrin-3
+Montipora_capitata_HIv3___RNAseq.g26644.t1	P70191	TRAF5_MOUSE	36.047	172	102	4	277	780	384	551	4.75e-27	112	792	558	64	MEDIUM	TNF receptor-associated factor 5
+Montipora_capitata_HIv3___RNAseq.g26661.t1	Q0DAE4	GRXC8_ORYSJ	53.571	56	26	0	643	810	74	129	1.24e-13	69.7	831	136	20	LOW	Glutaredoxin-C8
+Montipora_capitata_HIv3___RNAseq.g26700.t1	Q95LI2	VITRN_BOVIN	27.313	227	146	9	130	792	430	643	4.24e-11	66.6	840	652	79	LOW	Vitrin
+Montipora_capitata_HIv3___RNAseq.g26824.t1	Q8H569	AKT3_ORYSJ	37.624	101	60	2	1	300	538	636	4.78e-08	52.8	321	907	93	LOW	Potassium channel AKT3
+Montipora_capitata_HIv3___TS.g10096.t1	Q9Y5X5	NPFF2_HUMAN	26.115	314	191	9	94	951	148	448	2.60e-22	101	1062	522	81	LOW	Neuropeptide FF receptor 2
+Montipora_capitata_HIv3___RNAseq.g26860.t1	Q8WTJ4	UBXN6_CAEEL	28.440	109	67	3	22	324	150	255	9.79e-07	52.0	615	437	49	LOW	UBX domain-containing protein 6
+Montipora_capitata_HIv3___RNAseq.g26867.t1	Q5E9N5	CLPB_BOVIN	56.367	589	235	5	109	1812	84	671	0.0	620	1830	677	93	HIGH	Mitochondrial disaggregase
+Montipora_capitata_HIv3___RNAseq.g26900.t1	Q4L235	ACSF4_HUMAN	31.828	930	505	18	436	3111	254	1092	1.96e-133	434	3123	1098	99	MEDIUM	Beta-alanine-activating enzyme
+Montipora_capitata_HIv3___RNAseq.g26955.t1	P98133	FBN1_BOVIN	50.476	105	50	2	2028	2339	1342	1445	3.54e-19	97.4	2355	2871	17	LOW	Fibrillin-1
+Montipora_capitata_HIv3___TS.g10359.t4b	Q5E9U6	WNT16_BOVIN	44.000	300	148	4	1	879	76	362	2.66e-87	268	882	362	99	HIGH	Protein Wnt-16
+Montipora_capitata_HIv3___RNAseq.g27127.t1	P35556	FBN2_HUMAN	30.616	2760	1330	136	3610	11031	274	2734	0.0	673	14502	2912	66	MEDIUM	Fibrillin-2
+Montipora_capitata_HIv3___TS.g10979.t1	Q9P2E3	ZNFX1_HUMAN	39.055	1841	970	38	145	5412	139	1912	0.0	1192	5445	1918	97	MEDIUM	NFX1-type zinc finger-containing protein 1
+Montipora_capitata_HIv3___TS.g11205.t1	A0A2P1BRQ0	CTXA_SCOPL	40.455	220	130	1	295	954	79	297	7.54e-44	174	3444	702	19	LOW	Cytolytic toxin-alpha
+Montipora_capitata_HIv3___RNAseq.g16025.t1	P11309	PIM1_HUMAN	47.458	295	144	4	298	1173	5	291	3.77e-87	271	1308	313	67	HIGH	Serine/threonine-protein kinase pim-1
+Montipora_capitata_HIv3___TS.g11505.t1	Q02858	TIE2_MOUSE	31.857	474	256	13	1300	2574	638	1093	1.96e-56	214	2619	1122	49	LOW	Angiopoietin-1 receptor
+Montipora_capitata_HIv3___RNAseq.g16256.t1	Q8K2J9	BTBD6_MOUSE	33.641	434	273	6	19	1305	115	538	2.08e-80	261	1317	539	98	MEDIUM	BTB/POZ domain-containing protein 6
+Montipora_capitata_HIv3___RNAseq.g16474.t1	A0A974H8H3	DICRL_XENLA	34.366	1065	570	23	85	2928	34	1086	1.02e-157	529	4671	1891	88	MEDIUM	Endoribonuclease Dicer-L
+Montipora_capitata_HIv3___TS.g11775.t2	Q7RTR2	NLRC3_HUMAN	41.714	175	100	1	343	861	684	858	5.14e-23	107	1569	1065	35	LOW	NLR family CARD domain-containing protein 3
+Montipora_capitata_HIv3___TS.g12045.t2	B7WFQ1	USOM2_ACRMI	53.982	226	95	2	82	732	245	470	1.61e-60	207	1212	505	58	MEDIUM	Uncharacterized skeletal organic matrix protein 2
+Montipora_capitata_HIv3___RNAseq.g18018.t1	Q8WXS8	ATS14_HUMAN	50.000	58	25	1	454	627	553	606	6.40e-12	70.5	1041	1223	17	LOW	A disintegrin and metalloproteinase with thrombospondin motifs 14
+Montipora_capitata_HIv3___TS.g13432.t1	F1R8P4	GLRA2_DANRE	34.444	270	165	7	2413	3204	175	438	4.47e-35	143	3207	449	25	LOW	Glycine receptor subunit alpha-2
+Montipora_capitata_HIv3___RNAseq.g18203.t1	P39428	TRAF1_MOUSE	33.562	146	86	4	217	633	262	403	4.51e-18	85.1	648	409	64	MEDIUM	TNF receptor-associated factor 1
+Montipora_capitata_HIv3___TS.g13490.t3	Q3UG20	KMT2E_MOUSE	35.169	472	239	10	316	1542	118	585	1.18e-60	233	4176	1868	29	LOW	Inactive histone-lysine N-methyltransferase 2E
+Montipora_capitata_HIv3___TS.g13493.t1	Q5R930	MSRB3_PONAB	52.597	154	72	1	25	483	35	188	9.77e-58	182	507	190	91	HIGH	Methionine-R-sulfoxide reductase B3
+Montipora_capitata_HIv3___RNAseq.g18391.t1	P48416	CP10_LYMST	31.873	502	308	11	121	1590	65	544	2.08e-72	243	1596	545	92	MEDIUM	Cytochrome P450 10
+Montipora_capitata_HIv3___RNAseq.g18395.t1	Q5RCP3	LSM8_PONAB	76.042	96	23	0	73	360	1	96	1.92e-49	155	363	96	79	HIGH	U6 snRNA-associated Sm-like protein LSm8
+Montipora_capitata_HIv3___RNAseq.g18595.t1	Q60613	AA2AR_MOUSE	33.742	163	94	4	79	546	3	158	3.72e-11	69.3	1854	410	25	LOW	Adenosine receptor A2a
+Montipora_capitata_HIv3___RNAseq.g18596.t1	Q90632	MOT3_CHICK	26.244	442	279	6	163	1368	19	453	3.50e-33	135	1455	542	83	LOW	Monocarboxylate transporter 3
+Montipora_capitata_HIv3___RNAseq.g44445.t1	Q3ZBG9	PLS2_BOVIN	62.232	233	88	0	40	738	59	291	3.44e-97	289	741	293	94	HIGH	Phospholipid scramblase 2
+Montipora_capitata_HIv3___RNAseq.g44497.t1	Q9C0G6	DYH6_HUMAN	34.259	108	23	1	7	186	3565	3672	3.62e-15	65.1	252	4158	92	MEDIUM	Dynein axonemal heavy chain 6
+Montipora_capitata_HIv3___RNAseq.g44498.t1	Q9C0G6	DYH6_HUMAN	44.262	61	34	0	286	468	2932	2992	6.41e-06	50.1	624	4158	29	LOW	Dynein axonemal heavy chain 6
+Montipora_capitata_HIv3___RNAseq.g44519.t1	Q6TMK4	POXA_DICDI	34.351	524	303	14	2530	4056	21	518	3.07e-86	295	4101	531	37	LOW	Peroxinectin A
+Montipora_capitata_HIv3___RNAseq.g44539.t1	Q29121	GALT1_PIG	48.039	510	247	9	184	1680	49	551	2.29e-160	472	1728	559	87	HIGH	Polypeptide N-acetylgalactosaminyltransferase 1
+Montipora_capitata_HIv3___RNAseq.g44562.t1	I3J7Q8	HISAT_ORENI	38.202	89	55	0	4	270	19	107	5.92e-14	74.7	912	337	29	LOW	Histidine N-acetyltransferase
+Montipora_capitata_HIv3___RNAseq.g44702.t1	P03360	POL_AVIRE	31.718	227	131	12	277	927	812	1024	7.23e-12	73.6	2508	1152	26	LOW	Gag-Pol polyprotein (Fragment)
+Montipora_capitata_HIv3___TS.g45844.t2b	P0DXC0	CGLR3_STYPI	41.935	341	191	5	70	1077	2	340	6.40e-78	256	2181	340	89	HIGH	Cyclic GMP-AMP synthase-like receptor 3
+Montipora_capitata_HIv3___RNAseq.g44719.t1	Q8NCC3	PAG15_HUMAN	42.037	383	205	6	112	1242	39	410	7.50e-106	322	1245	412	91	HIGH	Lysosomal phospholipase A and acyltransferase
+Montipora_capitata_HIv3___RNAseq.g44775.t1	Q0EEE2	PTHD3_MOUSE	27.948	848	541	25	304	2718	86	906	1.49e-72	261	2844	906	85	LOW	Patched domain-containing protein 3
+Montipora_capitata_HIv3___RNAseq.g44783.t1	P0DXC0	CGLR3_STYPI	53.372	341	149	4	31	1041	5	339	1.66e-119	351	1047	340	97	HIGH	Cyclic GMP-AMP synthase-like receptor 3
+Montipora_capitata_HIv3___RNAseq.g44785.t1	P0DXC0	CGLR3_STYPI	48.991	347	163	5	220	1248	3	339	4.07e-104	317	1479	340	70	HIGH	Cyclic GMP-AMP synthase-like receptor 3
+Montipora_capitata_HIv3___RNAseq.g44814.t1	Q9XTA5	HIF1A_BOVIN	40.548	365	197	6	208	1263	7	364	3.08e-76	265	2181	823	48	LOW	Hypoxia-inducible factor 1-alpha
+Montipora_capitata_HIv3___TS.g45983.t1	Q09811	HUS2_SCHPO	30.612	196	114	5	865	1449	680	854	2.50e-13	77.0	1659	1328	35	LOW	ATP-dependent DNA helicase hus2/rqh1
+Montipora_capitata_HIv3___RNAseq.g44960.t2	P70191	TRAF5_MOUSE	26.306	555	305	16	4	1638	29	489	1.35e-48	181	1749	558	93	LOW	TNF receptor-associated factor 5
+Montipora_capitata_HIv3___RNAseq.21467_t	O00463	TRAF5_HUMAN	25.592	633	352	21	4	1881	29	549	1.87e-47	178	1902	557	99	LOW	TNF receptor-associated factor 5
+Montipora_capitata_HIv3___TS.g46096.t1	Q60803	TRAF3_MOUSE	25.241	519	307	11	4	1464	36	505	8.20e-36	147	3147	567	98	LOW	TNF receptor-associated factor 3
+Montipora_capitata_HIv3___TS.g46166.t1	Q26636	CATL_SARPE	59.936	312	116	3	307	1215	28	339	9.90e-136	395	1218	339	75	HIGH	Cathepsin L
+Montipora_capitata_HIv3___RNAseq.g45041.t1	P77234	YBEQ_ECOLI	30.417	240	144	9	73	765	53	278	2.33e-10	65.9	1734	325	40	LOW	Sel1-repeat-containing protein YbeQ
+Montipora_capitata_HIv3___RNAseq.g45042.t1	A0A2J6RX17	NLRN_HYAVF	27.013	385	227	16	37	1107	323	681	4.32e-18	94.4	3660	990	29	LOW	Nucleotide-binding leucine-rich repeat (NLR)-like protein
+Montipora_capitata_HIv3___RNAseq.g45051.t1	B2RY50	ODAD2_MOUSE	44.044	638	316	4	706	2619	438	1034	1.59e-156	489	2658	1037	72	HIGH	Outer dynein arm-docking complex subunit 2
+Montipora_capitata_HIv3___TS.g46192.t3	P32242	OTX1_HUMAN	51.449	138	37	4	64	477	8	115	6.75e-32	124	819	354	51	MEDIUM	Homeobox protein OTX1
+Montipora_capitata_HIv3___RNAseq.g45083.t2	Q8BMI4	GEN_MOUSE	40.726	248	99	2	1	606	1	246	6.09e-54	196	1284	908	76	HIGH	Flap endonuclease GEN homolog 1
+Montipora_capitata_HIv3___RNAseq.g45106.t1	Q4R9C4	G2E3_MACFA	29.859	355	214	8	769	1815	367	692	1.61e-42	166	1836	706	57	LOW	G2/M phase-specific E3 ubiquitin-protein ligase
+Montipora_capitata_HIv3___TS.g46469.t1	Q8AV57	SDK2_CHICK	23.663	1103	672	38	2773	5796	688	1715	6.72e-43	177	7230	2177	42	LOW	Protein sidekick-2
+Montipora_capitata_HIv3___RNAseq.g45361.t1	Q4R794	S35F5_MACFA	53.053	262	119	3	1	777	160	420	7.01e-58	194	837	432	93	HIGH	Solute carrier family 35 member F5
+Montipora_capitata_HIv3___RNAseq.g45417.t1	P97402	GCNT2_MOUSE	36.615	325	192	5	1684	2652	71	383	4.72e-61	218	3612	401	72	MEDIUM	N-acetyllactosaminide beta-1,6-N-acetylglucosaminyl-transferase
+Montipora_capitata_HIv3___RNAseq.g45527.t1	Q15542	TAF5_HUMAN	55.684	607	265	3	205	2019	195	799	0.0	672	2028	800	89	HIGH	Transcription initiation factor TFIID subunit 5
+Montipora_capitata_HIv3___RNAseq.g401.t1	O46392	CO1A2_CANLF	35.429	350	199	7	5014	6024	1030	1365	1.21e-59	231	6030	1366	60	MEDIUM	Collagen alpha-2(I) chain
+Montipora_capitata_HIv3___RNAseq.g403.t1	Q3U821	WDR75_MOUSE	33.372	863	509	21	34	2547	6	827	5.58e-131	415	2565	830	98	MEDIUM	WD repeat-containing protein 75
+Montipora_capitata_HIv3___RNAseq.g408.t1	Q80ZA0	ITL1B_MOUSE	43.396	53	30	0	544	702	39	91	5.37e-06	51.6	1209	313	13	LOW	Intelectin-1b
+Montipora_capitata_HIv3___RNAseq.g422.t1	B3EWY9	MLP_ACRMI	29.143	1074	644	34	2443	5484	345	1361	1.16e-118	419	6732	1594	60	LOW	Mucin-like protein (Fragment)
+Montipora_capitata_HIv3___RNAseq.g658.t1	Q99728	BARD1_HUMAN	39.005	382	204	5	1474	2619	421	773	2.38e-81	281	2631	777	44	LOW	BRCA1-associated RING domain protein 1
+Montipora_capitata_HIv3___RNAseq.g663.t1	Q3USZ8	DIK2A_MOUSE	30.532	357	201	13	190	1134	55	406	2.59e-39	149	1209	430	78	MEDIUM	Divergent protein kinase domain 2A
+Montipora_capitata_HIv3___RNAseq.g668.t1	P55011	S12A2_HUMAN	38.947	475	222	15	76	1335	751	1212	9.60e-96	315	1338	1212	94	MEDIUM	Solute carrier family 12 member 2
+Montipora_capitata_HIv3___RNAseq.g702.t1	Q7RTR2	NLRC3_HUMAN	39.259	405	186	3	10	1224	665	1009	2.60e-49	184	1311	1065	99	MEDIUM	NLR family CARD domain-containing protein 3
+Montipora_capitata_HIv3___RNAseq.g1066.t1	P35187	SGS1_YEAST	28.604	444	244	13	91	1356	679	1071	3.19e-42	166	1692	1447	75	LOW	ATP-dependent helicase SGS1
+Montipora_capitata_HIv3___RNAseq.g1174.t1	Q5R7L8	BL1S1_PONAB	61.864	118	45	0	1	354	29	146	1.98e-47	152	384	153	92	HIGH	Biogenesis of lysosome-related organelles complex 1 subunit 1
+Montipora_capitata_HIv3___RNAseq.g1392.t1	P60889	CBX7_RAT	47.059	51	26	1	106	255	9	59	8.65e-06	47.8	675	158	22	LOW	Chromobox protein homolog 7
+Montipora_capitata_HIv3___RNAseq.g1559.t1	Q5RA50	F124A_PONAB	27.715	267	174	5	46	834	26	277	8.86e-25	108	1041	546	76	LOW	Protein FAM124A
+Montipora_capitata_HIv3___TS.g39186.t1	B0BN95	HARB1_RAT	31.250	240	159	3	307	1014	66	303	1.02e-31	126	1167	349	61	MEDIUM	Putative nuclease HARBI1
+Montipora_capitata_HIv3___RNAseq.g1705.t1	F4JTS8	NOV_ARATH	27.923	1497	855	44	1225	5376	642	2027	3.53e-119	423	5406	2729	88	LOW	Protein NO VEIN
+Montipora_capitata_HIv3___RNAseq.g2152.t1	Q9W0T1	NU301_DROME	26.104	249	140	10	2041	2691	2253	2489	5.42e-11	70.9	2700	2669	24	LOW	Nucleosome-remodeling factor subunit NURF301
+Montipora_capitata_HIv3___RNAseq.g2355.t1	Q8I7P9	POL5_DROME	34.667	375	222	10	25	1092	110	480	5.66e-49	191	2439	1003	69	MEDIUM	Retrovirus-related Pol polyprotein from transposon opus
+Montipora_capitata_HIv3___RNAseq.g2559.t1a	D3ZGQ5	NEK8_RAT	54.302	709	287	8	1	2085	1	686	0.0	723	2103	698	99	HIGH	Serine/threonine-protein kinase Nek8
+Montipora_capitata_HIv3___RNAseq.g2567.t1	Q9JLC8	SACS_MOUSE	32.130	4597	2653	138	25	13026	89	4481	0.0	1997	13230	4582	98	MEDIUM	Sacsin
+Montipora_capitata_HIv3___RNAseq.g2578.t1	Q9JLC8	SACS_MOUSE	34.417	1723	987	51	232	5169	89	1745	0.0	835	5316	4582	93	MEDIUM	Sacsin
+Montipora_capitata_HIv3___RNAseq.g2640.t1a	Q61830	MRC1_MOUSE	31.228	285	171	8	400	1197	209	487	4.38e-35	148	2595	1456	46	LOW	Macrophage mannose receptor 1
+Montipora_capitata_HIv3___RNAseq.g2796.t1	Q09575	YRD6_CAEEL	30.667	225	137	7	337	966	815	1035	1.13e-13	77.0	1215	1268	52	MEDIUM	Uncharacterized protein K02A2.6
+Montipora_capitata_HIv3___TS.g40519.t3	P54277	PMS1_HUMAN	44.125	383	195	5	1	1110	1	377	1.45e-91	317	3174	932	60	HIGH	PMS1 protein homolog 1
+Montipora_capitata_HIv3___RNAseq.g3041.t1	P16157	ANK1_HUMAN	32.050	727	476	8	469	2631	72	786	1.38e-77	283	3192	1881	72	MEDIUM	Ankyrin-1
+Montipora_capitata_HIv3___RNAseq.g3049.t1	P16157	ANK1_HUMAN	27.740	584	362	11	637	2340	76	615	1.97e-42	171	2382	1881	72	LOW	Ankyrin-1
+Montipora_capitata_HIv3___RNAseq.g3053.t1	Q502K3	ANR52_DANRE	27.112	1018	622	17	2950	5808	11	973	2.28e-78	287	6150	1071	64	LOW	Serine/threonine-protein phosphatase 6 regulatory ankyrin repeat subunit C
+Montipora_capitata_HIv3___TS.g40633.t1	A6NMZ7	CO6A6_HUMAN	24.917	1200	801	34	571	3996	27	1184	1.95e-57	228	23757	2263	99	LOW	Collagen alpha-6(VI) chain
+Montipora_capitata_HIv3___TS.g40634.t1	B3EWZ3	CADN_ACRMI	43.041	388	184	4	4866	5930	158	541	1.84e-80	300	9429	1675	73	HIGH	Coadhesin (Fragment)
+Montipora_capitata_HIv3___RNAseq.g3112.t1	P20645	MPRD_HUMAN	41.667	72	42	0	589	804	175	246	1.67e-06	52.0	855	277	25	LOW	Cation-dependent mannose-6-phosphate receptor
+Montipora_capitata_HIv3___TS.g40750.t4	Q5SF07	IF2B2_MOUSE	29.327	416	255	12	649	1866	186	572	8.51e-28	122	1914	592	64	LOW	Insulin-like growth factor 2 mRNA-binding protein 2
+Montipora_capitata_HIv3___RNAseq.g3284.t1	P31907	HOXX_BRADU	37.128	571	312	16	127	1803	1	536	2.54e-98	314	1809	566	93	MEDIUM	Hydrogenase maturation factor HoxX
+Montipora_capitata_HIv3___TS.g40898.t1a	Q54T82	Y1931_DICDI	24.074	162	80	4	97	570	550	672	3.78e-06	54.3	1992	1211	24	LOW	Putative leucine-rich repeat-containing protein DDB_G0281931
+Montipora_capitata_HIv3___RNAseq.g3374.t1	Q921L8	GLT11_MOUSE	52.190	548	244	9	199	1794	61	606	0.0	570	1806	608	88	HIGH	Polypeptide N-acetylgalactosaminyltransferase 11
+Montipora_capitata_HIv3___TS.g40937.t3b	Q9DBC0	SELO_MOUSE	45.930	516	234	7	115	1647	157	632	2.28e-138	421	1797	667	85	HIGH	Protein adenylyltransferase SelO, mitochondrial
+Montipora_capitata_HIv3___RNAseq.g8826.t1	Q496Y0	LONF3_HUMAN	29.346	627	354	14	376	2130	158	737	5.12e-82	280	2196	759	80	LOW	LON peptidase N-terminal domain and RING finger protein 3
+Montipora_capitata_HIv3___RNAseq.g8836.t1	Q8NCG5	CHST4_HUMAN	27.424	361	221	10	214	1212	29	376	1.87e-32	129	1251	386	80	LOW	Carbohydrate sulfotransferase 4
+Montipora_capitata_HIv3___RNAseq.g8858.t1	Q8BR93	HARB1_MOUSE	35.652	115	69	2	13	348	193	305	3.90e-07	51.6	474	349	71	LOW	Putative nuclease HARBI1
+Montipora_capitata_HIv3___RNAseq.g8867.t2	Q8VDP6	CDIPT_MOUSE	57.143	224	80	3	82	750	3	211	2.63e-82	248	762	213	88	HIGH	CDP-diacylglycerol--inositol 3-phosphatidyltransferase
+Montipora_capitata_HIv3___RNAseq.g8869.t1	F8J3H2	HOLE_PSEX7	28.425	292	180	11	169	1023	25	294	6.58e-26	108	1026	294	83	LOW	Holothin acyltransferase
+Montipora_capitata_HIv3___RNAseq.g8971.t1	P22455	FGFR4_HUMAN	31.768	362	199	13	169	1203	20	350	9.79e-40	154	1242	802	83	MEDIUM	Fibroblast growth factor receptor 4
+Montipora_capitata_HIv3___RNAseq.g9026.t1	Q2XWK0	SVOP_XENLA	42.772	505	269	6	4	1476	21	519	8.38e-138	411	1482	548	99	HIGH	Synaptic vesicle 2-related protein
+Montipora_capitata_HIv3___RNAseq.g9027.t1	Q6GME2	CK054_XENLA	50.799	313	148	3	34	954	4	316	6.12e-117	343	957	316	96	HIGH	Ester hydrolase C11orf54 homolog
+Montipora_capitata_HIv3___RNAseq.g9060.t1	Q9ER35	FN3K_MOUSE	55.276	199	81	1	37	609	110	308	7.83e-81	246	627	309	91	HIGH	Fructosamine-3-kinase
+Montipora_capitata_HIv3___RNAseq.g9087.t1	Q6JQN1	ACD10_HUMAN	47.880	401	201	3	40	1218	17	417	1.34e-107	343	1242	1059	95	HIGH	Acyl-CoA dehydrogenase family member 10
+Montipora_capitata_HIv3___TS.g41895.t1	Q505D1	ANR28_MOUSE	28.244	262	169	6	145	927	45	288	2.34e-18	90.1	1056	1053	85	LOW	Serine/threonine-protein phosphatase 6 regulatory ankyrin repeat subunit A
+Montipora_capitata_HIv3___RNAseq.g9239.t1	Q96BD0	SO4A1_HUMAN	33.489	642	386	12	13	1887	80	697	3.41e-102	330	1983	722	95	MEDIUM	Solute carrier organic anion transporter family member 4A1
+Montipora_capitata_HIv3___RNAseq.g9307.t1	Q9WVT6	CAH14_MOUSE	39.929	283	147	9	19	825	5	278	1.09e-54	186	1092	337	74	MEDIUM	Carbonic anhydrase 14
+Montipora_capitata_HIv3___TS.g42117.t1	Q9WVT6	CAH14_MOUSE	39.576	283	148	9	166	972	5	278	1.06e-53	184	1194	337	68	MEDIUM	Carbonic anhydrase 14
+Montipora_capitata_HIv3___RNAseq.g9338.t1	Q9H6F5	CCD86_HUMAN	51.327	113	54	1	31	366	230	342	1.55e-13	68.9	369	360	91	MEDIUM	Coiled-coil domain-containing protein 86
+Montipora_capitata_HIv3___RNAseq.g9384.t1	Q7RTR2	NLRC3_HUMAN	43.223	391	209	13	4	1176	678	1055	1.13e-48	182	1356	1065	91	HIGH	NLR family CARD domain-containing protein 3
+Montipora_capitata_HIv3___RNAseq.g9561.t1	Q04799	FMO5_RABIT	51.633	490	225	5	4	1455	5	488	0.0	529	1605	533	90	HIGH	Flavin-containing monooxygenase 5
+Montipora_capitata_HIv3___TS.g42596.t1	Q9C0G6	DYH6_HUMAN	63.043	46	17	0	832	969	2565	2610	5.36e-13	74.3	1050	4158	13	LOW	Dynein axonemal heavy chain 6
+Montipora_capitata_HIv3___RNAseq.g10176.t1	Q10914	GLR2_CAEEL	31.132	424	198	10	22	1014	498	920	1.57e-50	186	1278	977	78	MEDIUM	Glutamate receptor 2
+Montipora_capitata_HIv3___RNAseq.g10510.t1	O23082	CRK44_ARATH	29.327	208	123	8	973	1572	62	253	9.50e-12	70.5	1695	379	35	LOW	Cysteine-rich receptor-like protein kinase 44
+Montipora_capitata_HIv3___RNAseq.g10739.t1	Q09811	HUS2_SCHPO	30.372	349	191	13	1	1014	539	846	4.69e-32	134	1404	1328	72	MEDIUM	ATP-dependent DNA helicase hus2/rqh1
+Montipora_capitata_HIv3___TS.g44059.t3	Q9XWZ2	ACD11_CAEEL	48.174	575	271	7	151	1842	23	581	0.0	548	2088	617	81	HIGH	Acyl-CoA dehydrogenase family member 11
+Montipora_capitata_HIv3___RNAseq.g11214.t1	P68266	GLTP_PIG	44.390	205	106	4	19	609	5	209	2.77e-52	170	612	209	97	HIGH	Glycolipid transfer protein
+Montipora_capitata_HIv3___TS.g44069.t1	P68266	GLTP_PIG	42.326	215	106	5	19	639	5	209	3.84e-49	162	642	209	97	HIGH	Glycolipid transfer protein
+Montipora_capitata_HIv3___TS.g44077.t1	Q5F4A1	G2E3_CHICK	20.492	366	257	15	1276	2349	400	739	2.26e-06	55.1	2364	742	45	LOW	G2/M phase-specific E3 ubiquitin-protein ligase
+Montipora_capitata_HIv3___RNAseq.g11237.t1	A6QLU6	AGRD1_BOVIN	34.653	101	63	1	79	372	726	826	4.45e-13	72.4	789	902	37	LOW	Adhesion G-protein coupled receptor D1
+Montipora_capitata_HIv3___RNAseq.g11431.t1	Q8K2J9	BTBD6_MOUSE	43.525	278	151	3	19	852	115	386	2.85e-73	239	1002	539	83	HIGH	BTB/POZ domain-containing protein 6
+Montipora_capitata_HIv3___RNAseq.g11548.t1	Q60803	TRAF3_MOUSE	37.762	429	243	5	7	1287	158	564	2.28e-87	280	1311	567	98	MEDIUM	TNF receptor-associated factor 3
+Montipora_capitata_HIv3___RNAseq.g11658.t1	O13019	RS12_ORENI	78.906	128	27	0	28	411	4	131	9.96e-68	208	741	132	52	MEDIUM	Small ribosomal subunit protein eS12
+Montipora_capitata_HIv3___RNAseq.g11766.t1	Q0DXS3	RDR1_ORYSJ	31.304	460	259	16	253	1578	69	489	4.47e-45	175	2019	740	66	MEDIUM	Probable RNA-dependent RNA polymerase 1
+Montipora_capitata_HIv3___RNAseq.g11883.t1	A0A1D5NSM8	SVEP1_DANRE	46.354	192	98	4	79	639	1427	1618	9.72e-43	157	678	3615	83	HIGH	Sushi, von Willebrand factor type A, EGF and pentraxin domain-containing protein 1
+Montipora_capitata_HIv3___RNAseq.g12062.t1	F8W3R9	ALK_DANRE	39.806	103	50	3	364	654	688	784	7.30e-07	55.5	1206	1705	24	LOW	ALK tyrosine kinase receptor
+Montipora_capitata_HIv3___RNAseq.g12097.t1	P27708	PYR1_HUMAN	62.049	2245	735	19	70	6546	2	2215	0.0	2702	6582	2225	98	HIGH	Multifunctional protein CAD
+Montipora_capitata_HIv3___RNAseq.g40427.t1a	Q05932	FOLC_HUMAN	47.415	561	259	11	16	1650	45	585	1.16e-161	476	1665	587	98	HIGH	Folylpolyglutamate synthase, mitochondrial
+Montipora_capitata_HIv3___RNAseq.g40444.t1	Q5UQ60	YL662_MIMIV	25.753	299	184	10	232	1053	48	333	2.28e-18	89.7	1113	462	74	LOW	Uncharacterized protein L662
+Montipora_capitata_HIv3___RNAseq.g40524.t1	Q16787	LAMA3_HUMAN	55.319	47	21	0	190	330	1263	1309	2.38e-10	59.7	351	3333	50	LOW	Laminin subunit alpha-3
+Montipora_capitata_HIv3___TS.g47006.t1	Q12766	HMGX3_HUMAN	21.973	223	128	4	28	576	917	1133	1.06e-06	53.1	756	1292	73	LOW	HMG domain-containing protein 3
+Montipora_capitata_HIv3___RNAseq.g40556.t1	Q64605	PTPRS_RAT	27.813	791	474	32	76	2343	162	890	1.40e-45	181	2451	1907	94	LOW	Receptor-type tyrosine-protein phosphatase S
+Montipora_capitata_HIv3___TS.g47027.t2	Q13114	TRAF3_HUMAN	33.750	560	327	12	40	1710	47	565	2.34e-100	318	1713	568	98	MEDIUM	TNF receptor-associated factor 3
+Montipora_capitata_HIv3___RNAseq.g40578.t1	Q60803	TRAF3_MOUSE	33.216	569	311	15	40	1689	46	564	9.89e-96	306	1737	567	95	MEDIUM	TNF receptor-associated factor 3
+Montipora_capitata_HIv3___TS.g47198.t1	Q95SX7	RTBS_DROME	31.855	248	145	10	655	1368	548	781	4.89e-13	75.1	1374	906	52	MEDIUM	Probable RNA-directed DNA polymerase from transposon BS
+Montipora_capitata_HIv3___TS.g47223.t1	O73853	CP17A_ICTPU	37.166	487	298	4	43	1494	18	499	5.80e-109	336	1500	514	97	MEDIUM	Steroid 17-alpha-hydroxylase/17,20 lyase
+Montipora_capitata_HIv3___RNAseq.g40803.t1	Q1LXK4	M10B1_DANRE	43.581	849	432	23	571	3027	157	988	0.0	622	3117	1013	79	HIGH	Putative helicase mov-10-B.1
+Montipora_capitata_HIv3___RNAseq.g40982.t1a	Q6DCP1	FXRD1_XENLA	46.229	411	191	7	190	1335	90	499	1.48e-120	363	1338	499	86	HIGH	FAD-dependent oxidoreductase domain-containing protein 1
+Montipora_capitata_HIv3___RNAseq.g40983.t1	P49899	IOD3_XENLA	38.235	170	68	4	217	618	86	254	3.33e-33	123	645	271	62	MEDIUM	Thyroxine 5-deiodinase
+Montipora_capitata_HIv3___RNAseq.g40991.t1	Q6DG03	DMTF1_DANRE	38.596	285	160	5	988	1842	124	393	5.52e-48	182	1914	645	45	LOW	Cyclin-D-binding Myb-like transcription factor 1
+Montipora_capitata_HIv3___RNAseq.g41091.t1c	Q7RTR2	NLRC3_HUMAN	41.688	391	226	1	997	2163	671	1061	2.27e-75	267	2223	1065	54	MEDIUM	NLR family CARD domain-containing protein 3
+Montipora_capitata_HIv3___RNAseq.g41093.t1	Q7RTR2	NLRC3_HUMAN	39.589	389	205	2	4	1080	677	1065	1.05e-68	237	1143	1065	97	MEDIUM	NLR family CARD domain-containing protein 3
+Montipora_capitata_HIv3___RNAseq.g41114.t1	P20700	LMNB1_HUMAN	30.189	583	302	14	40	1632	20	549	4.62e-48	182	2217	586	88	MEDIUM	Lamin-B1
+Montipora_capitata_HIv3___RNAseq.g41144.t1	O60494	CUBN_HUMAN	31.330	233	139	5	160	846	824	1039	4.59e-22	103	1419	3623	63	MEDIUM	Cubilin
+Montipora_capitata_HIv3___RNAseq.g41226.t1	Q9NVG8	TBC13_HUMAN	59.645	394	150	4	10	1170	6	397	6.34e-165	472	1248	400	93	HIGH	TBC1 domain family member 13
+Montipora_capitata_HIv3___RNAseq.g41254.t1	Q8TE60	ATS18_HUMAN	31.328	881	463	27	163	2445	60	918	1.61e-120	396	2484	1221	92	MEDIUM	A disintegrin and metalloproteinase with thrombospondin motifs 18
+Montipora_capitata_HIv3___TS.g47745.t1	Q5R874	DHX9_PONAB	53.138	1195	489	16	19	3555	5	1144	0.0	1258	3771	1269	94	HIGH	ATP-dependent RNA helicase A
+Montipora_capitata_HIv3___RNAseq.g41318.t1	Q08CY9	EOGT_XENTR	50.320	469	214	9	133	1518	56	512	5.02e-158	463	1554	525	89	HIGH	EGF domain-specific O-linked N-acetylglucosamine transferase
+Montipora_capitata_HIv3___RNAseq.g41333.t1	Q5ZMC0	EDF1_CHICK	70.946	148	43	0	1	444	1	148	4.02e-72	216	450	148	99	HIGH	Endothelial differentiation-related factor 1 homolog
+Montipora_capitata_HIv3___RNAseq.g41416.t2a	B3EWZ9	HEPHL_ACRMI	54.771	1090	474	10	28	3270	6	1085	0.0	1250	3474	1114	93	HIGH	Hephaestin-like protein
+Montipora_capitata_HIv3___RNAseq.g41490.t1	P33587	PROC_MOUSE	32.861	353	184	12	310	1242	104	445	6.71e-40	151	1266	460	74	MEDIUM	Vitamin K-dependent protein C
+Montipora_capitata_HIv3___TS.g48039.t2	O01635	ASIC1_CAEEL	26.950	423	215	17	574	1806	436	776	6.08e-27	120	1896	823	65	LOW	Degenerin-like protein asic-1
+Montipora_capitata_HIv3___RNAseq.g41558.t1	B3EWY6	SAAR1_ACRMI	38.532	109	63	3	133	456	113	218	7.49e-15	76.3	711	386	46	LOW	Skeletal aspartic acid-rich protein 1
+Montipora_capitata_HIv3___RNAseq.g41637.t1	Q8N567	ZCHC9_HUMAN	50.000	152	66	5	472	924	129	271	3.11e-44	155	927	271	49	LOW	Zinc finger CCHC domain-containing protein 9
+Montipora_capitata_HIv3___TS.g48244.t1	Q6N075	MFSD5_HUMAN	35.156	384	226	6	220	1335	26	398	9.74e-51	182	1497	450	75	MEDIUM	Molybdate-anion transporter
+Montipora_capitata_HIv3___RNAseq.g42092.t1	Q8C1B2	PARPT_MOUSE	36.946	203	124	4	2257	2859	449	649	1.16e-33	142	2868	657	21	LOW	Protein mono-ADP-ribosyltransferase TIPARP
+Montipora_capitata_HIv3___RNAseq.g42130.t1	Q09575	YRD6_CAEEL	27.624	181	111	6	205	693	714	892	1.02e-10	64.7	705	1268	69	LOW	Uncharacterized protein K02A2.6
+Montipora_capitata_HIv3___RNAseq.g42152.t1	Q9TXQ1	TNKS1_CAEEL	33.469	493	289	12	6127	7545	1800	2273	1.96e-66	255	7800	2276	57	MEDIUM	Poly [ADP-ribose] polymerase tankyrase
+Montipora_capitata_HIv3___RNAseq.g42608.t1	Q8IU60	DCP2_HUMAN	50.787	254	122	1	67	828	8	258	1.11e-93	291	1314	420	58	MEDIUM	m7GpppN-mRNA hydrolase
+Montipora_capitata_HIv3___RNAseq.g42612.t1	Q8HXX6	SAP3_MACFA	23.529	187	111	7	52	531	7	188	2.10e-09	57.8	534	190	90	LOW	Ganglioside GM2 activator
+Montipora_capitata_HIv3___RNAseq.g42740.t1	Q9JME5	AP3B2_MOUSE	72.144	639	172	2	40	1938	23	661	0.0	887	2595	1082	73	HIGH	AP-3 complex subunit beta-2
+Montipora_capitata_HIv3___RNAseq.g42988.t1	Q8C9B9	DIDO1_MOUSE	54.545	33	15	0	2158	2256	266	298	8.87e-07	57.0	2367	2256	4	LOW	Death-inducer obliterator 1
+Montipora_capitata_HIv3___RNAseq.g43111.t1	Q99L28	RLP24_MOUSE	64.375	160	55	1	1	474	1	160	6.66e-71	214	486	163	98	HIGH	Probable ribosome biogenesis protein RLP24
+Montipora_capitata_HIv3___RNAseq.g43134.t1	P32027	CROC_DROME	62.385	109	41	0	238	564	71	179	8.65e-40	148	849	508	39	LOW	Fork head domain-containing protein crocodile
+Montipora_capitata_HIv3___RNAseq.g43161.t1a	O88700	BLM_MOUSE	50.617	567	263	7	937	2622	656	1210	0.0	579	2979	1416	57	MEDIUM	RecQ-like DNA helicase BLM
+Montipora_capitata_HIv3___RNAseq.g43228.t1a	Q9D2K4	IQCH_MOUSE	42.048	1094	562	16	22	3249	5	1044	0.0	845	3729	1071	87	HIGH	IQ domain-containing protein H
+Montipora_capitata_HIv3___RNAseq.g43738.t1	A0A261GVB1	TYR2_HAHS4	41.834	447	206	14	13	1275	2	420	9.98e-93	301	2070	550	61	HIGH	Tyrosinase HcTyr2
+Montipora_capitata_HIv3___RNAseq.g43827.t1	P31907	HOXX_BRADU	50.943	106	47	3	7	309	327	432	1.94e-21	90.9	333	566	91	HIGH	Hydrogenase maturation factor HoxX
+Montipora_capitata_HIv3___TS.g50346.t1b	P31907	HOXX_BRADU	31.004	229	125	11	40	690	10	217	3.81e-15	77.8	711	566	92	MEDIUM	Hydrogenase maturation factor HoxX
+Montipora_capitata_HIv3___RNAseq.g43960.t1	Q8R508	FAT3_RAT	37.302	126	61	7	106	462	4021	4135	2.66e-11	72.0	2685	4555	13	LOW	Protocadherin Fat 3
+Montipora_capitata_HIv3___RNAseq.g44050.t1	Q7T2B9	MTPN_DANRE	40.449	89	52	1	385	651	6	93	7.95e-14	69.3	732	118	36	LOW	Myotrophin
+Montipora_capitata_HIv3___TS.g50674.t1	Q9BXW7	HDHD5_HUMAN	38.107	412	169	11	109	1188	41	418	1.12e-57	197	1203	423	90	MEDIUM	Haloacid dehalogenase-like hydrolase domain-containing 5
+Montipora_capitata_HIv3___RNAseq.g44164.t1	P38658	ERP60_SCHMA	37.008	127	72	2	76	435	19	144	4.29e-20	89.4	498	484	72	MEDIUM	Probable protein disulfide-isomerase ER-60
+Montipora_capitata_HIv3___RNAseq.g44252.t1	H1AFJ5	SCNNA_NEOFS	27.419	558	332	16	148	1671	23	557	1.09e-55	202	1716	655	89	LOW	Epithelial sodium channel subunit alpha
+Montipora_capitata_HIv3___RNAseq.g44321.t1	Q3UZD5	PRDM6_MOUSE	41.609	435	193	12	670	1944	200	583	1.81e-95	309	1953	596	65	HIGH	Putative histone-lysine N-methyltransferase PRDM6
+Montipora_capitata_HIv3___RNAseq.g46193.t1c	Q86VZ2	WDR5B_HUMAN	23.899	318	210	12	3007	3912	27	328	1.36e-08	62.0	4062	330	22	LOW	WD repeat-containing protein 5B
+Montipora_capitata_HIv3___RNAseq.g46357.t1	Q9CYL5	GAPR1_MOUSE	42.282	149	77	5	811	1251	9	150	1.52e-28	113	1362	154	32	LOW	Golgi-associated plant pathogenesis-related protein 1
+Montipora_capitata_HIv3___RNAseq.g46376.t1	B3EWZ8	ECT_ACRMI	54.762	42	19	0	298	423	248	289	3.93e-06	48.9	459	400	27	LOW	Ectin (Fragment)
+Montipora_capitata_HIv3___RNAseq.g46377.t1	Q9CYL5	GAPR1_MOUSE	41.441	111	49	6	1	324	52	149	7.85e-14	66.6	351	154	92	MEDIUM	Golgi-associated plant pathogenesis-related protein 1
+Montipora_capitata_HIv3___RNAseq.g46378.t1	P48416	CP10_LYMST	33.794	506	314	10	73	1566	52	544	6.12e-95	302	1569	545	95	MEDIUM	Cytochrome P450 10
+Montipora_capitata_HIv3___RNAseq.g46398.t1	Q09930	DIRA_CAEEL	33.918	171	102	3	58	567	31	191	2.20e-28	109	663	219	77	MEDIUM	GTP-binding protein drn-1 (Fragment)
+Montipora_capitata_HIv3___RNAseq.g46409.t1	Q9PVW8	SAL_SILAS	37.681	207	109	7	40	636	113	307	2.44e-31	119	642	308	93	MEDIUM	Rhamnose-binding lectin
+Montipora_capitata_HIv3___RNAseq.g46546.t1	Q93Z30	BHP_ARATH	30.159	252	145	8	1684	2355	166	414	1.71e-24	111	2367	459	28	LOW	Serine/threonine-protein kinase 12
+Montipora_capitata_HIv3___RNAseq.g46567.t1	Q93Z30	BHP_ARATH	30.992	242	141	7	979	1635	176	414	1.19e-23	107	1665	459	39	LOW	Serine/threonine-protein kinase 12
+Montipora_capitata_HIv3___TS.g1054.t1	F6R2G2	NLRC4_XENTR	26.056	284	155	11	409	1131	143	414	2.13e-10	66.2	1146	997	63	LOW	NLR family CARD domain-containing protein 4
+Montipora_capitata_HIv3___RNAseq.g46769.t1	Q80TC5	POGK_MOUSE	32.258	93	61	2	205	483	199	289	1.94e-06	51.2	594	607	47	LOW	Pogo transposable element with KRAB domain
+Montipora_capitata_HIv3___RNAseq.g46819.t1	Q9VVY3	GBS76_DROME	36.872	179	101	5	142	651	459	634	1.72e-28	115	675	681	76	MEDIUM	Glycogen-binding subunit 76A
+Montipora_capitata_HIv3___RNAseq.g46820.t1	Q28E28	PPR3B_XENTR	41.379	174	91	6	139	630	77	249	1.29e-28	112	705	301	70	HIGH	Protein phosphatase 1 regulatory subunit 3B
+Montipora_capitata_HIv3___TS.g1118.t1	Q8TDB6	DTX3L_HUMAN	57.542	179	75	1	1498	2031	561	739	1.35e-51	194	2037	740	26	LOW	E3 ubiquitin-protein ligase DTX3L
+Montipora_capitata_HIv3___RNAseq.g46860.t1	Q9WYX8	Y508_THEMA	48.295	176	87	4	1471	1998	426	597	5.35e-39	158	3654	599	14	LOW	Uncharacterized protein TM_0508
+Montipora_capitata_HIv3___RNAseq.g46863.t1	Q8TDB6	DTX3L_HUMAN	56.863	204	86	2	2251	2856	536	739	6.38e-57	213	2862	740	21	LOW	E3 ubiquitin-protein ligase DTX3L
+Montipora_capitata_HIv3___RNAseq.35314_t	Q5REG4	DTX3_PONAB	59.574	188	72	3	3538	4089	157	344	1.28e-54	197	4095	347	13	LOW	Probable E3 ubiquitin-protein ligase DTX3
+Montipora_capitata_HIv3___RNAseq.g46921.t1	A2RT91	ANKAR_MOUSE	32.533	375	249	3	25	1143	977	1349	1.32e-55	205	1617	1465	69	MEDIUM	Ankyrin and armadillo repeat-containing protein
+Montipora_capitata_HIv3___RNAseq.g47014.t1	Q3UQ28	PXDN_MOUSE	31.250	272	179	6	535	1326	340	611	8.72e-33	137	1515	1475	62	MEDIUM	Peroxidasin homolog
+Montipora_capitata_HIv3___TS.g1358.t1	Q9Z0U4	GABR1_RAT	22.737	475	291	14	70	1335	163	614	1.28e-22	104	1353	960	94	LOW	Gamma-aminobutyric acid type B receptor subunit 1
+Montipora_capitata_HIv3___RNAseq.g47210.t1	Q09575	YRD6_CAEEL	28.529	333	203	11	223	1140	753	1077	2.39e-33	138	1515	1268	61	LOW	Uncharacterized protein K02A2.6
+Montipora_capitata_HIv3___RNAseq.g47211.t1	P10394	POL4_DROME	41.667	96	54	1	205	486	443	538	1.01e-13	71.6	516	1237	55	MEDIUM	Retrovirus-related Pol polyprotein from transposon 412
+Montipora_capitata_HIv3___RNAseq.g47379.t1	Q99547	MPH6_HUMAN	48.352	91	42	2	1	273	75	160	1.22e-11	60.1	276	160	99	MEDIUM	M-phase phosphoprotein 6
+Montipora_capitata_HIv3___RNAseq.g47633.t1	Q9BZ19	ANR60_HUMAN	25.907	193	111	8	127	636	113	296	5.53e-07	57.0	3384	345	15	LOW	Ankyrin repeat domain-containing protein 60
+Montipora_capitata_HIv3___RNAseq.g47938.t1	P05130	KPC1_DROME	37.193	285	162	7	328	1167	352	624	5.38e-48	176	1185	679	71	MEDIUM	Protein kinase C, brain isozyme
+Montipora_capitata_HIv3___RNAseq.g47955.t1	Q641Y8	DDX1_RAT	67.692	195	61	1	7	585	538	732	7.14e-93	289	609	740	95	HIGH	ATP-dependent RNA helicase DDX1
+Montipora_capitata_HIv3___RNAseq.g48010.t1	Q96CG8	CTHR1_HUMAN	46.763	139	70	3	148	555	105	242	2.93e-36	130	666	243	61	HIGH	Collagen triple helix repeat-containing protein 1
+Montipora_capitata_HIv3___TS.g2501.t2	A4IFW2	PTPRF_DANRE	30.588	340	192	9	1051	1998	600	919	8.46e-30	132	2802	1909	34	LOW	Receptor-type tyrosine-protein phosphatase F
+Montipora_capitata_HIv3___TS.g2560.t1	P23978	SC6A1_RAT	44.479	643	284	8	97	1998	1	579	0.0	557	2073	599	92	HIGH	Sodium- and chloride-dependent GABA transporter 1
+Montipora_capitata_HIv3___RNAseq.g49273.t1	B3EWY9	MLP_ACRMI	31.173	571	320	15	34	1590	1004	1553	3.93e-73	256	1602	1594	97	MEDIUM	Mucin-like protein (Fragment)
+Montipora_capitata_HIv3___RNAseq.g49548.t1b	Q90805	CNG1_CHICK	30.879	421	264	12	589	1824	244	646	6.68e-51	196	3444	735	72	MEDIUM	Cyclic nucleotide-gated channel cone photoreceptor subunit alpha
+Montipora_capitata_HIv3___RNAseq.g49564.t1	P78357	CNTP1_HUMAN	32.609	276	170	8	277	1086	515	780	3.31e-33	134	1095	1384	74	MEDIUM	Contactin-associated protein 1
+Montipora_capitata_HIv3___RNAseq.g49577.t1	Q5TM20	TNFB_MACMU	28.931	159	87	7	49	474	56	205	4.68e-08	53.5	477	205	89	LOW	Lymphotoxin-alpha
+Montipora_capitata_HIv3___RNAseq.g49841.t1	A0A0C2SRU0	IBOD_AMAMK	40.960	354	177	9	367	1347	1	349	5.90e-81	257	1359	350	72	HIGH	Decarboxylase iboD
+Montipora_capitata_HIv3___RNAseq.g49895.t2	O43315	AQP9_HUMAN	49.438	267	134	1	76	873	4	270	1.84e-86	264	933	295	86	HIGH	Aquaporin-9
+Montipora_capitata_HIv3___RNAseq.g49962.t1	Q96C34	RUND1_HUMAN	33.888	661	316	16	58	1935	39	613	1.31e-81	273	1947	613	96	MEDIUM	RUN domain-containing protein 1
+Montipora_capitata_HIv3___RNAseq.g49974.t1	Q9W7R6	SOX14_CHICK	54.630	108	46	2	10	327	3	109	3.64e-26	105	723	240	44	LOW	Transcription factor SOX-14
+Montipora_capitata_HIv3___RNAseq.g49986.t1	A0A2J6RX17	NLRN_HYAVF	22.381	420	261	14	1003	2184	358	738	9.26e-07	57.8	4755	990	25	LOW	Nucleotide-binding leucine-rich repeat (NLR)-like protein
+Montipora_capitata_HIv3___RNAseq.g50110.t1	Q5CZC0	FSIP2_HUMAN	44.231	104	52	4	94	399	51	150	2.67e-12	77.0	7284	6907	4	LOW	Fibrous sheath-interacting protein 2
+Montipora_capitata_HIv3___RNAseq.g50166.t1	Q9UBS5	GABR1_HUMAN	26.385	758	467	19	22	2136	164	883	1.27e-61	226	2139	961	99	LOW	Gamma-aminobutyric acid type B receptor subunit 1
+Montipora_capitata_HIv3___TS.g4543.t1	O88871	GABR2_RAT	37.584	298	175	3	88	981	457	743	2.61e-57	206	1290	940	69	MEDIUM	Gamma-aminobutyric acid type B receptor subunit 2
+Montipora_capitata_HIv3___RNAseq.g50170.t1	O75899	GABR2_HUMAN	26.368	603	368	14	379	2049	173	745	1.08e-52	201	2319	941	72	LOW	Gamma-aminobutyric acid type B receptor subunit 2
+Montipora_capitata_HIv3___RNAseq.g50276.t1	Q6NV04	HACL2_DANRE	69.231	624	187	2	1	1866	1	621	0.0	792	1869	621	99	HIGH	2-hydroxyacyl-CoA lyase 2
+Montipora_capitata_HIv3___TS.g4674.t2b	F1M3J4	MRP4_RAT	32.895	760	444	14	49	2244	4	725	1.20e-124	410	2655	1325	96	MEDIUM	ATP-binding cassette subfamily C member 4
+Montipora_capitata_HIv3___RNAseq.g8250.t1b	Q9UNQ0	ABCG2_HUMAN	50.556	540	260	3	28	1641	60	594	1.64e-179	524	1692	655	95	HIGH	Broad substrate specificity ATP-binding cassette transporter ABCG2
+Montipora_capitata_HIv3___TS.g20607.t1	Q9P2R3	ANFY1_HUMAN	54.369	515	182	1	331	1716	652	1166	0.0	556	1725	1169	81	HIGH	Rabankyrin-5
+Montipora_capitata_HIv3___RNAseq.g23883.t1	O50655	XERD_SELRU	28.155	206	142	4	94	699	39	242	3.84e-15	78.6	948	341	64	LOW	Integrase/recombinase xerD homolog
+Montipora_capitata_HIv3___RNAseq.g12596.t1	Q8BIK4	DOCK9_MOUSE	38.227	1117	547	25	1	3078	532	1596	0.0	704	3462	2055	99	MEDIUM	Dedicator of cytokinesis protein 9
+Montipora_capitata_HIv3___TS.g23449.t1	P08548	LIN1_NYCCO	23.858	197	143	2	3154	3732	452	645	1.21e-12	77.0	4101	1260	14	LOW	LINE-1 reverse transcriptase homolog
+Montipora_capitata_HIv3___RNAseq.g18899.t1c	A8WH75	CD302_PIG	25.926	135	82	7	22	408	30	152	1.75e-06	49.3	465	240	83	LOW	CD302 antigen
+Montipora_capitata_HIv3___RNAseq.g40120.t1	Q8RWL6	STY17_ARATH	29.242	277	170	9	2110	2883	275	544	3.32e-26	118	2907	570	27	LOW	Serine/threonine-protein kinase STY17
+Montipora_capitata_HIv3___RNAseq.g40082.t1	Q61488	DHH_MOUSE	33.146	178	112	3	985	1497	187	364	1.81e-22	103	1602	396	32	LOW	Desert hedgehog protein
+Montipora_capitata_HIv3___RNAseq.g7598.t1	Q5TZ51	MPV17_DANRE	49.123	171	85	2	22	528	5	175	9.87e-54	172	582	177	87	HIGH	Mitochondrial inner membrane protein Mpv17
+Montipora_capitata_HIv3___RNAseq.g50386.t1	P86854	PLCL_MYTGA	30.435	138	89	5	163	573	17	148	4.45e-18	80.9	636	156	65	MEDIUM	Perlucin-like protein
+Montipora_capitata_HIv3___TS.g19595.t1	Q96CG8	CTHR1_HUMAN	43.169	183	93	4	925	1440	61	243	5.31e-39	145	1449	243	36	LOW	Collagen triple helix repeat-containing protein 1
+Montipora_capitata_HIv3___RNAseq.g7739.t1	Q6TEP1	F91A1_DANRE	40.000	280	135	7	1	837	567	814	1.04e-51	184	843	831	99	HIGH	Protein FAM91A1
+Montipora_capitata_HIv3___RNAseq.g7741.t1	Q91731	SX11A_XENLA	67.949	78	24	1	58	288	31	108	1.62e-29	118	879	382	26	LOW	Transcription factor Sox-11-A
+Montipora_capitata_HIv3___RNAseq.g12401.t1	Q20176	NAS39_CAEEL	37.607	117	69	2	679	1023	664	778	8.99e-13	75.1	1683	928	20	LOW	Zinc metalloproteinase nas-39
+Montipora_capitata_HIv3___RNAseq.g23762.t1	Q5R739	JOS1_PONAB	45.714	175	94	1	4	525	25	199	5.11e-53	171	573	202	91	HIGH	Josephin-1
+Montipora_capitata_HIv3___RNAseq.g8395.t2a	Q9BUZ4	TRAF4_HUMAN	29.592	294	151	5	52	768	3	295	1.24e-39	152	1404	470	51	LOW	TNF receptor-associated factor 4
+Montipora_capitata_HIv3___RNAseq.g45777.t1	Q6DBY9	CHST1_DANRE	29.477	363	219	17	127	1146	65	413	5.19e-28	117	1179	420	87	LOW	Carbohydrate sulfotransferase 1
+Montipora_capitata_HIv3___RNAseq.g3804.t1	Q9VBW3	CAD96_DROME	43.986	291	160	2	1384	2256	484	771	3.75e-76	265	2259	773	39	LOW	Tyrosine kinase receptor Cad96Ca
+Montipora_capitata_HIv3___RNAseq.g3632.t2	P01133	EGF_HUMAN	47.619	63	31	2	1968	2150	870	932	3.96e-08	60.8	2154	1207	8	LOW	Pro-epidermal growth factor
+Montipora_capitata_HIv3___RNAseq.g40162.t1	Q9Z0U4	GABR1_RAT	27.440	707	444	19	88	2139	169	829	8.85e-58	216	2322	960	88	LOW	Gamma-aminobutyric acid type B receptor subunit 1
+Montipora_capitata_HIv3___RNAseq.g40166.t1	O88871	GABR2_RAT	29.364	613	369	15	427	2193	172	744	3.90e-64	235	2463	940	72	LOW	Gamma-aminobutyric acid type B receptor subunit 2
+Montipora_capitata_HIv3___TS.g14199.t1	Q5F4A1	G2E3_CHICK	20.386	363	259	13	1276	2343	400	739	4.82e-07	57.4	2358	742	45	LOW	G2/M phase-specific E3 ubiquitin-protein ligase
+Montipora_capitata_HIv3___RNAseq.g12548.t1	Q640U7	CCD93_XENTR	64.754	122	43	0	1114	1479	485	606	3.89e-46	173	1497	610	24	LOW	Coiled-coil domain-containing protein 93
+Montipora_capitata_HIv3___RNAseq.g29751.t1	Q5ZM55	FEM1B_CHICK	38.278	627	375	5	31	1896	8	627	1.24e-133	408	1899	627	98	MEDIUM	Protein fem-1 homolog B
+Montipora_capitata_HIv3___RNAseq.g18650.t1	Q7RTR2	NLRC3_HUMAN	44.444	387	215	0	418	1578	671	1057	2.73e-72	252	1581	1065	92	HIGH	NLR family CARD domain-containing protein 3
+Montipora_capitata_HIv3___TS.g14155.t1	Q8N972	ZN709_HUMAN	62.284	464	175	0	10	1401	151	614	0.0	579	1647	641	85	HIGH	Zinc finger protein 709
+Montipora_capitata_HIv3___RNAseq.g4241.t1	Q504Q3	PAN2_HUMAN	51.433	628	280	9	1	1845	566	1181	0.0	591	1866	1202	99	HIGH	PAN2-PAN3 deadenylation complex catalytic subunit PAN2
+Montipora_capitata_HIv3___RNAseq.g4221.t1	Q5F4A1	G2E3_CHICK	21.359	309	193	8	496	1302	389	687	3.84e-11	69.3	1470	742	55	LOW	G2/M phase-specific E3 ubiquitin-protein ligase
+Montipora_capitata_HIv3___RNAseq.g8507.t1	Q14159	SPIDR_HUMAN	29.589	365	194	14	19	1062	257	575	3.85e-22	103	1407	915	74	LOW	DNA repair-scaffolding protein
+Montipora_capitata_HIv3___RNAseq.g29906.t1	Q9Y5X5	NPFF2_HUMAN	23.500	200	119	8	28	558	260	448	4.62e-06	51.2	828	522	64	LOW	Neuropeptide FF receptor 2
+Montipora_capitata_HIv3___RNAseq.g34888.t1	Q9CL21	RECQ_PASMU	27.969	261	145	10	1	777	134	353	2.63e-20	94.7	921	632	84	LOW	ATP-dependent DNA helicase RecQ
+Montipora_capitata_HIv3___RNAseq.g18955.t1	Q3UG20	KMT2E_MOUSE	35.208	480	236	10	247	1497	118	585	3.56e-61	235	4056	1868	31	LOW	Inactive histone-lysine N-methyltransferase 2E
+Montipora_capitata_HIv3___RNAseq.g29879.t1b	Q8BIK4	DOCK9_MOUSE	39.840	1870	855	34	25	5004	238	2047	0.0	1245	5073	2055	98	MEDIUM	Dedicator of cytokinesis protein 9
+Montipora_capitata_HIv3___RNAseq.g18698.t1	Q12965	MYO1E_HUMAN	50.877	114	52	2	1	333	818	930	3.21e-25	117	2790	1108	17	LOW	Unconventional myosin-Ie
+Montipora_capitata_HIv3___RNAseq.g34765.t1	O00463	TRAF5_HUMAN	22.018	218	153	5	52	666	39	252	4.03e-12	70.1	933	557	66	LOW	TNF receptor-associated factor 5
+Montipora_capitata_HIv3___RNAseq.g6.t1	Q9VBW3	CAD96_DROME	43.269	312	174	2	1093	2028	463	771	1.77e-72	253	2031	773	46	LOW	Tyrosine kinase receptor Cad96Ca
+Montipora_capitata_HIv3___TS.g7221.t1	O88516	DLL3_MOUSE	44.706	85	46	1	883	1137	308	391	5.16e-14	78.6	1677	592	19	LOW	Delta-like protein 3
+Montipora_capitata_HIv3___RNAseq.g4159.t1	Q96AY4	TTC28_HUMAN	25.868	835	534	25	169	2538	294	1088	5.09e-46	183	2541	2481	98	LOW	Tetratricopeptide repeat protein 28
+Montipora_capitata_HIv3___TS.g20500.t1	Q8N972	ZN709_HUMAN	62.740	365	134	1	211	1305	203	565	1.64e-154	461	1764	641	68	HIGH	Zinc finger protein 709
+Montipora_capitata_HIv3___RNAseq.g8070.t1	O35235	TNF11_MOUSE	29.464	112	70	3	169	477	201	312	9.33e-07	50.8	483	316	64	LOW	Tumor necrosis factor ligand superfamily member 11
+Montipora_capitata_HIv3___RNAseq.g50417.t1	O50655	XERD_SELRU	29.655	290	189	8	79	930	45	325	1.01e-17	85.9	978	341	87	LOW	Integrase/recombinase xerD homolog
+Montipora_capitata_HIv3___RNAseq.g23618.t1	Q8WTJ4	UBXN6_CAEEL	28.440	109	67	3	22	324	150	255	2.64e-06	50.8	615	437	49	LOW	UBX domain-containing protein 6
+Montipora_capitata_HIv3___RNAseq.g50691.t1	Q14554	PDIA5_HUMAN	37.456	283	157	5	76	909	236	503	1.14e-35	138	975	519	87	MEDIUM	Protein disulfide-isomerase A5
+Montipora_capitata_HIv3___TS.g23708.t1	Q99JY3	GIMA4_MOUSE	31.980	197	106	6	748	1335	31	200	2.93e-17	87.0	1914	328	31	LOW	GTPase IMAP family member 4
+Montipora_capitata_HIv3___RNAseq.g4125.t1	Q9NZJ4	SACS_HUMAN	27.604	1594	914	54	85	4380	3061	4576	6.62e-128	445	4389	4579	98	LOW	Sacsin
+Montipora_capitata_HIv3___RNAseq.g50729.t2	Q9BUZ4	TRAF4_HUMAN	32.143	196	120	9	433	1002	25	213	9.63e-18	90.5	2184	470	26	LOW	TNF receptor-associated factor 4
+Montipora_capitata_HIv3___RNAseq.g15566.t1	O06997	YVDP_BACSU	29.139	453	277	13	163	1461	18	446	3.68e-26	114	1488	447	87	LOW	Uncharacterized FAD-linked oxidoreductase YvdP
+Montipora_capitata_HIv3___RNAseq.g15327.t1	Q61382	TRAF4_MOUSE	26.971	241	155	8	169	840	138	374	3.67e-10	63.5	843	470	80	LOW	TNF receptor-associated factor 4
+Montipora_capitata_HIv3___RNAseq.g29792.t1	P15043	RECQ_ECOLI	25.275	455	272	13	1	1227	78	510	3.78e-32	132	1272	609	96	LOW	ATP-dependent DNA helicase RecQ
+Montipora_capitata_HIv3___RNAseq.g24020.t1	Q16832	DDR2_HUMAN	35.762	151	88	4	91	516	34	184	1.50e-18	93.6	1677	855	25	LOW	Discoidin domain-containing receptor 2
+Montipora_capitata_HIv3___TS.g45403.t1	P35187	SGS1_YEAST	27.138	269	157	9	73	867	676	909	6.35e-17	88.2	1515	1447	52	LOW	ATP-dependent helicase SGS1
+Montipora_capitata_HIv3___TS.g29616.t1	Q8BIK4	DOCK9_MOUSE	34.416	831	335	22	658	2634	1049	1841	1.68e-120	407	2694	2055	97	MEDIUM	Dedicator of cytokinesis protein 9
+Montipora_capitata_HIv3___RNAseq.g40284.t1	Q640U7	CCD93_XENTR	56.643	143	56	2	283	693	457	599	1.77e-46	166	732	610	56	MEDIUM	Coiled-coil domain-containing protein 93
+Montipora_capitata_HIv3___RNAseq.53422_t	P47970	NPTX2_CAVPO	45.122	164	87	2	1	483	240	403	1.50e-41	147	546	427	88	HIGH	Neuronal pentraxin-2
+Montipora_capitata_HIv3___TS.g19443.t1	Q4R9C4	G2E3_MACFA	24.839	310	213	9	241	1140	348	647	1.94e-14	79.3	1305	706	69	LOW	G2/M phase-specific E3 ubiquitin-protein ligase
+Montipora_capitata_HIv3___RNAseq.g7992.t1	Q8BIK4	DOCK9_MOUSE	41.778	900	426	17	7	2532	807	1666	0.0	644	2544	2055	99	HIGH	Dedicator of cytokinesis protein 9
+Montipora_capitata_HIv3___RNAseq.g29851.t1	Q26636	CATL_SARPE	49.379	322	151	5	64	1002	21	339	9.07e-103	308	1005	339	93	HIGH	Cathepsin L
+Montipora_capitata_HIv3___RNAseq.g23733.t1	Q8BIK4	DOCK9_MOUSE	52.107	261	103	4	1	723	1604	1862	2.24e-81	269	765	2055	95	HIGH	Dedicator of cytokinesis protein 9
+Montipora_capitata_HIv3___RNAseq.g23734.t3	Q5JSL3	DOC11_HUMAN	33.548	465	225	12	7	1230	986	1423	2.33e-57	218	2475	2073	70	MEDIUM	Dedicator of cytokinesis protein 11
+Montipora_capitata_HIv3___RNAseq.g18929.t1	Q9NQT4	EXOS5_HUMAN	55.556	207	92	0	49	669	28	234	3.71e-72	223	702	235	88	HIGH	Exosome complex component RRP46
+Montipora_capitata_HIv3___RNAseq.g24095.t1	P97819	PLPL9_MOUSE	51.864	295	137	2	1564	2433	512	806	1.20e-96	322	2436	807	83	HIGH	85/88 kDa calcium-independent phospholipase A2
+Montipora_capitata_HIv3___RNAseq.g8123.t1	Q9W0M3	KDM8_DROME	21.739	230	158	5	64	699	172	397	2.23e-11	68.9	1227	401	52	LOW	Jumonji C domain-containing protein 5
+Montipora_capitata_HIv3___RNAseq.g8124.t1	Q9W0M3	KDM8_DROME	22.174	230	157	5	64	699	172	397	1.41e-11	69.3	1227	401	52	LOW	Jumonji C domain-containing protein 5
+Montipora_capitata_HIv3___RNAseq.g50429.t1	Q8N972	ZN709_HUMAN	66.667	141	47	0	4	426	405	545	3.49e-55	187	513	641	83	HIGH	Zinc finger protein 709
+Montipora_capitata_HIv3___RNAseq.g3908.t1	C0H694	SCR2A_MONCP	92.208	77	6	0	4	234	1	77	1.15e-48	152	309	81	75	HIGH	Small cysteine-rich protein 1 2
+Montipora_capitata_HIv3___TS.g4879.t1	Q5R5U3	ZN271_PONAB	59.453	402	163	0	250	1455	127	528	4.22e-178	518	1470	672	90	HIGH	Zinc finger protein 271
+Montipora_capitata_HIv3___RNAseq.g4457.t1	Q5R2J4	APCD1_PELSI	33.649	422	268	8	82	1326	52	468	6.23e-69	234	1641	515	76	MEDIUM	Protein APCDD1
+Montipora_capitata_HIv3___RNAseq.g50598.t1	Q6ZTR5	CFA47_HUMAN	33.178	1926	1157	33	13	5598	1325	3184	0.0	983	5616	3187	99	MEDIUM	Cilia- and flagella-associated protein 47
+Montipora_capitata_HIv3___RNAseq.g23657.t1	P34457	YMD3_CAEEL	40.351	171	84	4	22	519	30	187	2.81e-30	116	660	286	75	HIGH	Putative uncharacterized transposon-derived protein F54H12.3

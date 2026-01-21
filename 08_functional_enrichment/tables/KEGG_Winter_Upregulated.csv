@@ -1,3 +1,0 @@
-ID,Description,GeneRatio,BgRatio,pvalue,OddsRatio,Count,TermSize,GeneIDs,p.adjust
-ko00330,ko00330,3/24,97/5536,0.008082329112354854,8.22482092139323,3,97,Montipora_capitata_HIv3___TS.g10703.t1/Montipora_capitata_HIv3___RNAseq.g6536.t1a/Montipora_capitata_HIv3___RNAseq.24234_t,0.0404221831915578
-ko05164,ko05164,3/24,117/5536,0.0134740610638526,6.758179444709996,3,117,Montipora_capitata_HIv3___RNAseq.g22747.t1/Montipora_capitata_HIv3___RNAseq.g34571.t1/Montipora_capitata_HIv3___TS.g35289.t2,0.0404221831915578

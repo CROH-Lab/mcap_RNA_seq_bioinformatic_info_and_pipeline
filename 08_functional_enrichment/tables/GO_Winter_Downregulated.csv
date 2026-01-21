@@ -1,2 +1,0 @@
-ID,Description,GeneRatio,BgRatio,pvalue,OddsRatio,Count,TermSize,GeneIDs,p.adjust,TERM,ONTOLOGY
-GO:2001236,regulation of extrinsic apoptotic signaling pathway,3/12,81/8282,1.8608094237995161e-4,34.905630092400195,3,81,Montipora_capitata_HIv3___TS.g14965.t1/Montipora_capitata_HIv3___RNAseq.g29751.t1/Montipora_capitata_HIv3___RNAseq.g44164.t1,0.02865646512651255,regulation of extrinsic apoptotic signaling pathway,BP

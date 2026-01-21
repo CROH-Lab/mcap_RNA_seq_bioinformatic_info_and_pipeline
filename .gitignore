@@ -42,8 +42,23 @@
 06_featurecounts/gene_counts_raw.txt
 06_counts/
 
+# DEG Annotation - BLAST databases (very large, ~117GB)
+08_deg_annotation/databases/
+
+# DEG Annotation - Raw BLAST output (keep only parsed annotations)
+08_deg_annotation/results/degs_vs_sprot.tsv
+08_deg_annotation/results/degs_vs_trembl.tsv
+
+# DEG Annotation - Sequence files (can be regenerated)
+08_deg_annotation/sequences/*.fa
+
 # Log files
 logs/
+
+# R temporary files
+Rplots.pdf
+.Rhistory
+.RData
 
 # System files
 .DS_Store
