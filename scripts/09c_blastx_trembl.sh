@@ -1,7 +1,7 @@
 #!/bin/bash
-#SBATCH --job-name=blastx_trembl
-#SBATCH --output=/home/darmstrong4/mc_rework/logs/blastx_trembl_%j.out
-#SBATCH --error=/home/darmstrong4/mc_rework/logs/blastx_trembl_%j.err
+#SBATCH --job-name=dtre_blastx_trembl
+#SBATCH --output=/home/darmstrong4/mc_rework/logs/dtre_blastx_trembl_%j.out
+#SBATCH --error=/home/darmstrong4/mc_rework/logs/dtre_blastx_trembl_%j.err
 #SBATCH --time=48:00:00
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=64G
@@ -13,7 +13,7 @@ source ~/.bashrc
 conda activate mcap_rnaseq
 
 # Directories
-WORK_DIR="/home/darmstrong4/mc_rework/08_host_deg_annotation"
+WORK_DIR="/home/darmstrong4/mc_rework/09_symbiont_deg_annotation"
 DB="${WORK_DIR}/databases/trembl_db"
 QUERY="${WORK_DIR}/sequences/degs_no_sprot_hit.fa"
 OUT="${WORK_DIR}/results/degs_vs_trembl.tsv"
@@ -21,12 +21,12 @@ OUT="${WORK_DIR}/results/degs_vs_trembl.tsv"
 # Check if input exists
 if [ ! -f ${QUERY} ]; then
     echo "ERROR: No-hit file not found: ${QUERY}"
-    echo "Run 09c_parse_sprot.R first to generate this file"
+    echo "Run 09b_parse_sprot.sh first to generate this file"
     exit 1
 fi
 
 echo "============================================"
-echo "BLASTx vs TrEMBL"
+echo "D. trenchii BLASTx vs TrEMBL"
 echo "============================================"
 echo "Query: ${QUERY}"
 echo "Database: ${DB}"

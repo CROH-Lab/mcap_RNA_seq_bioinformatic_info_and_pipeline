@@ -1,7 +1,7 @@
 #!/bin/bash
 # Merge SwissProt and TrEMBL annotations
 
-cd /home/darmstrong4/mc_rework/09_blast_annotation
+cd /home/darmstrong4/mc_rework/08_host_deg_annotation
 
 echo "=== Merging SwissProt and TrEMBL Annotations ==="
 

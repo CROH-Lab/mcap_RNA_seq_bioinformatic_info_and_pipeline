@@ -475,6 +475,122 @@ results(dds, name = "treatment_B_vs_D", alpha = 0.05)
 | `Mcap_DESeq2.RData` | R objects for downstream analysis |
 | `Dtre_DESeq2.RData` | R objects for downstream analysis |
 
+## DEG Functional Annotation (BLASTx)
+
+### Annotation Strategy
+
+Differentially expressed genes (DEGs) were functionally annotated using a two-tier BLASTx approach against UniProt databases to maximize annotation coverage while prioritizing high-quality curated annotations.
+
+**Pipeline:**
+1. Extract CDS sequences for all DEGs from reference genomes
+2. BLASTx against SwissProt (curated, reviewed proteins)
+3. BLASTx remaining unannotated sequences against TrEMBL (comprehensive, unreviewed)
+4. Parse results, assign quality tiers, and merge annotations
+
+### BLASTx Parameters
+```bash
+blastx -query degs_cds.fa \
+    -db {sprot_db|trembl_db} \
+    -evalue 1e-5 \
+    -max_target_seqs 5 \
+    -num_threads 16 \
+    -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qlen slen qcovs stitle"
+```
+
+### Quality Tier Assignment
+
+| Tier | Criteria |
+|------|----------|
+| **HIGH** | E-value < 1e-20, Identity ≥ 40%, Query coverage ≥ 60% |
+| **MEDIUM** | E-value < 1e-10, Identity ≥ 30%, Query coverage ≥ 50% |
+| **LOW** | Passes E-value < 1e-5 threshold only |
+
+### Host Annotation Results (*M. capitata*)
+
+| Metric | Count | Percentage |
+|--------|-------|------------|
+| **Total DEGs** | 972 | 100% |
+| SwissProt hits | 560 | 57.6% |
+| TrEMBL hits (additional) | 345 | 35.5% |
+| **Total annotated** | **905** | **93.1%** |
+| Unannotated | 67 | 6.9% |
+
+**Quality Distribution (Host):**
+
+| Tier | Count | Percentage |
+|------|-------|------------|
+| HIGH | 368 | 40.7% |
+| MEDIUM | 218 | 24.1% |
+| LOW | 319 | 35.2% |
+
+### Symbiont Annotation Results (*D. trenchii*)
+
+| Metric | Count | Percentage |
+|--------|-------|------------|
+| **Total DEGs** | 281 | 100% |
+| SwissProt hits | 113 | 40.2% |
+| TrEMBL hits (additional) | 50 | 17.8% |
+| **Total annotated** | **163** | **58.0%** |
+| Unannotated | 118 | 42.0% |
+
+**Quality Distribution (Symbiont):**
+
+| Tier | Count | Percentage |
+|------|-------|------------|
+| HIGH | 68 | 41.7% |
+| MEDIUM | 21 | 12.9% |
+| LOW | 74 | 45.4% |
+
+*Note: Dinoflagellates may possess many lineage-specific genes with no characterized homologs.*
+
+### Annotation Databases
+
+| Database | Version | Proteins | Download date |
+|----------|---------|----------|-------------|
+| **SwissProt** | 2024_01 | ~570,000 | 01_18_2026 |
+| **TrEMBL** | 2024_01 | ~250M | 01_18_2026 |
+
+### Output Files
+
+**Host (08_host_deg_annotation/):**
+
+| File | Description |
+|------|-------------|
+| `sequences/all_degs.txt` | List of 972 host DEG IDs |
+| `sequences/degs_cds.fa` | CDS sequences for DEGs |
+| `results/sprot_annotations_full.tsv` | SwissProt best hits with quality tiers |
+| `results/trembl_annotations_full.tsv` | TrEMBL best hits with quality tiers |
+| `results/all_annotations_full.tsv` | Combined annotations (905 genes) |
+| `results/unannotated_degs.txt` | DEGs with no BLAST hits (67 genes) |
+
+**Symbiont (09_symbiont_deg_annotation/):**
+
+| File | Description |
+|------|-------------|
+| `sequences/all_degs.txt` | List of 281 symbiont DEG IDs |
+| `sequences/degs_cds.fa` | CDS sequences for DEGs |
+| `results/sprot_annotations_full.tsv` | SwissProt best hits with quality tiers |
+| `results/trembl_annotations_full.tsv` | TrEMBL best hits with quality tiers |
+| `results/all_annotations_full.tsv` | Combined annotations (163 genes) |
+| `results/unannotated_degs.txt` | DEGs with no BLAST hits (118 genes) |
+
+### Annotation File Format
+
+All annotation files contain the following columns:
+
+| Column | Description |
+|--------|-------------|
+| gene_id | Original gene identifier |
+| uniprot_acc | UniProt accession number |
+| uniprot_entry | UniProt entry name |
+| pident | Percent identity |
+| align_length | Alignment length |
+| evalue | E-value |
+| bitscore | Bit score |
+| qcovs | Query coverage (%) |
+| quality_tier | HIGH/MEDIUM/LOW |
+| description | Protein function description |
+| source | SwissProt or TrEMBL |
 
 ## Directory Structure
 

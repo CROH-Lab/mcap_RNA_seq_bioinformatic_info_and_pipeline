@@ -1,10 +1,10 @@
 #!/bin/bash
-#SBATCH --job-name=blastx_trembl
-#SBATCH --output=/home/darmstrong4/mc_rework/logs/blastx_trembl_%j.out
-#SBATCH --error=/home/darmstrong4/mc_rework/logs/blastx_trembl_%j.err
-#SBATCH --time=48:00:00
+#SBATCH --job-name=dtre_blastx_sprot
+#SBATCH --output=/home/darmstrong4/mc_rework/logs/dtre_blastx_sprot_%j.out
+#SBATCH --error=/home/darmstrong4/mc_rework/logs/dtre_blastx_sprot_%j.err
+#SBATCH --time=12:00:00
 #SBATCH --cpus-per-task=16
-#SBATCH --mem=64G
+#SBATCH --mem=32G
 #SBATCH --mail-user=darmstrong4@islander.tamucc.edu
 #SBATCH --mail-type=BEGIN,END,FAIL
 
@@ -13,20 +13,13 @@ source ~/.bashrc
 conda activate mcap_rnaseq
 
 # Directories
-WORK_DIR="/home/darmstrong4/mc_rework/08_host_deg_annotation"
-DB="${WORK_DIR}/databases/trembl_db"
-QUERY="${WORK_DIR}/sequences/degs_no_sprot_hit.fa"
-OUT="${WORK_DIR}/results/degs_vs_trembl.tsv"
-
-# Check if input exists
-if [ ! -f ${QUERY} ]; then
-    echo "ERROR: No-hit file not found: ${QUERY}"
-    echo "Run 09c_parse_sprot.R first to generate this file"
-    exit 1
-fi
+WORK_DIR="/home/darmstrong4/mc_rework/09_symbiont_deg_annotation"
+DB="${WORK_DIR}/databases/sprot_db"
+QUERY="${WORK_DIR}/sequences/degs_cds.fa"
+OUT="${WORK_DIR}/results/degs_vs_sprot.tsv"
 
 echo "============================================"
-echo "BLASTx vs TrEMBL"
+echo "D. trenchii BLASTx vs SwissProt"
 echo "============================================"
 echo "Query: ${QUERY}"
 echo "Database: ${DB}"

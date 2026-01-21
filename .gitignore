@@ -15,6 +15,7 @@
 # Reference files and indices
 04_reference/*.fa
 04_reference/*.fa.gz
+04_reference/*.fa.fai
 04_reference/*.fasta
 04_reference/*.fasta.gz
 04_reference/*.gff3
@@ -42,15 +43,37 @@
 06_featurecounts/gene_counts_raw.txt
 06_counts/
 
-# DEG Annotation - BLAST databases (very large, ~117GB)
-08_deg_annotation/databases/
+# =============================================================================
+# DEG Annotation - Host (08_host_deg_annotation)
+# =============================================================================
 
-# DEG Annotation - Raw BLAST output (keep only parsed annotations)
-08_deg_annotation/results/degs_vs_sprot.tsv
-08_deg_annotation/results/degs_vs_trembl.tsv
+# BLAST databases (very large, ~117GB)
+08_host_deg_annotation/databases/
 
-# DEG Annotation - Sequence files (can be regenerated)
-08_deg_annotation/sequences/*.fa
+# Raw BLAST output (keep only parsed annotations)
+08_host_deg_annotation/results/degs_vs_sprot.tsv
+08_host_deg_annotation/results/degs_vs_trembl.tsv
+
+# Sequence files (can be regenerated)
+08_host_deg_annotation/sequences/*.fa
+
+# =============================================================================
+# DEG Annotation - Symbiont (09_symbiont_deg_annotation)
+# =============================================================================
+
+# BLAST databases (symlinked to 08, but exclude anyway)
+09_symbiont_deg_annotation/databases
+
+# Raw BLAST output (keep only parsed annotations)
+09_symbiont_deg_annotation/results/degs_vs_sprot.tsv
+09_symbiont_deg_annotation/results/degs_vs_trembl.tsv
+
+# Sequence files (can be regenerated)
+09_symbiont_deg_annotation/sequences/*.fa
+
+# =============================================================================
+# General exclusions
+# =============================================================================
 
 # Log files
 logs/

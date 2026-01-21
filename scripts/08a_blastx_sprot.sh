@@ -13,7 +13,7 @@ source ~/.bashrc
 conda activate mcap_rnaseq
 
 # Directories
-WORK_DIR="/home/darmstrong4/mc_rework/09_blast_annotation"
+WORK_DIR="/home/darmstrong4/mc_rework/08_host_deg_annotation"
 DB="${WORK_DIR}/databases/sprot_db"
 QUERY="${WORK_DIR}/sequences/degs_cds.fa"
 OUT="${WORK_DIR}/results/degs_vs_sprot.tsv"

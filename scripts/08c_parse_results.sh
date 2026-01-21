@@ -1,7 +1,7 @@
 #!/bin/bash
 # Parse TrEMBL results identically to SwissProt
 
-cd /home/darmstrong4/mc_rework/09_blast_annotation
+cd /home/darmstrong4/mc_rework/08_host_deg_annotation
 
 # Check if TrEMBL results exist
 if [ ! -f results/degs_vs_trembl.tsv ]; then
