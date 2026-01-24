@@ -105,3 +105,30 @@ temp/
 test_*.txt
 test_*.txt.summary
 slurm-*.out
+
+# =============================================================================
+# eggNOG databases (very large ~55GB)
+# =============================================================================
+09_symbiont_deg_annotation/databases/eggnog/
+
+# Large protein/CDS sequence files
+09_symbiont_deg_annotation/sequences/*.faa
+09_symbiont_deg_annotation/sequences/Dtre_all_cds.fa
+
+# =============================================================================
+# GO_MWU large intermediate files
+# =============================================================================
+10_GO_MWU/output/*_dissimilarity.csv
+10_GO_MWU/input/*.tmp
+10_GO_MWU/input/go.obo
+
+# GO_MWU intermediate files in working directory
+10_GO_MWU/*.tmp
+10_GO_MWU/dissim_*
+10_GO_MWU/MWU_*
+10_GO_MWU/BP_*
+10_GO_MWU/MF_*
+10_GO_MWU/CC_*
+
+# Reference annotation files (large)
+04_reference/*_ANNOT_gff
