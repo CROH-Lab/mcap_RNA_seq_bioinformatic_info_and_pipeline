@@ -34,8 +34,8 @@ clusterCutHeight <- 0.25
 absValue <- 1
 
 # FDR thresholds for plotting
-level1 <- 0.1
-level2 <- 0.05
+level1 <- 0.05
+level2 <- 0.025
 level3 <- 0.01
 
 # ==============================================================================
