@@ -86,8 +86,8 @@ divisions <- c("BP", "MF", "CC")
 
 # GO_MWU parameters
 largest <- 0.1
-smallest <- 10
-clusterCutHeight <- 0.75
+smallest <- 20
+clusterCutHeight <- 0.95
 
 # absValue for signed -log10(pvalue):
 # -log10(0.05) = 1.3  -> genes with p < 0.05 are "good candidates"
