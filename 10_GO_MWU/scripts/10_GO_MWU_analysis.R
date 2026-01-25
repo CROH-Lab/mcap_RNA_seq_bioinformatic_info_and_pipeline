@@ -87,7 +87,7 @@ divisions <- c("BP", "MF", "CC")
 # GO_MWU parameters
 largest <- 0.1
 smallest <- 20
-clusterCutHeight <- 0.95
+clusterCutHeight <- 0.75
 
 # absValue for signed -log10(pvalue):
 # -log10(0.05) = 1.3  -> genes with p < 0.05 are "good candidates"
@@ -95,9 +95,9 @@ clusterCutHeight <- 0.95
 absValue <- -log10(0.05)  # ~1.3
 
 # FDR thresholds for plotting
-level1 <- 0.05
-level2 <- 0.01
-level3 <- 0.001
+level1 <- 0.01
+level2 <- 0.001
+level3 <- 0.0001
 
 # ==============================================================================
 # RUN ANALYSIS FOR ALL COMBINATIONS
