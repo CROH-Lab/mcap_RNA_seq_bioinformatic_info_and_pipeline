@@ -63,9 +63,9 @@ config <- list(
         largest = 0.1,
         smallest = 10,
         clusterCutHeight = 0.5,
-        level1 = 0.05,
-        level2 = 0.01,
-        level3 = 0.001,
+        level1 = 0.01,
+        level2 = 0.001,
+        level3 = 0.0001,
         txtsize = 0.9,
         treeHeight = 0.5
     ),
@@ -73,19 +73,19 @@ config <- list(
         largest = 0.1,
         smallest = 10,
         clusterCutHeight = 0.5,
-        level1 = 0.05,
-        level2 = 0.01,
-        level3 = 0.001,
-        txtsize = 1.0,
-        treeHeight = 0.5
+        level1 = 0.01,
+        level2 = 0.001,
+        level3 = 0.0001,
+        txtsize = 1.2,
+        treeHeight = 0.25
     ),
     CC = list(
         largest = 0.1,
         smallest = 10,
         clusterCutHeight = 0.5,
-        level1 = 0.05,
-        level2 = 0.01,
-        level3 = 0.001,
+        level1 = 0.01,
+        level2 = 0.001,
+        level3 = 0.0001,
         txtsize = 1.0,
         treeHeight = 0.5
     )
@@ -93,7 +93,7 @@ config <- list(
 
 # Representative GO extraction parameters
 rep_GO_config <- list(
-    pcut = 0.05,   # adjusted p-value cutoff for representative GOs
+    pcut = 0.01,   # adjusted p-value cutoff for representative GOs
     hcut = 0.9     # height to cut tree for independent groups
 )
 
