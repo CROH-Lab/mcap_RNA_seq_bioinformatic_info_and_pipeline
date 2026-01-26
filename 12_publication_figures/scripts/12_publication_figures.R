@@ -1,9 +1,9 @@
 #!/usr/bin/env Rscript
 # ==============================================================================
 # Publication-Ready Figures: M. capitata and D. trenchii OA Response
+# Version 2 - Revised formatting
 # ==============================================================================
 
-# Set working directory
 setwd("/home/darmstrong4/mc_rework/12_publication_figures")
 
 # ==============================================================================
@@ -76,10 +76,7 @@ host_annot <- read.delim("/home/darmstrong4/mc_rework/08_host_deg_annotation/res
 sym_annot <- read.delim("/home/darmstrong4/mc_rework/09_symbiont_deg_annotation/results/all_annotations_full.tsv",
                          stringsAsFactors = FALSE)
 
-# Sample metadata
-sample_info <- read.delim("/home/darmstrong4/mc_rework/sample_info.txt", stringsAsFactors = FALSE)
-
-# VSD matrices (stored as matrices, not DESeqTransform objects)
+# VSD matrices
 host_summer_vsd <- readRDS("/home/darmstrong4/mc_rework/07_deseq2/objects/Mcapitata_Summer_vsd.rds")
 host_winter_vsd <- readRDS("/home/darmstrong4/mc_rework/07_deseq2/objects/Mcapitata_Winter_vsd.rds")
 sym_summer_vsd <- readRDS("/home/darmstrong4/mc_rework/07_deseq2/objects/Dtrenchii_Summer_vsd.rds")
@@ -98,7 +95,7 @@ cat("  Symbiont Summer:", nrow(sym_summer_degs), "\n")
 cat("  Symbiont Winter:", nrow(sym_winter_degs), "\n")
 
 # ==============================================================================
-# FIGURE 1: Density Ridgeline Plot of log2FoldChange
+# FIGURE 1: Density Ridgeline Plot (±2 log2FC, clean labels)
 # ==============================================================================
 
 cat("\n==============================================================================\n")
@@ -108,57 +105,56 @@ cat("===========================================================================
 ridgeline_data <- bind_rows(
     host_summer %>% 
         filter(!is.na(log2FoldChange)) %>%
-        mutate(Organism = "Host (M. capitata)", Season = "Summer") %>%
-        select(log2FoldChange, Organism, Season),
+        mutate(Organism = "M. cap", Season = "S", Group_Label = "M. cap - S") %>%
+        select(log2FoldChange, Organism, Season, Group_Label),
     host_winter %>% 
         filter(!is.na(log2FoldChange)) %>%
-        mutate(Organism = "Host (M. capitata)", Season = "Winter") %>%
-        select(log2FoldChange, Organism, Season),
+        mutate(Organism = "M. cap", Season = "W", Group_Label = "M. cap - W") %>%
+        select(log2FoldChange, Organism, Season, Group_Label),
     sym_summer %>% 
         filter(!is.na(log2FoldChange)) %>%
-        mutate(Organism = "Symbiont (D. trenchii)", Season = "Summer") %>%
-        select(log2FoldChange, Organism, Season),
+        mutate(Organism = "D. tre", Season = "S", Group_Label = "D. tre - S") %>%
+        select(log2FoldChange, Organism, Season, Group_Label),
     sym_winter %>% 
         filter(!is.na(log2FoldChange)) %>%
-        mutate(Organism = "Symbiont (D. trenchii)", Season = "Winter") %>%
-        select(log2FoldChange, Organism, Season)
+        mutate(Organism = "D. tre", Season = "W", Group_Label = "D. tre - W") %>%
+        select(log2FoldChange, Organism, Season, Group_Label)
 )
 
 ridgeline_data <- ridgeline_data %>%
-    mutate(Group = paste(Organism, "-", Season),
-           Group = factor(Group, levels = c(
-               "Symbiont (D. trenchii) - Winter",
-               "Symbiont (D. trenchii) - Summer",
-               "Host (M. capitata) - Winter",
-               "Host (M. capitata) - Summer"
-           )))
+    mutate(Group_Label = factor(Group_Label, levels = c(
+        "D. tre - W",
+        "D. tre - S",
+        "M. cap - W",
+        "M. cap - S"
+    )))
 
-fig1_ridgeline <- ggplot(ridgeline_data, aes(x = log2FoldChange, y = Group, fill = interaction(Organism, Season))) +
+fig1_ridgeline <- ggplot(ridgeline_data, aes(x = log2FoldChange, y = Group_Label, 
+                                              fill = interaction(Organism, Season))) +
     geom_density_ridges(alpha = 0.8, scale = 1.5, rel_min_height = 0.01) +
     geom_vline(xintercept = 0, linetype = "dashed", color = "gray40", linewidth = 0.8) +
     geom_vline(xintercept = c(-1, 1), linetype = "dotted", color = "gray60", linewidth = 0.5) +
     scale_fill_manual(values = c(
-        "Host (M. capitata).Summer" = "#E69F00",
-        "Host (M. capitata).Winter" = "#F0E442",
-        "Symbiont (D. trenchii).Summer" = "#56B4E9",
-        "Symbiont (D. trenchii).Winter" = "#009E73"
+        "M. cap.S" = "#E69F00",
+        "M. cap.W" = "#F0E442",
+        "D. tre.S" = "#56B4E9",
+        "D. tre.W" = "#009E73"
     )) +
-    scale_x_continuous(limits = c(-10, 10), breaks = seq(-10, 10, 2)) +
+    scale_x_continuous(limits = c(-2, 2), breaks = seq(-2, 2, 0.5)) +
     labs(
         x = expression(Log[2]~Fold~Change~(OA~vs~Ambient)),
-        y = "",
-        title = "Distribution of Gene Expression Changes Under Ocean Acidification"
+        y = ""
     ) +
     theme_pub +
     theme(legend.position = "none",
-          axis.text.y = element_text(size = 11, face = "bold"))
+          axis.text.y = element_text(size = 12, face = "bold.italic"))
 
 ggsave("figures/Fig1_ridgeline_log2FC.pdf", fig1_ridgeline, width = 10, height = 6, dpi = 300)
 ggsave("figures/Fig1_ridgeline_log2FC.png", fig1_ridgeline, width = 10, height = 6, dpi = 300)
 cat("Saved: Fig1_ridgeline_log2FC.pdf/png\n")
 
 # ==============================================================================
-# FIGURE 2: Venn Diagrams - Seasonal DEG Overlap
+# FIGURE 2: Venn Diagrams (no titles, color legend only)
 # ==============================================================================
 
 cat("\n==============================================================================\n")
@@ -176,20 +172,16 @@ venn_host <- draw.pairwise.venn(
     area1 = length(host_summer_ids),
     area2 = length(host_winter_ids),
     cross.area = host_overlap,
-    category = c("Summer", "Winter"),
+    category = c("", ""),  # No category labels
     fill = c(summer_color, winter_color),
     alpha = 0.6,
     col = c(summer_color, winter_color),
     lwd = 2,
     cex = 2,
     fontface = "bold",
-    cat.cex = 1.5,
-    cat.fontface = "bold",
-    cat.pos = c(-30, 30),
-    cat.dist = c(0.05, 0.05),
+    cat.cex = 0,  # Hide category text
     margin = 0.1
 )
-grid.text("Host (M. capitata) DEGs", y = 0.95, gp = gpar(fontsize = 16, fontface = "bold"))
 dev.off()
 
 # Symbiont Venn Diagram
@@ -203,52 +195,68 @@ venn_sym <- draw.pairwise.venn(
     area1 = length(sym_summer_ids),
     area2 = length(sym_winter_ids),
     cross.area = sym_overlap,
-    category = c("Summer", "Winter"),
+    category = c("", ""),  # No category labels
     fill = c(summer_color, winter_color),
     alpha = 0.6,
     col = c(summer_color, winter_color),
     lwd = 2,
     cex = 2,
     fontface = "bold",
-    cat.cex = 1.5,
-    cat.fontface = "bold",
-    cat.pos = c(-30, 30),
-    cat.dist = c(0.05, 0.05),
+    cat.cex = 0,  # Hide category text
     margin = 0.1
 )
-grid.text("Symbiont (D. trenchii) DEGs", y = 0.95, gp = gpar(fontsize = 16, fontface = "bold"))
 dev.off()
 
-cat("Saved: Fig2A_host_venn.pdf, Fig2B_symbiont_venn.pdf\n")
+# Create a separate legend
+legend_df <- data.frame(
+    Season = c("Summer", "Winter"),
+    color = c(summer_color, winter_color)
+)
+
+legend_plot <- ggplot(legend_df, aes(x = 1, y = Season, fill = Season)) +
+    geom_tile(width = 0.3, height = 0.8) +
+    scale_fill_manual(values = c("Summer" = summer_color, "Winter" = winter_color)) +
+    theme_void() +
+    theme(legend.position = "right",
+          legend.title = element_text(size = 14, face = "bold"),
+          legend.text = element_text(size = 12))
+
+ggsave("figures/Fig2_legend.pdf", legend_plot, width = 3, height = 2)
+
+cat("Saved: Fig2A_host_venn.pdf, Fig2B_symbiont_venn.pdf, Fig2_legend.pdf\n")
 cat("  Host overlap:", host_overlap, "DEGs\n")
 cat("  Symbiont overlap:", sym_overlap, "DEGs\n")
 
 # ==============================================================================
-# FIGURE 3: Heatmaps of Top DEGs
+# FIGURE 3: Heatmaps (ALL DEGs, no title)
 # ==============================================================================
 
 cat("\n==============================================================================\n")
-cat("Figure 3: Heatmaps\n")
+cat("Figure 3: Heatmaps (All DEGs)\n")
 cat("==============================================================================\n\n")
 
-# Function to create heatmap from matrix
-create_deg_heatmap <- function(vsd_mat, deseq_results, title_text, n_genes = 50) {
+create_deg_heatmap_all <- function(vsd_mat, deseq_results, filename, max_genes = 500) {
     
-    # Get top DEGs by absolute log2FC
-    top_degs <- deseq_results %>%
+    # Get ALL DEGs
+    all_degs <- deseq_results %>%
         filter(!is.na(padj) & padj < 0.05) %>%
-        arrange(desc(abs(log2FoldChange))) %>%
-        head(n_genes)
+        arrange(desc(abs(log2FoldChange)))
     
-    if (nrow(top_degs) < 5) {
-        cat("  Warning: Fewer than 5 DEGs for", title_text, "\n")
+    if (nrow(all_degs) < 5) {
+        cat("  Warning: Fewer than 5 DEGs, skipping\n")
         return(NULL)
     }
     
-    # Filter to top DEGs
-    common_genes <- intersect(top_degs$gene_id, rownames(vsd_mat))
+    # Limit to max_genes if too many (for visualization)
+    if (nrow(all_degs) > max_genes) {
+        cat("  Note: Limiting to top", max_genes, "DEGs by |log2FC| for visualization\n")
+        all_degs <- head(all_degs, max_genes)
+    }
+    
+    # Filter to DEGs present in VSD matrix
+    common_genes <- intersect(all_degs$gene_id, rownames(vsd_mat))
     if (length(common_genes) < 5) {
-        cat("  Warning: Fewer than 5 matching genes for", title_text, "\n")
+        cat("  Warning: Fewer than 5 matching genes, skipping\n")
         return(NULL)
     }
     
@@ -268,100 +276,50 @@ create_deg_heatmap <- function(vsd_mat, deseq_results, title_text, n_genes = 50)
     
     anno_colors <- list(Treatment = c("OA" = "#E69F00", "Ambient" = "#56B4E9"))
     
-    return(list(
-        matrix = heatmap_mat_scaled,
-        annotation = anno_col,
-        colors = anno_colors,
-        title = title_text
-    ))
+    # Calculate height based on number of genes
+    plot_height <- max(8, min(20, nrow(heatmap_mat_scaled) / 20))
+    
+    pdf(filename, width = 8, height = plot_height)
+    pheatmap::pheatmap(heatmap_mat_scaled,
+             color = colorRampPalette(c(down_color, "white", up_color))(100),
+             cluster_rows = TRUE,
+             cluster_cols = TRUE,
+             show_rownames = FALSE,
+             show_colnames = TRUE,
+             annotation_col = anno_col,
+             annotation_colors = anno_colors,
+             fontsize = 10,
+             border_color = NA,
+             main = "")  # No title
+    dev.off()
+    
+    cat("  Saved:", filename, "with", length(common_genes), "DEGs\n")
+    return(length(common_genes))
 }
 
-cat("Creating heatmaps...\n")
+cat("Creating heatmaps with ALL DEGs...\n")
 
 # Host Summer
-hm_host_summer <- create_deg_heatmap(host_summer_vsd, host_summer, "Host Summer", n_genes = 50)
-if (!is.null(hm_host_summer)) {
-    pdf("figures/Fig3A_heatmap_host_summer.pdf", width = 8, height = 10)
-    pheatmap::pheatmap(hm_host_summer$matrix,
-             main = "Host (M. capitata) - Summer\nTop 50 DEGs",
-             color = colorRampPalette(c(down_color, "white", up_color))(100),
-             cluster_rows = TRUE,
-             cluster_cols = TRUE,
-             show_rownames = FALSE,
-             show_colnames = TRUE,
-             annotation_col = hm_host_summer$annotation,
-             annotation_colors = hm_host_summer$colors,
-             fontsize = 10,
-             border_color = NA)
-    dev.off()
-    cat("  Saved: Fig3A_heatmap_host_summer.pdf\n")
-}
+create_deg_heatmap_all(host_summer_vsd, host_summer, "figures/Fig3A_heatmap_host_summer.pdf")
 
 # Host Winter
-hm_host_winter <- create_deg_heatmap(host_winter_vsd, host_winter, "Host Winter", n_genes = 50)
-if (!is.null(hm_host_winter)) {
-    pdf("figures/Fig3B_heatmap_host_winter.pdf", width = 8, height = 10)
-    pheatmap::pheatmap(hm_host_winter$matrix,
-             main = "Host (M. capitata) - Winter\nTop 50 DEGs",
-             color = colorRampPalette(c(down_color, "white", up_color))(100),
-             cluster_rows = TRUE,
-             cluster_cols = TRUE,
-             show_rownames = FALSE,
-             show_colnames = TRUE,
-             annotation_col = hm_host_winter$annotation,
-             annotation_colors = hm_host_winter$colors,
-             fontsize = 10,
-             border_color = NA)
-    dev.off()
-    cat("  Saved: Fig3B_heatmap_host_winter.pdf\n")
-}
+create_deg_heatmap_all(host_winter_vsd, host_winter, "figures/Fig3B_heatmap_host_winter.pdf")
 
 # Symbiont Summer (may have few DEGs)
-hm_sym_summer <- create_deg_heatmap(sym_summer_vsd, sym_summer, "Symbiont Summer", n_genes = 50)
-if (!is.null(hm_sym_summer)) {
-    pdf("figures/Fig3C_heatmap_symbiont_summer.pdf", width = 8, height = 10)
-    pheatmap::pheatmap(hm_sym_summer$matrix,
-             main = "Symbiont (D. trenchii) - Summer\nDEGs",
-             color = colorRampPalette(c(down_color, "white", up_color))(100),
-             cluster_rows = TRUE,
-             cluster_cols = TRUE,
-             show_rownames = FALSE,
-             show_colnames = TRUE,
-             annotation_col = hm_sym_summer$annotation,
-             annotation_colors = hm_sym_summer$colors,
-             fontsize = 10,
-             border_color = NA)
-    dev.off()
-    cat("  Saved: Fig3C_heatmap_symbiont_summer.pdf\n")
-}
+create_deg_heatmap_all(sym_summer_vsd, sym_summer, "figures/Fig3C_heatmap_symbiont_summer.pdf")
 
 # Symbiont Winter
-hm_sym_winter <- create_deg_heatmap(sym_winter_vsd, sym_winter, "Symbiont Winter", n_genes = 50)
-if (!is.null(hm_sym_winter)) {
-    pdf("figures/Fig3D_heatmap_symbiont_winter.pdf", width = 8, height = 10)
-    pheatmap::pheatmap(hm_sym_winter$matrix,
-             main = "Symbiont (D. trenchii) - Winter\nTop 50 DEGs",
-             color = colorRampPalette(c(down_color, "white", up_color))(100),
-             cluster_rows = TRUE,
-             cluster_cols = TRUE,
-             show_rownames = FALSE,
-             show_colnames = TRUE,
-             annotation_col = hm_sym_winter$annotation,
-             annotation_colors = hm_sym_winter$colors,
-             fontsize = 10,
-             border_color = NA)
-    dev.off()
-    cat("  Saved: Fig3D_heatmap_symbiont_winter.pdf\n")
-}
+create_deg_heatmap_all(sym_winter_vsd, sym_winter, "figures/Fig3D_heatmap_symbiont_winter.pdf")
 
 # ==============================================================================
-# FIGURE 4: Chord Diagram - Calcification/Ion Transport Genes
+# FIGURE 4: Chord Diagram - Calcification/Ion Transport
 # ==============================================================================
 
 cat("\n==============================================================================\n")
 cat("Figure 4: Chord Diagram - Calcification/Ion Transport\n")
 cat("==============================================================================\n\n")
 
+# Keywords for calcification/ion transport/homeostasis
 calc_keywords <- c("calcif", "calcium", "carbonate", "bicarbon", "ion.transport", 
                    "homeostasis", "channel", "pump", "exchanger", "ATPase", 
                    "voltage.gated", "sodium", "potassium", "chloride", "proton",
@@ -369,107 +327,240 @@ calc_keywords <- c("calcif", "calcium", "carbonate", "bicarbon", "ion.transport"
 
 keyword_pattern <- paste(calc_keywords, collapse = "|")
 
-# Find host DEGs with calcification-related annotations
-host_all_degs <- bind_rows(
-    host_summer_degs %>% mutate(season = "Summer"),
-    host_winter_degs %>% mutate(season = "Winter")
-) %>% distinct(gene_id, .keep_all = TRUE)
+# Extract functional category
+extract_category <- function(desc) {
+    if (is.na(desc)) return("Other Transport")
+    desc_lower <- tolower(desc)
+    if (grepl("calcium.channel|voltage.gated.*calcium|voltage.dependent.*calcium", desc_lower)) return("Ca2+ Channel")
+    if (grepl("calcium.pump|calcium.transport.*atpase|plasma membrane calcium", desc_lower)) return("Ca2+ ATPase")
+    if (grepl("calcium.bind|calmodulin|ef.hand|calcium.dependent.protein", desc_lower)) return("Ca2+ Signaling")
+    if (grepl("sodium.*potassium|na\\+.*k\\+|nka|sodium.potassium", desc_lower)) return("Na+/K+ ATPase")
+    if (grepl("sodium|na\\+", desc_lower)) return("Na+ Transport")
+    if (grepl("potassium|k\\+", desc_lower)) return("K+ Channel")
+    if (grepl("chloride|anion|clc", desc_lower)) return("Cl- Transport")
+    if (grepl("carbonic.anhydrase", desc_lower)) return("Carbonic Anhydrase")
+    if (grepl("exchanger|antiporter|nhe|ncx", desc_lower)) return("Ion Exchanger")
+    if (grepl("proton|h\\+.*atpase|v.type|vacuolar", desc_lower)) return("H+ ATPase")
+    if (grepl("bicarbonate|hco3|slc4|slc26", desc_lower)) return("HCO3- Transport")
+    if (grepl("aquaporin|water.channel", desc_lower)) return("Aquaporin")
+    return("Other Transport")
+}
 
-host_calc_degs <- host_all_degs %>%
+# Find host DEGs with calcification-related annotations
+host_calc_summer <- host_summer_degs %>%
     left_join(host_annot, by = "gene_id") %>%
     filter(grepl(keyword_pattern, description, ignore.case = TRUE)) %>%
-    mutate(organism = "Host",
-           short_desc = str_extract(description, "^[^,]+"))
+    mutate(organism = "Host", season = "Summer",
+           category = sapply(description, extract_category),
+           short_name = ifelse(!is.na(uniprot_entry), uniprot_entry, 
+                               sub(".*g(\\d+)\\.t.*", "g\\1", gene_id)))
+
+host_calc_winter <- host_winter_degs %>%
+    left_join(host_annot, by = "gene_id") %>%
+    filter(grepl(keyword_pattern, description, ignore.case = TRUE)) %>%
+    mutate(organism = "Host", season = "Winter",
+           category = sapply(description, extract_category),
+           short_name = ifelse(!is.na(uniprot_entry), uniprot_entry, 
+                               sub(".*g(\\d+)\\.t.*", "g\\1", gene_id)))
 
 # Find symbiont DEGs with calcification-related annotations
-sym_all_degs <- bind_rows(
-    sym_summer_degs %>% mutate(season = "Summer"),
-    sym_winter_degs %>% mutate(season = "Winter")
-) %>% distinct(gene_id, .keep_all = TRUE)
-
-sym_calc_degs <- sym_all_degs %>%
+sym_calc_summer <- sym_summer_degs %>%
     left_join(sym_annot, by = "gene_id") %>%
     filter(grepl(keyword_pattern, description, ignore.case = TRUE)) %>%
-    mutate(organism = "Symbiont",
-           short_desc = str_extract(description, "^[^,]+"))
+    mutate(organism = "Symbiont", season = "Summer",
+           category = sapply(description, extract_category),
+           short_name = ifelse(!is.na(uniprot_entry), uniprot_entry, 
+                               sub(".*g(\\d+)$", "g\\1", gene_id)))
 
-cat("Calcification-related DEGs found:\n")
-cat("  Host:", nrow(host_calc_degs), "\n")
-cat("  Symbiont:", nrow(sym_calc_degs), "\n")
+sym_calc_winter <- sym_winter_degs %>%
+    left_join(sym_annot, by = "gene_id") %>%
+    filter(grepl(keyword_pattern, description, ignore.case = TRUE)) %>%
+    mutate(organism = "Symbiont", season = "Winter",
+           category = sapply(description, extract_category),
+           short_name = ifelse(!is.na(uniprot_entry), uniprot_entry, 
+                               sub(".*g(\\d+)$", "g\\1", gene_id)))
 
-# Save calcification gene lists
-if (nrow(host_calc_degs) > 0) {
-    write.csv(host_calc_degs, "data/host_calcification_degs.csv", row.names = FALSE)
-}
-if (nrow(sym_calc_degs) > 0) {
-    write.csv(sym_calc_degs, "data/symbiont_calcification_degs.csv", row.names = FALSE)
-}
+# Combine all
+all_calc_degs <- bind_rows(host_calc_summer, host_calc_winter, 
+                            sym_calc_summer, sym_calc_winter)
 
-# Create chord diagram if we have genes
-if (nrow(host_calc_degs) > 0 || nrow(sym_calc_degs) > 0) {
+cat("Calcification-related DEGs:\n")
+cat("  Host Summer:", nrow(host_calc_summer), "\n")
+cat("  Host Winter:", nrow(host_calc_winter), "\n")
+cat("  Symbiont Summer:", nrow(sym_calc_summer), "\n")
+cat("  Symbiont Winter:", nrow(sym_calc_winter), "\n")
+cat("  Total:", nrow(all_calc_degs), "\n")
+
+# Save data
+write.csv(all_calc_degs, "data/all_calcification_degs.csv", row.names = FALSE)
+
+if (nrow(all_calc_degs) >= 5) {
     
-    # Extract key functional categories
-    extract_category <- function(desc) {
-        if (is.na(desc)) return("Other")
-        desc_lower <- tolower(desc)
-        if (grepl("calcium.channel|voltage.gated.*calcium|voltage.dependent.*calcium", desc_lower)) return("Ca2+ Channel")
-        if (grepl("calcium.pump|calcium.transport.*atpase|plasma membrane calcium", desc_lower)) return("Ca2+ ATPase")
-        if (grepl("calcium.bind|calmodulin|ef.hand|calcium.dependent.protein", desc_lower)) return("Ca2+ Binding")
-        if (grepl("sodium|potassium|na\\+|k\\+", desc_lower)) return("Na+/K+ Transport")
-        if (grepl("chloride|anion", desc_lower)) return("Anion Transport")
-        if (grepl("carbonic.anhydrase", desc_lower)) return("Carbonic Anhydrase")
-        if (grepl("exchanger|antiporter", desc_lower)) return("Ion Exchanger")
-        if (grepl("proton|h\\+.*atpase|v.type", desc_lower)) return("H+ ATPase")
-        if (grepl("transporter|solute.carrier", desc_lower)) return("Solute Carrier")
-        return("Other Ion/Transport")
-    }
+    # Order: Host first (by log2FC), then Symbiont (by log2FC)
+    all_calc_degs <- all_calc_degs %>%
+        arrange(organism, desc(abs(log2FoldChange)))
     
-    if (nrow(host_calc_degs) > 0) {
-        host_calc_degs$category <- sapply(host_calc_degs$description, extract_category)
-    }
-    if (nrow(sym_calc_degs) > 0) {
-        sym_calc_degs$category <- sapply(sym_calc_degs$description, extract_category)
-    }
+    # Make unique short names
+    all_calc_degs <- all_calc_degs %>%
+        group_by(short_name) %>%
+        mutate(short_name = ifelse(n() > 1, 
+                                    paste0(short_name, "_", row_number()),
+                                    short_name)) %>%
+        ungroup()
     
-    # Create summary table for chord diagram
-    host_cat_summary <- if(nrow(host_calc_degs) > 0) {
-        host_calc_degs %>% 
-            group_by(category) %>% 
-            summarise(count = n(), avg_lfc = mean(log2FoldChange, na.rm = TRUE)) %>%
-            mutate(organism = "Host")
-    } else { data.frame() }
+    # Create gene labels with organism prefix
+    all_calc_degs$gene_label <- paste0(
+        ifelse(all_calc_degs$organism == "Host", "H:", "S:"),
+        all_calc_degs$short_name
+    )
     
-    sym_cat_summary <- if(nrow(sym_calc_degs) > 0) {
-        sym_calc_degs %>% 
-            group_by(category) %>% 
-            summarise(count = n(), avg_lfc = mean(log2FoldChange, na.rm = TRUE)) %>%
-            mutate(organism = "Symbiont")
-    } else { data.frame() }
+    # Get unique categories
+    categories <- unique(all_calc_degs$category)
     
-    all_cat_summary <- bind_rows(host_cat_summary, sym_cat_summary)
+    # Create sector order: genes first (Host then Symbiont), then categories
+    host_genes <- all_calc_degs %>% filter(organism == "Host") %>% pull(gene_label)
+    sym_genes <- all_calc_degs %>% filter(organism == "Symbiont") %>% pull(gene_label)
     
-    if (nrow(all_cat_summary) > 0) {
-        write.csv(all_cat_summary, "data/calcification_category_summary.csv", row.names = FALSE)
+    sector_order <- c(host_genes, sym_genes, categories)
+    
+    # Prepare data for chord diagram
+    # Each row connects a gene to its category
+    chord_data <- all_calc_degs %>%
+        select(gene_label, category, log2FoldChange, season, organism) %>%
+        mutate(value = 1)  # Equal weight for connections
+    
+    # Create color functions
+    # Log2FC colors for genes
+    lfc_colors <- colorRamp2(c(-3, 0, 3), c(down_color, "white", up_color))
+    
+    # Season colors for chords
+    season_colors <- c("Summer" = summer_color, "Winter" = winter_color)
+    
+    # Category colors
+    n_cats <- length(categories)
+    cat_colors <- setNames(
+        colorRampPalette(brewer.pal(min(n_cats, 12), "Set3"))(n_cats),
+        categories
+    )
+    
+    # Gene sector colors based on log2FC
+    gene_colors <- setNames(
+        sapply(all_calc_degs$log2FoldChange, function(x) lfc_colors(x)),
+        all_calc_degs$gene_label
+    )
+    
+    # Combine all sector colors
+    all_sector_colors <- c(gene_colors, cat_colors)
+    
+    # Create the chord diagram
+    pdf("figures/Fig4_chord_calcification.pdf", width = 14, height = 14)
+    
+    circos.clear()
+    circos.par(
+        start.degree = 90,
+        gap.degree = c(rep(1, length(host_genes) - 1), 5,  # Gap after host genes
+                       rep(1, length(sym_genes) - 1), 10,  # Bigger gap before categories
+                       rep(2, length(categories) - 1), 10), # Gap after categories
+        track.margin = c(0.01, 0.01)
+    )
+    
+    # Initialize sectors
+    all_sectors <- c(all_calc_degs$gene_label, categories)
+    sector_sizes <- c(rep(1, nrow(all_calc_degs)), 
+                      table(all_calc_degs$category)[categories])
+    
+    circos.initialize(factors = factor(all_sectors, levels = sector_order),
+                      xlim = cbind(rep(0, length(all_sectors)), sector_sizes))
+    
+    # Track 1: Sector labels
+    circos.track(ylim = c(0, 1), panel.fun = function(x, y) {
+        sector.name = get.cell.meta.data("sector.index")
+        xcenter = get.cell.meta.data("xcenter")
         
-        # Create bar plot instead of chord if limited data
-        fig4_bar <- ggplot(all_cat_summary, aes(x = reorder(category, count), y = count, fill = organism)) +
-            geom_bar(stat = "identity", position = "dodge", alpha = 0.8) +
-            coord_flip() +
-            scale_fill_manual(values = c("Host" = host_color, "Symbiont" = symbiont_color)) +
-            labs(
-                x = "",
-                y = "Number of DEGs",
-                title = "Calcification & Ion Transport DEGs",
-                fill = "Organism"
-            ) +
-            theme_pub
+        # Determine if it's a gene or category
+        if (sector.name %in% all_calc_degs$gene_label) {
+            # Gene - show rotated text
+            circos.text(xcenter, 0.5, sector.name, 
+                       facing = "clockwise", niceFacing = TRUE,
+                       adj = c(0, 0.5), cex = 0.5)
+        } else {
+            # Category - show as sector label
+            circos.text(xcenter, 0.5, sector.name,
+                       facing = "bending.inside", niceFacing = TRUE,
+                       adj = c(0.5, 0), cex = 0.8, font = 2)
+        }
+    }, bg.col = all_sector_colors[sector_order], bg.border = NA, track.height = 0.1)
+    
+    # Track 2: Log2FC color bar for genes only
+    circos.track(ylim = c(0, 1), panel.fun = function(x, y) {
+        sector.name = get.cell.meta.data("sector.index")
+        if (sector.name %in% all_calc_degs$gene_label) {
+            lfc <- all_calc_degs$log2FoldChange[all_calc_degs$gene_label == sector.name]
+            col <- lfc_colors(lfc)
+            circos.rect(0, 0, 1, 1, col = col, border = NA)
+        }
+    }, bg.border = NA, track.height = 0.05)
+    
+    # Add links (chords) from genes to categories
+    for (i in 1:nrow(all_calc_degs)) {
+        gene <- all_calc_degs$gene_label[i]
+        cat <- all_calc_degs$category[i]
+        season <- all_calc_degs$season[i]
         
-        ggsave("figures/Fig4_calcification_degs.pdf", fig4_bar, width = 10, height = 6)
-        ggsave("figures/Fig4_calcification_degs.png", fig4_bar, width = 10, height = 6, dpi = 300)
-        cat("Saved: Fig4_calcification_degs.pdf/png\n")
+        # Get position in category sector
+        cat_genes <- all_calc_degs %>% filter(category == cat)
+        pos_in_cat <- which(cat_genes$gene_label == gene)
+        
+        circos.link(gene, c(0, 1), 
+                    cat, c(pos_in_cat - 1, pos_in_cat),
+                    col = adjustcolor(season_colors[season], alpha.f = 0.5),
+                    border = adjustcolor(season_colors[season], alpha.f = 0.8))
     }
+    
+    # Add legends
+    # Log2FC legend
+    lgd_lfc <- Legend(
+        col_fun = lfc_colors,
+        title = "Log2FC",
+        title_position = "topleft",
+        legend_height = unit(3, "cm")
+    )
+    
+    # Season legend
+    lgd_season <- Legend(
+        labels = c("Summer", "Winter"),
+        legend_gp = gpar(fill = c(summer_color, winter_color)),
+        title = "Season",
+        title_position = "topleft"
+    )
+    
+    # Organism legend
+    lgd_org <- Legend(
+        labels = c("Host (H:)", "Symbiont (S:)"),
+        legend_gp = gpar(fill = c(host_color, symbiont_color)),
+        title = "Organism",
+        title_position = "topleft"
+    )
+    
+    # Draw legends
+    draw(lgd_lfc, x = unit(0.9, "npc"), y = unit(0.85, "npc"))
+    draw(lgd_season, x = unit(0.9, "npc"), y = unit(0.6, "npc"))
+    draw(lgd_org, x = unit(0.9, "npc"), y = unit(0.4, "npc"))
+    
+    circos.clear()
+    dev.off()
+    
+    cat("Saved: Fig4_chord_calcification.pdf\n")
+    
+    # Also save a simpler bar plot version
+    cat_summary <- all_calc_degs %>%
+        group_by(category, organism, season) %>%
+        summarise(count = n(), avg_lfc = mean(log2FoldChange, na.rm = TRUE), .groups = "drop")
+    
+    write.csv(cat_summary, "data/calcification_category_summary.csv", row.names = FALSE)
+    
 } else {
-    cat("No calcification-related DEGs found\n")
+    cat("Insufficient calcification-related DEGs for chord diagram\n")
 }
 
 # ==============================================================================
@@ -495,7 +586,6 @@ create_volcano <- function(deseq_df, title_text, padj_cutoff = 0.05, lfc_cutoff 
             significance = factor(significance, levels = c("Up", "Down", "Sig (|LFC|<1)", "NS"))
         )
     
-    # Cap extreme values for visualization
     df$neg_log10_pval <- pmin(df$neg_log10_pval, 50)
     df$log2FoldChange <- pmax(pmin(df$log2FoldChange, 10), -10)
     
@@ -523,17 +613,16 @@ create_volcano <- function(deseq_df, title_text, padj_cutoff = 0.05, lfc_cutoff 
     return(p)
 }
 
-vol_host_summer <- create_volcano(host_summer, "Host (M. capitata) - Summer")
-vol_host_winter <- create_volcano(host_winter, "Host (M. capitata) - Winter")
-vol_sym_summer <- create_volcano(sym_summer, "Symbiont (D. trenchii) - Summer")
-vol_sym_winter <- create_volcano(sym_winter, "Symbiont (D. trenchii) - Winter")
+vol_host_summer <- create_volcano(host_summer, "M. cap - Summer")
+vol_host_winter <- create_volcano(host_winter, "M. cap - Winter")
+vol_sym_summer <- create_volcano(sym_summer, "D. tre - Summer")
+vol_sym_winter <- create_volcano(sym_winter, "D. tre - Winter")
 
 ggsave("figures/Fig5A_volcano_host_summer.pdf", vol_host_summer, width = 8, height = 6)
 ggsave("figures/Fig5B_volcano_host_winter.pdf", vol_host_winter, width = 8, height = 6)
 ggsave("figures/Fig5C_volcano_symbiont_summer.pdf", vol_sym_summer, width = 8, height = 6)
 ggsave("figures/Fig5D_volcano_symbiont_winter.pdf", vol_sym_winter, width = 8, height = 6)
 
-# Combined volcano plot
 vol_combined <- plot_grid(
     vol_host_summer + theme(legend.position = "none"),
     vol_host_winter + theme(legend.position = "none"),
@@ -561,20 +650,15 @@ cat("===========================================================================
 
 create_pca_from_matrix <- function(vsd_mat, title_text) {
     
-    # Perform PCA on transposed matrix (samples as rows)
     pca_result <- prcomp(t(vsd_mat), scale. = FALSE)
-    
-    # Calculate percent variance
     percent_var <- round(100 * (pca_result$sdev^2 / sum(pca_result$sdev^2)), 1)
     
-    # Create data frame for plotting
     pca_data <- data.frame(
         PC1 = pca_result$x[, 1],
         PC2 = pca_result$x[, 2],
         sample = rownames(pca_result$x)
     )
     
-    # Extract treatment from sample names (B = OA, D = Ambient)
     pca_data$Treatment <- ifelse(grepl("B", pca_data$sample), "OA", "Ambient")
     
     p <- ggplot(pca_data, aes(x = PC1, y = PC2, color = Treatment, shape = Treatment)) +
@@ -595,17 +679,16 @@ create_pca_from_matrix <- function(vsd_mat, title_text) {
     return(p)
 }
 
-pca_host_summer <- create_pca_from_matrix(host_summer_vsd, "Host (M. capitata) - Summer")
-pca_host_winter <- create_pca_from_matrix(host_winter_vsd, "Host (M. capitata) - Winter")
-pca_sym_summer <- create_pca_from_matrix(sym_summer_vsd, "Symbiont (D. trenchii) - Summer")
-pca_sym_winter <- create_pca_from_matrix(sym_winter_vsd, "Symbiont (D. trenchii) - Winter")
+pca_host_summer <- create_pca_from_matrix(host_summer_vsd, "M. cap - Summer")
+pca_host_winter <- create_pca_from_matrix(host_winter_vsd, "M. cap - Winter")
+pca_sym_summer <- create_pca_from_matrix(sym_summer_vsd, "D. tre - Summer")
+pca_sym_winter <- create_pca_from_matrix(sym_winter_vsd, "D. tre - Winter")
 
 ggsave("figures/Fig6A_pca_host_summer.pdf", pca_host_summer, width = 7, height = 6)
 ggsave("figures/Fig6B_pca_host_winter.pdf", pca_host_winter, width = 7, height = 6)
 ggsave("figures/Fig6C_pca_symbiont_summer.pdf", pca_sym_summer, width = 7, height = 6)
 ggsave("figures/Fig6D_pca_symbiont_winter.pdf", pca_sym_winter, width = 7, height = 6)
 
-# Combined PCA plot
 pca_combined <- plot_grid(
     pca_host_summer + theme(legend.position = "none"),
     pca_host_winter + theme(legend.position = "none"),
@@ -658,7 +741,7 @@ cat("\n=========================================================================
 cat("Analysis Complete!\n")
 cat("==============================================================================\n\n")
 
-cat("Output files saved to:\n")
+cat("Output files:\n")
 cat("  figures/ - All PDF and PNG figures\n")
 cat("  data/ - Summary tables and gene lists\n")
 
