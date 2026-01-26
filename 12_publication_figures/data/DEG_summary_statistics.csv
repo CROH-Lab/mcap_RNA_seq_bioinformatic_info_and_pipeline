@@ -1,0 +1,5 @@
+"Organism","Season","Total_Genes","DEGs_total","DEGs_up","DEGs_down"
+"Host","Summer",23294,772,405,367
+"Host","Winter",23062,215,132,83
+"Symbiont","Summer",35008,2,1,1
+"Symbiont","Winter",35147,279,200,79

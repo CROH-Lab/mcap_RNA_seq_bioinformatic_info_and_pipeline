@@ -132,3 +132,11 @@ slurm-*.out
 
 # Reference annotation files (large)
 04_reference/*_ANNOT_gff
+
+# =============================================================================
+# Symbiont GO_MWU large files
+# =============================================================================
+11_symbiont_GO_MWU/output/*_dissimilarity.csv
+11_symbiont_GO_MWU/input/go.obo
+11_symbiont_GO_MWU/*.tmp
+11_symbiont_GO_MWU/dissim_*
