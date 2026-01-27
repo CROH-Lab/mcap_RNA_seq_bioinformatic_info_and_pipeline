@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 # ==============================================================================
 # Refined Chord Diagrams - Calcification/Ion Transport DEGs
-# Version 3 - Separate diagrams for Summer and Winter
+# Version 4 - LFC colored gene bars, perpendicular category labels, no category color bars
 # ==============================================================================
 
 setwd("/home/darmstrong4/mc_rework/12_publication_figures")
@@ -88,13 +88,11 @@ cat("Refined DEGs:", nrow(truly_relevant), "\n")
 
 truly_relevant <- truly_relevant %>%
     mutate(broad_category = case_when(
-        # Ca2+ Transport & Signaling
         grepl("calcium.*channel|voltage.*calcium|TRP|transient receptor", description, ignore.case = TRUE) ~ "Ca2+ Transport",
         grepl("calcium.*atpase|calcium.*pump|plasma membrane calcium", description, ignore.case = TRUE) ~ "Ca2+ Transport",
         grepl("calcium.*kinase|CDPK", description, ignore.case = TRUE) ~ "Ca2+ Signaling",
         category %in% c("Ca2+ Channel", "Ca2+ ATPase", "Ca2+ Signaling") ~ "Ca2+ Transport",
         
-        # Other Ion Channels
         grepl("potassium.*channel|potassium.*voltage|K\\+", description, ignore.case = TRUE) ~ "K+ Channels",
         grepl("sodium.*channel|Na\\+.*channel", description, ignore.case = TRUE) ~ "Na+ Channels",
         grepl("chloride.*channel|Cl-", description, ignore.case = TRUE) ~ "Cl- Channels",
@@ -102,43 +100,29 @@ truly_relevant <- truly_relevant %>%
         category == "Na+ Transport" ~ "Na+ Channels",
         category == "Cl- Transport" ~ "Cl- Channels",
         
-        # Ion Pumps & Exchangers
         grepl("Na\\+/K\\+|sodium.*potassium.*exchanger|NCKX", description, ignore.case = TRUE) ~ "Ion Pumps",
         grepl("H\\+.*ATPase|proton.*transport|V-type", description, ignore.case = TRUE) ~ "Ion Pumps",
         category %in% c("Na+/K+ ATPase", "H+ ATPase", "Ion Exchanger") ~ "Ion Pumps",
         
-        # pH/CO2 Regulation
         grepl("carbonic anhydrase", description, ignore.case = TRUE) ~ "pH/CO2 Regulation",
         grepl("monocarboxylate", description, ignore.case = TRUE) ~ "pH/CO2 Regulation",
         category == "Carbonic Anhydrase" ~ "pH/CO2 Regulation",
         
-        # Biomineralization & ECM
         grepl("skeletal|SARP|alkaline phosphatase|bone morphogenetic|BMP|collagen", description, ignore.case = TRUE) ~ "Biomineralization",
         
-        # Metabolite Transport
         grepl("sugar phosphate|phosphate.*translocator", description, ignore.case = TRUE) ~ "Metabolite Transport",
         
         TRUE ~ "Other"
     ))
 
-# Remove "Other" if any slipped through
 truly_relevant <- truly_relevant %>% filter(broad_category != "Other")
 
-# Save refined list
 write.csv(truly_relevant, "data/calcification_degs_refined.csv", row.names = FALSE)
 
-# Summary by season
 cat("\n--- COUNTS BY SEASON ---\n")
 truly_relevant %>%
     count(season, organism) %>%
     pivot_wider(names_from = organism, values_from = n, values_fill = 0) %>%
-    as.data.frame() %>%
-    print()
-
-cat("\n--- BROAD CATEGORY COUNTS ---\n")
-truly_relevant %>%
-    count(broad_category, season, organism) %>%
-    pivot_wider(names_from = c(organism, season), values_from = n, values_fill = 0) %>%
     as.data.frame() %>%
     print()
 
@@ -148,7 +132,6 @@ truly_relevant %>%
 
 create_seasonal_chord <- function(data, season_name, output_prefix) {
     
-    # Filter for this season
     season_data <- data %>% filter(season == season_name)
     
     if (nrow(season_data) < 3) {
@@ -176,47 +159,16 @@ create_seasonal_chord <- function(data, season_name, output_prefix) {
                                     gene_label)) %>%
         ungroup()
     
-    # Get categories present in this season's data
     categories <- unique(season_data$broad_category)
     n_cats <- length(categories)
     
     cat("  Categories:", paste(categories, collapse = ", "), "\n")
     
-    # Prepare chord data
     chord_df <- season_data %>%
         select(gene_label, broad_category, log2FoldChange, organism) %>%
         as.data.frame()
     
-    # Define sectors
     all_sectors <- c(chord_df$gene_label, categories)
-    
-    # Sector colors - genes by organism
-    gene_colors <- setNames(
-        ifelse(chord_df$organism == "Host", host_color, symbiont_color),
-        chord_df$gene_label
-    )
-    
-    # Category colors
-    cat_color_palette <- c(
-        "Ca2+ Transport" = "#E41A1C",
-        "Ca2+ Signaling" = "#FC8D62", 
-        "K+ Channels" = "#377EB8",
-        "Na+ Channels" = "#4DAF4A",
-        "Cl- Channels" = "#984EA3",
-        "Ion Pumps" = "#FF7F00",
-        "pH/CO2 Regulation" = "#A65628",
-        "Biomineralization" = "#F781BF",
-        "Metabolite Transport" = "#999999"
-    )
-    
-    category_colors <- cat_color_palette[categories]
-    all_sector_colors <- c(gene_colors, category_colors)
-    
-    # Link colors by organism for this season
-    link_colors <- adjustcolor(
-        ifelse(chord_df$organism == "Host", host_color, symbiont_color), 
-        alpha.f = 0.5
-    )
     
     # Log2FC color function
     lfc_range <- range(chord_df$log2FoldChange, na.rm = TRUE)
@@ -224,12 +176,28 @@ create_seasonal_chord <- function(data, season_name, output_prefix) {
     lfc_max <- max(3, lfc_range[2])
     lfc_col_fun <- colorRamp2(c(lfc_min, 0, lfc_max), c(down_color, "white", up_color))
     
+    # Gene sector colors - BY LOG2FC (not organism)
+    gene_colors <- setNames(
+        sapply(chord_df$log2FoldChange, function(x) lfc_col_fun(x)),
+        chord_df$gene_label
+    )
+    
+    # Category colors - use gray/neutral since we're removing the color bars
+    category_colors <- setNames(rep("gray85", n_cats), categories)
+    
+    all_sector_colors <- c(gene_colors, category_colors)
+    
+    # Link/chord colors by organism
+    link_colors <- adjustcolor(
+        ifelse(chord_df$organism == "Host", host_color, symbiont_color), 
+        alpha.f = 0.6
+    )
+    
     # Adjacency list
     adj_list <- chord_df %>%
         mutate(value = 1) %>%
         select(from = gene_label, to = broad_category, value)
     
-    # Season-specific colors for title
     season_title_color <- ifelse(season_name == "Summer", summer_color, winter_color)
     
     # ==============================================================================
@@ -250,37 +218,29 @@ create_seasonal_chord <- function(data, season_name, output_prefix) {
         order = all_sectors,
         grid.col = all_sector_colors,
         col = link_colors,
-        transparency = 0.3,
+        transparency = 0.2,
         annotationTrack = "grid",
         preAllocateTracks = list(
-            list(track.height = 0.05),
-            list(track.height = 0.18)
+            list(track.height = 0.18)  # Just one track for labels
         )
     )
     
-    # Track 1: LFC color bar
+    # Single track for labels - perpendicular category names
     circos.track(track.index = 1, panel.fun = function(x, y) {
         sector.name <- get.cell.meta.data("sector.index")
         xlim <- get.cell.meta.data("xlim")
-        if (sector.name %in% chord_df$gene_label) {
-            lfc <- chord_df$log2FoldChange[chord_df$gene_label == sector.name][1]
-            circos.rect(xlim[1], 0, xlim[2], 1, col = lfc_col_fun(lfc), border = NA)
-        }
-    }, bg.border = NA)
-    
-    # Track 2: Labels
-    circos.track(track.index = 2, panel.fun = function(x, y) {
-        sector.name <- get.cell.meta.data("sector.index")
-        xlim <- get.cell.meta.data("xlim")
         ylim <- get.cell.meta.data("ylim")
+        
         if (sector.name %in% chord_df$gene_label) {
+            # Gene labels - clockwise/rotated
             circos.text(mean(xlim), ylim[1] + 0.3, sector.name,
                        facing = "clockwise", niceFacing = TRUE,
                        adj = c(0, 0.5), cex = 0.55, col = "black")
         } else {
+            # Category labels - PERPENDICULAR (clockwise facing)
             circos.text(mean(xlim), ylim[1] + 0.3, sector.name,
-                       facing = "bending.inside", niceFacing = TRUE,
-                       adj = c(0.5, 0), cex = 1.0, font = 2, col = "black")
+                       facing = "clockwise", niceFacing = TRUE,
+                       adj = c(0, 0.5), cex = 0.9, font = 2, col = "black")
         }
     }, bg.border = NA)
     
@@ -301,7 +261,7 @@ create_seasonal_chord <- function(data, season_name, output_prefix) {
     lgd_org <- Legend(
         labels = c("Host (H:)", "Symbiont (S:)"),
         legend_gp = gpar(fill = c(host_color, symbiont_color)),
-        title = "Organism", 
+        title = "Organism\n(chord color)", 
         title_position = "topleft",
         title_gp = gpar(fontsize = 11, fontface = "bold"),
         labels_gp = gpar(fontsize = 9)
@@ -326,24 +286,12 @@ create_seasonal_chord <- function(data, season_name, output_prefix) {
     
     chordDiagram(
         adj_list, order = all_sectors, grid.col = all_sector_colors,
-        col = link_colors, transparency = 0.3,
+        col = link_colors, transparency = 0.2,
         annotationTrack = "grid",
-        preAllocateTracks = list(
-            list(track.height = 0.05),
-            list(track.height = 0.18)
-        )
+        preAllocateTracks = list(list(track.height = 0.18))
     )
     
     circos.track(track.index = 1, panel.fun = function(x, y) {
-        sector.name <- get.cell.meta.data("sector.index")
-        xlim <- get.cell.meta.data("xlim")
-        if (sector.name %in% chord_df$gene_label) {
-            lfc <- chord_df$log2FoldChange[chord_df$gene_label == sector.name][1]
-            circos.rect(xlim[1], 0, xlim[2], 1, col = lfc_col_fun(lfc), border = NA)
-        }
-    }, bg.border = NA)
-    
-    circos.track(track.index = 2, panel.fun = function(x, y) {
         sector.name <- get.cell.meta.data("sector.index")
         xlim <- get.cell.meta.data("xlim")
         ylim <- get.cell.meta.data("ylim")
@@ -353,8 +301,8 @@ create_seasonal_chord <- function(data, season_name, output_prefix) {
                        adj = c(0, 0.5), cex = 0.55, col = "black")
         } else {
             circos.text(mean(xlim), ylim[1] + 0.3, sector.name,
-                       facing = "bending.inside", niceFacing = TRUE,
-                       adj = c(0.5, 0), cex = 1.0, font = 2, col = "black")
+                       facing = "clockwise", niceFacing = TRUE,
+                       adj = c(0, 0.5), cex = 0.9, font = 2, col = "black")
         }
     }, bg.border = NA)
     
@@ -379,11 +327,7 @@ create_seasonal_chord <- function(data, season_name, output_prefix) {
 summer_data <- create_seasonal_chord(truly_relevant, "Summer", "Fig4A_chord_summer")
 winter_data <- create_seasonal_chord(truly_relevant, "Winter", "Fig4B_chord_winter")
 
-# ==============================================================================
-# SAVE SUMMARIES
-# ==============================================================================
-
-# Category summary by season
+# Save summary
 cat_summary <- truly_relevant %>%
     group_by(broad_category, organism, season) %>%
     summarise(count = n(), avg_lfc = mean(log2FoldChange, na.rm = TRUE), .groups = "drop")
