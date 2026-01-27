@@ -1,0 +1,24 @@
+"refined_category","organism","season","count","avg_lfc"
+"BMP Signaling","Host","Winter",1,-1.08868807947773
+"Biomineralization Enzyme","Host","Summer",1,1.15909872327656
+"Biomineralization Matrix","Host","Winter",1,3.49197750158172
+"Ca2+ ATPase","Host","Winter",1,-0.543015221431354
+"Ca2+ Channel","Host","Winter",1,0.551454516755346
+"Ca2+ Channel","Symbiont","Winter",5,0.69670096899061
+"Ca2+ Signaling (CDPK)","Symbiont","Winter",3,0.641682665801972
+"Carbonic Anhydrase","Host","Winter",2,1.74168797185445
+"Cl- Channel","Host","Summer",1,2.06212254589932
+"Cl- Channel","Host","Winter",1,2.0470012116824
+"Cl- Channel","Symbiont","Winter",1,0.663862429317851
+"Collagen/ECM","Host","Summer",1,-1.17674994168092
+"Collagen/ECM","Host","Winter",2,1.81986199728209
+"H+ ATPase","Host","Summer",1,1.15932081870911
+"K+ Channel","Host","Summer",2,-1.06824792302839
+"K+ Channel","Symbiont","Winter",5,0.712899352248647
+"MCT (pH Regulation)","Host","Summer",2,-2.54566422575124
+"MCT (pH Regulation)","Host","Winter",3,-2.36912781975084
+"Na+ Channel","Host","Winter",1,1.22126218741236
+"Na+ Channel","Symbiont","Winter",3,0.990641488487968
+"Na+/K+ ATPase","Host","Summer",1,0.908616761529072
+"Phosphate Transport","Symbiont","Winter",2,-0.407219168889494
+"TRP Channel","Host","Summer",3,2.15044677410175
