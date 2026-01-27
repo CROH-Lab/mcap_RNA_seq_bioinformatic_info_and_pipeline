@@ -1,15 +1,19 @@
-"category","count","avg_lfc","organism"
-"Anion Transport",3,0.220567379977387,"Host"
-"Ca2+ ATPase",1,-0.543015221431354,"Host"
-"Ca2+ Channel",1,0.551454516755346,"Host"
-"Carbonic Anhydrase",2,1.74168797185445,"Host"
-"H+ ATPase",1,1.15932081870911,"Host"
-"Na+/K+ Transport",6,-0.106857003682228,"Host"
-"Other Ion/Transport",73,0.797330322337877,"Host"
-"Solute Carrier",10,-0.0222657647768015,"Host"
-"Anion Transport",1,0.663862429317851,"Symbiont"
-"Ca2+ Binding",3,0.641682665801972,"Symbiont"
-"Ca2+ Channel",5,0.69670096899061,"Symbiont"
-"Na+/K+ Transport",8,0.817052653338392,"Symbiont"
-"Other Ion/Transport",21,0.114286880980212,"Symbiont"
-"Solute Carrier",2,0.91192645488284,"Symbiont"
+"category","organism","season","count","avg_lfc"
+"Ca2+ ATPase","Host","Winter",1,-0.543015221431354
+"Ca2+ Channel","Host","Winter",1,0.551454516755346
+"Ca2+ Channel","Symbiont","Winter",5,0.69670096899061
+"Ca2+ Signaling","Symbiont","Winter",3,0.641682665801972
+"Carbonic Anhydrase","Host","Winter",2,1.74168797185445
+"Cl- Transport","Host","Summer",2,1.6258812503317
+"Cl- Transport","Host","Winter",2,-0.271529574524415
+"Cl- Transport","Symbiont","Winter",1,0.663862429317851
+"H+ ATPase","Host","Summer",1,1.15932081870911
+"K+ Channel","Host","Summer",2,-1.06824792302839
+"K+ Channel","Symbiont","Winter",5,0.712899352248647
+"Na+ Transport","Host","Summer",1,-1.23927502182943
+"Na+ Transport","Host","Winter",2,0.913006042131886
+"Na+ Transport","Symbiont","Winter",3,0.990641488487968
+"Na+/K+ ATPase","Host","Summer",1,0.908616761529072
+"Other Transport","Host","Summer",71,0.65972874882587
+"Other Transport","Host","Winter",13,0.781147952551117
+"Other Transport","Symbiont","Winter",23,0.183646843928266
