@@ -62,27 +62,27 @@ config <- list(
     BP = list(
         largest = 0.1,
         smallest = 10,
-        clusterCutHeight = 0.5,
+        clusterCutHeight = 0.25,
         level1 = 0.01,
         level2 = 0.001,
         level3 = 0.0001,
-        txtsize = 0.9,
+        txtsize = 1,
         treeHeight = 0.5
     ),
     MF = list(
         largest = 0.1,
         smallest = 10,
-        clusterCutHeight = 0.5,
+        clusterCutHeight = 0.25,
         level1 = 0.01,
         level2 = 0.001,
         level3 = 0.0001,
         txtsize = 1.2,
-        treeHeight = 0.05
+        treeHeight = 0.5
     ),
     CC = list(
         largest = 0.1,
         smallest = 10,
-        clusterCutHeight = 0.5,
+        clusterCutHeight = 0.25,
         level1 = 0.01,
         level2 = 0.001,
         level3 = 0.0001,
