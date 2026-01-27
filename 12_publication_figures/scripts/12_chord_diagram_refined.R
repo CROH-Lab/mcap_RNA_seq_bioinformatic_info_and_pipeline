@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 # ==============================================================================
 # Refined Chord Diagrams - Calcification/Ion Transport DEGs
-# Version 4 - LFC colored gene bars, perpendicular category labels, no category color bars
+# Version 5 - Clean gene names, no titles, matching font sizes
 # ==============================================================================
 
 setwd("/home/darmstrong4/mc_rework/12_publication_figures")
@@ -145,10 +145,10 @@ create_seasonal_chord <- function(data, season_name, output_prefix) {
     season_data <- season_data %>%
         arrange(desc(organism == "Host"), desc(abs(log2FoldChange)))
     
-    # Create gene labels
+    # Create gene labels - CLEAN: remove species notation (everything after _)
     season_data$gene_label <- paste0(
         ifelse(season_data$organism == "Host", "H:", "S:"),
-        season_data$short_name
+        sub("_.*", "", season_data$short_name)  # Remove _ and everything after
     )
     
     # Make unique labels
@@ -176,13 +176,13 @@ create_seasonal_chord <- function(data, season_name, output_prefix) {
     lfc_max <- max(3, lfc_range[2])
     lfc_col_fun <- colorRamp2(c(lfc_min, 0, lfc_max), c(down_color, "white", up_color))
     
-    # Gene sector colors - BY LOG2FC (not organism)
+    # Gene sector colors - BY LOG2FC
     gene_colors <- setNames(
         sapply(chord_df$log2FoldChange, function(x) lfc_col_fun(x)),
         chord_df$gene_label
     )
     
-    # Category colors - use gray/neutral since we're removing the color bars
+    # Category colors - gray/neutral
     category_colors <- setNames(rep("gray85", n_cats), categories)
     
     all_sector_colors <- c(gene_colors, category_colors)
@@ -197,8 +197,6 @@ create_seasonal_chord <- function(data, season_name, output_prefix) {
     adj_list <- chord_df %>%
         mutate(value = 1) %>%
         select(from = gene_label, to = broad_category, value)
-    
-    season_title_color <- ifelse(season_name == "Summer", summer_color, winter_color)
     
     # ==============================================================================
     # DRAW PDF
@@ -221,32 +219,23 @@ create_seasonal_chord <- function(data, season_name, output_prefix) {
         transparency = 0.2,
         annotationTrack = "grid",
         preAllocateTracks = list(
-            list(track.height = 0.18)  # Just one track for labels
+            list(track.height = 0.18)
         )
     )
     
-    # Single track for labels - perpendicular category names
+    # Single track for labels - all perpendicular, bold, same size
     circos.track(track.index = 1, panel.fun = function(x, y) {
         sector.name <- get.cell.meta.data("sector.index")
         xlim <- get.cell.meta.data("xlim")
         ylim <- get.cell.meta.data("ylim")
         
-        if (sector.name %in% chord_df$gene_label) {
-            # Gene labels - clockwise/rotated
-            circos.text(mean(xlim), ylim[1] + 0.3, sector.name,
-                       facing = "clockwise", niceFacing = TRUE,
-                       adj = c(0, 0.5), cex = 0.55, col = "black")
-        } else {
-            # Category labels - PERPENDICULAR (clockwise facing)
-            circos.text(mean(xlim), ylim[1] + 0.3, sector.name,
-                       facing = "clockwise", niceFacing = TRUE,
-                       adj = c(0, 0.5), cex = 0.9, font = 2, col = "black")
-        }
+        # Both genes and categories: perpendicular, bold, same size
+        circos.text(mean(xlim), ylim[1] + 0.3, sector.name,
+                   facing = "clockwise", niceFacing = TRUE,
+                   adj = c(0, 0.5), cex = 0.8, font = 2, col = "black")
     }, bg.border = NA)
     
-    # Title
-    title(main = paste0(season_name, " - Calcification/Ion Transport DEGs"), 
-          cex.main = 1.5, col.main = season_title_color, font.main = 2)
+    # NO TITLE
     
     # Legends
     lgd_lfc <- Legend(
@@ -295,19 +284,10 @@ create_seasonal_chord <- function(data, season_name, output_prefix) {
         sector.name <- get.cell.meta.data("sector.index")
         xlim <- get.cell.meta.data("xlim")
         ylim <- get.cell.meta.data("ylim")
-        if (sector.name %in% chord_df$gene_label) {
-            circos.text(mean(xlim), ylim[1] + 0.3, sector.name,
-                       facing = "clockwise", niceFacing = TRUE,
-                       adj = c(0, 0.5), cex = 0.55, col = "black")
-        } else {
-            circos.text(mean(xlim), ylim[1] + 0.3, sector.name,
-                       facing = "clockwise", niceFacing = TRUE,
-                       adj = c(0, 0.5), cex = 0.9, font = 2, col = "black")
-        }
+        circos.text(mean(xlim), ylim[1] + 0.3, sector.name,
+                   facing = "clockwise", niceFacing = TRUE,
+                   adj = c(0, 0.5), cex = 0.8, font = 2, col = "black")
     }, bg.border = NA)
-    
-    title(main = paste0(season_name, " - Calcification/Ion Transport DEGs"), 
-          cex.main = 1.5, col.main = season_title_color, font.main = 2)
     
     draw(lgd_lfc, x = unit(0.92, "npc"), y = unit(0.75, "npc"))
     draw(lgd_org, x = unit(0.92, "npc"), y = unit(0.45, "npc"))
