@@ -1,16 +1,20 @@
 #!/usr/bin/env Rscript
 # ==============================================================================
 # Refined Chord Diagrams - Calcification/Ion Transport DEGs
-# Version 5 - Clean gene names, no titles, matching font sizes
+# Version 6 - Combined figure with A/B panels and shared legend
 # ==============================================================================
 
 setwd("/home/darmstrong4/mc_rework/12_publication_figures")
+options(repos = c(CRAN = "https://cloud.r-project.org"))
+install.packages("gridBase")
 
 suppressPackageStartupMessages({
     library(tidyverse)
     library(circlize)
     library(RColorBrewer)
     library(ComplexHeatmap)
+    library(grid)
+    library(gridBase)
 })
 
 # Color palettes
@@ -119,39 +123,25 @@ truly_relevant <- truly_relevant %>% filter(broad_category != "Other")
 
 write.csv(truly_relevant, "data/calcification_degs_refined.csv", row.names = FALSE)
 
-cat("\n--- COUNTS BY SEASON ---\n")
-truly_relevant %>%
-    count(season, organism) %>%
-    pivot_wider(names_from = organism, values_from = n, values_fill = 0) %>%
-    as.data.frame() %>%
-    print()
-
 # ==============================================================================
-# FUNCTION TO CREATE CHORD DIAGRAM FOR ONE SEASON
+# PREPARE DATA FOR BOTH SEASONS
 # ==============================================================================
 
-create_seasonal_chord <- function(data, season_name, output_prefix) {
+prepare_season_data <- function(data, season_name) {
     
     season_data <- data %>% filter(season == season_name)
     
-    if (nrow(season_data) < 3) {
-        cat("  Skipping", season_name, "- too few genes (", nrow(season_data), ")\n")
-        return(NULL)
-    }
+    if (nrow(season_data) < 3) return(NULL)
     
-    cat("\nCreating", season_name, "chord diagram with", nrow(season_data), "genes...\n")
-    
-    # Order: Host first, then Symbiont, by abs(log2FC)
     season_data <- season_data %>%
         arrange(desc(organism == "Host"), desc(abs(log2FoldChange)))
     
-    # Create gene labels - CLEAN: remove species notation (everything after _)
+    # Clean gene labels
     season_data$gene_label <- paste0(
         ifelse(season_data$organism == "Host", "H:", "S:"),
-        sub("_.*", "", season_data$short_name)  # Remove _ and everything after
+        sub("_.*", "", season_data$short_name)
     )
     
-    # Make unique labels
     season_data <- season_data %>%
         group_by(gene_label) %>%
         mutate(gene_label = ifelse(n() > 1, 
@@ -159,35 +149,45 @@ create_seasonal_chord <- function(data, season_name, output_prefix) {
                                     gene_label)) %>%
         ungroup()
     
-    categories <- unique(season_data$broad_category)
-    n_cats <- length(categories)
-    
-    cat("  Categories:", paste(categories, collapse = ", "), "\n")
+    return(season_data)
+}
+
+summer_data <- prepare_season_data(truly_relevant, "Summer")
+winter_data <- prepare_season_data(truly_relevant, "Winter")
+
+cat("Summer DEGs:", nrow(summer_data), "\n")
+cat("Winter DEGs:", nrow(winter_data), "\n")
+
+# Global LFC range for consistent color scale
+all_lfc <- c(summer_data$log2FoldChange, winter_data$log2FoldChange)
+lfc_min <- min(-3, min(all_lfc, na.rm = TRUE))
+lfc_max <- max(3, max(all_lfc, na.rm = TRUE))
+lfc_col_fun <- colorRamp2(c(lfc_min, 0, lfc_max), c(down_color, "white", up_color))
+
+# ==============================================================================
+# FUNCTION TO DRAW ONE CHORD DIAGRAM
+# ==============================================================================
+
+draw_chord <- function(season_data, label_text) {
     
     chord_df <- season_data %>%
         select(gene_label, broad_category, log2FoldChange, organism) %>%
         as.data.frame()
     
+    categories <- unique(chord_df$broad_category)
     all_sectors <- c(chord_df$gene_label, categories)
     
-    # Log2FC color function
-    lfc_range <- range(chord_df$log2FoldChange, na.rm = TRUE)
-    lfc_min <- min(-3, lfc_range[1])
-    lfc_max <- max(3, lfc_range[2])
-    lfc_col_fun <- colorRamp2(c(lfc_min, 0, lfc_max), c(down_color, "white", up_color))
-    
-    # Gene sector colors - BY LOG2FC
+    # Gene colors by LFC
     gene_colors <- setNames(
         sapply(chord_df$log2FoldChange, function(x) lfc_col_fun(x)),
         chord_df$gene_label
     )
     
-    # Category colors - gray/neutral
-    category_colors <- setNames(rep("gray85", n_cats), categories)
-    
+    # Category colors - gray
+    category_colors <- setNames(rep("gray85", length(categories)), categories)
     all_sector_colors <- c(gene_colors, category_colors)
     
-    # Link/chord colors by organism
+    # Link colors by organism
     link_colors <- adjustcolor(
         ifelse(chord_df$organism == "Host", host_color, symbiont_color), 
         alpha.f = 0.6
@@ -197,12 +197,6 @@ create_seasonal_chord <- function(data, season_name, output_prefix) {
     adj_list <- chord_df %>%
         mutate(value = 1) %>%
         select(from = gene_label, to = broad_category, value)
-    
-    # ==============================================================================
-    # DRAW PDF
-    # ==============================================================================
-    
-    pdf(paste0("figures/", output_prefix, ".pdf"), width = 12, height = 11)
     
     circos.clear()
     circos.par(
@@ -218,65 +212,6 @@ create_seasonal_chord <- function(data, season_name, output_prefix) {
         col = link_colors,
         transparency = 0.2,
         annotationTrack = "grid",
-        preAllocateTracks = list(
-            list(track.height = 0.18)
-        )
-    )
-    
-    # Single track for labels - all perpendicular, bold, same size
-    circos.track(track.index = 1, panel.fun = function(x, y) {
-        sector.name <- get.cell.meta.data("sector.index")
-        xlim <- get.cell.meta.data("xlim")
-        ylim <- get.cell.meta.data("ylim")
-        
-        # Both genes and categories: perpendicular, bold, same size
-        circos.text(mean(xlim), ylim[1] + 0.3, sector.name,
-                   facing = "clockwise", niceFacing = TRUE,
-                   adj = c(0, 0.5), cex = 0.8, font = 2, col = "black")
-    }, bg.border = NA)
-    
-    # NO TITLE
-    
-    # Legends
-    lgd_lfc <- Legend(
-        col_fun = lfc_col_fun, 
-        title = "Log2FC",
-        title_position = "topleft", 
-        legend_height = unit(2.5, "cm"),
-        title_gp = gpar(fontsize = 11, fontface = "bold"),
-        labels_gp = gpar(fontsize = 9)
-    )
-    
-    lgd_org <- Legend(
-        labels = c("Host (H:)", "Symbiont (S:)"),
-        legend_gp = gpar(fill = c(host_color, symbiont_color)),
-        title = "Organism\n(chord color)", 
-        title_position = "topleft",
-        title_gp = gpar(fontsize = 11, fontface = "bold"),
-        labels_gp = gpar(fontsize = 9)
-    )
-    
-    draw(lgd_lfc, x = unit(0.92, "npc"), y = unit(0.75, "npc"))
-    draw(lgd_org, x = unit(0.92, "npc"), y = unit(0.45, "npc"))
-    
-    circos.clear()
-    dev.off()
-    
-    cat("  Saved:", paste0("figures/", output_prefix, ".pdf"), "\n")
-    
-    # ==============================================================================
-    # DRAW PNG
-    # ==============================================================================
-    
-    png(paste0("figures/", output_prefix, ".png"), width = 12, height = 11, units = "in", res = 300)
-    
-    circos.clear()
-    circos.par(start.degree = 90, gap.degree = 3, track.margin = c(0.01, 0.01))
-    
-    chordDiagram(
-        adj_list, order = all_sectors, grid.col = all_sector_colors,
-        col = link_colors, transparency = 0.2,
-        annotationTrack = "grid",
         preAllocateTracks = list(list(track.height = 0.18))
     )
     
@@ -286,26 +221,142 @@ create_seasonal_chord <- function(data, season_name, output_prefix) {
         ylim <- get.cell.meta.data("ylim")
         circos.text(mean(xlim), ylim[1] + 0.3, sector.name,
                    facing = "clockwise", niceFacing = TRUE,
-                   adj = c(0, 0.5), cex = 0.8, font = 2, col = "black")
+                   adj = c(0, 0.5), cex = 0.7, font = 2, col = "black")
     }, bg.border = NA)
     
-    draw(lgd_lfc, x = unit(0.92, "npc"), y = unit(0.75, "npc"))
-    draw(lgd_org, x = unit(0.92, "npc"), y = unit(0.45, "npc"))
-    
     circos.clear()
-    dev.off()
-    
-    cat("  Saved:", paste0("figures/", output_prefix, ".png"), "\n")
-    
-    return(season_data)
 }
 
 # ==============================================================================
-# CREATE BOTH SEASONAL CHORD DIAGRAMS
+# CREATE COMBINED PDF WITH STACKED PANELS
 # ==============================================================================
 
-summer_data <- create_seasonal_chord(truly_relevant, "Summer", "Fig4A_chord_summer")
-winter_data <- create_seasonal_chord(truly_relevant, "Winter", "Fig4B_chord_winter")
+cat("\nCreating combined figure...\n")
+
+pdf("figures/Fig4_chord_combined.pdf", width = 10, height = 18)
+
+# Layout: 2 rows for plots, space at bottom for legend
+layout(matrix(c(1, 2, 3, 3), nrow = 2, ncol = 2, byrow = TRUE),
+       widths = c(1, 1),
+       heights = c(1, 1, 0.25, 0.25))
+
+# Adjusted layout for stacked plots with legend on right
+layout(matrix(c(1, 3,
+                2, 3), nrow = 2, ncol = 2, byrow = TRUE),
+       widths = c(4, 1),
+       heights = c(1, 1))
+
+# Panel A - Summer
+par(mar = c(1, 1, 2, 1))
+draw_chord(summer_data, "A")
+mtext("A", side = 3, line = 0, adj = 0, cex = 2, font = 2)
+
+# Panel B - Winter
+par(mar = c(1, 1, 2, 1))
+draw_chord(winter_data, "B")
+mtext("B", side = 3, line = 0, adj = 0, cex = 2, font = 2)
+
+# Panel 3 - Legends
+par(mar = c(2, 0, 2, 0))
+plot.new()
+
+# Draw legends using grid
+pushViewport(viewport())
+
+# Log2FC legend
+lgd_lfc <- Legend(
+    col_fun = lfc_col_fun, 
+    title = "Log2FC",
+    title_position = "topleft", 
+    legend_height = unit(4, "cm"),
+    legend_width = unit(1, "cm"),
+    title_gp = gpar(fontsize = 14, fontface = "bold"),
+    labels_gp = gpar(fontsize = 12),
+    grid_width = unit(0.8, "cm")
+)
+
+# Organism legend
+lgd_org <- Legend(
+    labels = c("Host (H:)", "Symbiont (S:)"),
+    legend_gp = gpar(fill = c(host_color, symbiont_color)),
+    title = "Organism\n(chord color)", 
+    title_position = "topleft",
+    title_gp = gpar(fontsize = 14, fontface = "bold"),
+    labels_gp = gpar(fontsize = 12),
+    grid_height = unit(0.8, "cm"),
+    grid_width = unit(0.8, "cm")
+)
+
+draw(lgd_lfc, x = unit(0.5, "npc"), y = unit(0.7, "npc"))
+draw(lgd_org, x = unit(0.5, "npc"), y = unit(0.25, "npc"))
+
+popViewport()
+
+dev.off()
+
+cat("Saved: figures/Fig4_chord_combined.pdf\n")
+
+# ==============================================================================
+# CREATE COMBINED PNG - Better approach with viewport
+# ==============================================================================
+
+png("figures/Fig4_chord_combined.png", width = 10, height = 18, units = "in", res = 300)
+
+layout(matrix(c(1, 3,
+                2, 3), nrow = 2, ncol = 2, byrow = TRUE),
+       widths = c(4, 1),
+       heights = c(1, 1))
+
+# Panel A - Summer
+par(mar = c(1, 1, 2, 1))
+draw_chord(summer_data, "A")
+mtext("A", side = 3, line = 0, adj = 0, cex = 2, font = 2)
+
+# Panel B - Winter
+par(mar = c(1, 1, 2, 1))
+draw_chord(winter_data, "B")
+mtext("B", side = 3, line = 0, adj = 0, cex = 2, font = 2)
+
+# Panel 3 - Legends
+par(mar = c(2, 0, 2, 0))
+plot.new()
+
+pushViewport(viewport())
+draw(lgd_lfc, x = unit(0.5, "npc"), y = unit(0.7, "npc"))
+draw(lgd_org, x = unit(0.5, "npc"), y = unit(0.25, "npc"))
+popViewport()
+
+dev.off()
+
+cat("Saved: figures/Fig4_chord_combined.png\n")
+
+# ==============================================================================
+# ALSO SAVE INDIVIDUAL PLOTS (without legends, for flexibility)
+# ==============================================================================
+
+# Summer only
+pdf("figures/Fig4A_chord_summer.pdf", width = 10, height = 10)
+par(mar = c(1, 1, 1, 1))
+draw_chord(summer_data, "A")
+dev.off()
+
+png("figures/Fig4A_chord_summer.png", width = 10, height = 10, units = "in", res = 300)
+par(mar = c(1, 1, 1, 1))
+draw_chord(summer_data, "A")
+dev.off()
+
+# Winter only
+pdf("figures/Fig4B_chord_winter.pdf", width = 10, height = 10)
+par(mar = c(1, 1, 1, 1))
+draw_chord(winter_data, "B")
+dev.off()
+
+png("figures/Fig4B_chord_winter.png", width = 10, height = 10, units = "in", res = 300)
+par(mar = c(1, 1, 1, 1))
+draw_chord(winter_data, "B")
+dev.off()
+
+cat("\nSaved individual plots as well.\n")
 
 # Save summary
 cat_summary <- truly_relevant %>%
@@ -313,8 +364,4 @@ cat_summary <- truly_relevant %>%
     summarise(count = n(), avg_lfc = mean(log2FoldChange, na.rm = TRUE), .groups = "drop")
 write.csv(cat_summary, "data/calcification_category_summary_refined.csv", row.names = FALSE)
 
-cat("\n=== SUMMARY ===\n")
-cat("Summer DEGs:", ifelse(is.null(summer_data), 0, nrow(summer_data)), "\n")
-cat("Winter DEGs:", ifelse(is.null(winter_data), 0, nrow(winter_data)), "\n")
-
-cat("\nDone!\n")
+cat("\n=== COMPLETE ===\n")
