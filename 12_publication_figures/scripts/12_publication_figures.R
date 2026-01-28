@@ -528,6 +528,7 @@ winter_result <- create_season_sankey("winter")
 
 cat("\n==============================================================================\n")
 cat("Creating Combined Summer + Winter Sankey\n")
+cat("NOTE: Excludes Protein Phosphorylation, Na/K Transport, Phospholipid Transport\n")
 cat("==============================================================================\n\n")
 
 # Load both seasons together
@@ -573,9 +574,11 @@ calc_combined <- calc_combined %>%
         source_node = paste(season_prefix, organism, division, sep = "-"),
         organism_season = paste(organism, season, sep = "_")  # For 4-color scheme
     ) %>%
-    filter(!is.na(parent_category))
+    filter(!is.na(parent_category)) %>%
+    # EXCLUDE specific categories for combined plot
+    filter(!parent_category %in% c("Protein Phosphorylation", "Na/K Transport", "Phospholipid Transport"))
 
-cat("Terms after filtering:", nrow(calc_combined), "\n")
+cat("Terms after filtering (with category exclusions):", nrow(calc_combined), "\n")
 
 # Hierarchical filtering - top 10 parent categories overall
 parent_ranking_combined <- calc_combined %>%
@@ -646,10 +649,12 @@ nodes_combined_for_sankey <- as.data.frame(nodes_combined_renamed)
 links_combined_for_sankey <- as.data.frame(links_combined)
 links_combined_for_sankey$group <- links_combined_for_sankey$organism_season
 
-# 4-color scheme: Orange (host summer), Green (symbiont summer), Purple (host winter), Light blue (symbiont winter)
+# 4-color scheme: 
+# #ff671f = Host Summer, #ffb81c = Host Winter
+# #006341 = Symbiont Summer, #8fe2b0 = Symbiont Winter
 color_scale_combined <- 'd3.scaleOrdinal()
-    .domain(["host_summer", "symbiont_summer", "host_winter", "symbiont_winter", "parent"])
-    .range(["#E69F00", "#2ECC71", "#9B59B6", "#56B4E9", "#95A5A6"])'
+    .domain(["host_summer", "host_winter", "symbiont_summer", "symbiont_winter", "parent"])
+    .range(["#ff671f", "#ffb81c", "#006341", "#8fe2b0", "#95A5A6"])'
 
 sankey_combined <- sankeyNetwork(
     Links = links_combined_for_sankey,
@@ -702,7 +707,11 @@ print(summary_combined)
 cat("\n✓ All Sankey plots complete!\n")
 cat("  - Fig4_calcification_sankey_summer.html (Orange=Host, Green=Symbiont)\n")
 cat("  - Fig4_calcification_sankey_winter.html (Orange=Host, Green=Symbiont)\n")
-cat("  - Fig4_calcification_sankey_combined.html (4 colors by season+organism)\n")
+cat("  - Fig4_calcification_sankey_combined.html\n")
+cat("      Host Summer=#ff671f, Host Winter=#ffb81c\n")
+cat("      Symbiont Summer=#006341, Symbiont Winter=#8fe2b0\n")
+cat("      Excludes: Protein Phosphorylation, Na/K Transport, Phospholipid Transport\n")
+
 # ==============================================================================
 # FIGURE 5: Volcano Plots
 # ==============================================================================
