@@ -4,6 +4,7 @@
 # Using signed -log10(pvalue) as the measure
 # Modular configuration per GO division
 # With representative GO extraction
+# FIXED: Corrected file pattern matching for output files
 # ==============================================================================
 
 # Set working directory
@@ -23,25 +24,25 @@ cat("===========================================================================
 
 # Function to create GO_MWU input from DESeq2 results
 create_gomwu_input <- function(deseq_file, output_file) {
-    
+
     deseq <- read.csv(deseq_file, row.names = 1)
     deseq_clean <- deseq[!is.na(deseq$pvalue) & !is.na(deseq$log2FoldChange), ]
     min_pval <- min(deseq_clean$pvalue[deseq_clean$pvalue > 0])
     deseq_clean$pvalue[deseq_clean$pvalue == 0] <- min_pval
     signed_logP <- sign(deseq_clean$log2FoldChange) * -log10(deseq_clean$pvalue)
-    
+
     gomwu_input <- data.frame(
         gene = rownames(deseq_clean),
         signed_logP = signed_logP
     )
     write.csv(gomwu_input, output_file, row.names = FALSE, quote = FALSE)
-    
+
     cat("Input file:", basename(deseq_file), "\n")
     cat("  Total genes:", nrow(deseq), "\n")
     cat("  Genes with valid p-values:", nrow(deseq_clean), "\n")
     cat("  Signed -log10(p) range:", round(min(signed_logP), 2), "to", round(max(signed_logP), 2), "\n")
     cat("  Genes with |signed_logP| > 1.3 (p < 0.05):", sum(abs(signed_logP) > 1.3), "\n\n")
-    
+
     return(gomwu_input)
 }
 
@@ -108,33 +109,33 @@ divisions <- c("BP", "MF", "CC")
 # ==============================================================================
 
 extract_representative_GOs <- function(results, pcut = 0.01, hcut = 0.9) {
-    
+
     if (is.null(results[[1]]) || nrow(results[[1]]) == 0) {
         return(NULL)
     }
-    
+
     ct <- cutree(results[[2]], h = hcut)
     rep_GOs <- data.frame()
-    
+
     for (ci in unique(ct)) {
         rn <- names(ct)[ct == ci]
         obs <- grep("obsolete", rn)
         if (length(obs) > 0) { rn <- rn[-obs] }
         if (length(rn) == 0) { next }
-        
+
         rr <- results[[1]][rn, , drop = FALSE]
         bestrr <- rr[which(rr$pval == min(rr$pval)), , drop = FALSE]
         best <- 1
-        
+
         if (nrow(bestrr) > 1) {
             nns <- sub(" .+", "", row.names(bestrr))
             fr <- c()
-            for (i in 1:length(nns)) { 
-                fr <- c(fr, eval(parse(text = nns[i]))) 
+            for (i in 1:length(nns)) {
+                fr <- c(fr, eval(parse(text = nns[i])))
             }
             best <- which(fr == max(fr))[1]
         }
-        
+
         if (bestrr$pval[best] <= pcut) {
             term_name <- sub("\\d+\\/\\d+ ", "", row.names(bestrr)[best])
             rep_GOs <- rbind(rep_GOs, data.frame(
@@ -148,12 +149,12 @@ extract_representative_GOs <- function(results, pcut = 0.01, hcut = 0.9) {
             ))
         }
     }
-    
+
     if (nrow(rep_GOs) > 0) {
         rep_GOs <- rep_GOs[order(rep_GOs$pval), ]
         rownames(rep_GOs) <- NULL
     }
-    
+
     return(rep_GOs)
 }
 
@@ -177,21 +178,21 @@ results_summary <- data.frame()
 all_rep_GOs <- list()
 
 for (season in seasons) {
-    
+
     input_file <- paste0("symbiont_", season, "_signed_logP.csv")
     all_rep_GOs[[season]] <- list()
-    
+
     cat("\n")
     cat("##############################################################\n")
     cat("# Processing SYMBIONT:", toupper(season), "\n")
     cat("##############################################################\n")
-    
+
     for (div in divisions) {
-        
+
         cat("\n=== Symbiont ", season, " - ", div, " ===\n", sep="")
-        
+
         prefix <- paste0("symbiont_", season, "_", div)
-        
+
         tryCatch({
             # Run MWU statistics
             gomwuStats(input_file, goDatabase, goAnnotations, div,
@@ -200,11 +201,11 @@ for (season in seasons) {
                        smallest = config[[div]]$smallest,
                        clusterCutHeight = config[[div]]$clusterCutHeight
             )
-            
+
             # Generate individual plot
             pdf_file <- paste0("figures/", prefix, "_GO_MWU.pdf")
             pdf(pdf_file, width = 12, height = 10)
-            
+
             results <- gomwuPlot(input_file, goAnnotations, div,
                                  absValue = absValue,
                                  level1 = config[[div]]$level1,
@@ -214,37 +215,54 @@ for (season in seasons) {
                                  treeHeight = config[[div]]$treeHeight,
                                  colors = c("dodgerblue2", "firebrick1", "skyblue2", "lightcoral")
             )
-            
+
             dev.off()
             cat("Saved plot:", pdf_file, "\n")
-            
+
             # Extract representative GOs
-            rep_GOs <- extract_representative_GOs(results, 
-                                                   pcut = rep_GO_config$pcut, 
+            rep_GOs <- extract_representative_GOs(results,
+                                                   pcut = rep_GO_config$pcut,
                                                    hcut = rep_GO_config$hcut)
-            
+
             if (!is.null(rep_GOs) && nrow(rep_GOs) > 0) {
                 rep_GOs$season <- season
                 rep_GOs$division <- div
                 rep_GOs$organism <- "symbiont"
                 all_rep_GOs[[season]][[div]] <- rep_GOs
-                
-                write.csv(rep_GOs, paste0("output/", prefix, "_representative_GOs.csv"), 
+
+                write.csv(rep_GOs, paste0("output/", prefix, "_representative_GOs.csv"),
                           row.names = FALSE)
                 cat("Representative GO terms:", nrow(rep_GOs), "\n")
             }
+
+            # ===================================================================
+            # FIXED: Correct file pattern matching for GO_MWU output files
+            # GO_MWU perl scripts create files with pattern:
+            #   MWU_<div>_<input_filename>.csv
+            #   dissim_<div>_<input_filename>_<annotations>.tab
+            # ===================================================================
             
-            # Move output files
-            mwu_file <- list.files(pattern = paste0("^MWU_", div, "_"))
-            if (length(mwu_file) > 0) {
-                file.rename(mwu_file[1], paste0("output/", prefix, "_MWU_results.csv"))
+            # The actual filenames created by gomwu_a.pl
+            expected_mwu <- paste0("MWU_", div, "_", input_file)
+            expected_dissim_pattern <- paste0("^dissim_", div, "_", input_file)
+            
+            # Move MWU results file
+            if (file.exists(expected_mwu)) {
+                file.rename(expected_mwu, paste0("output/", prefix, "_MWU_results.csv"))
+                cat("Moved MWU results to output/\n")
+            } else {
+                cat("Warning: Expected MWU file not found:", expected_mwu, "\n")
             }
             
-            dissim_file <- list.files(pattern = paste0("^dissim_", div, "_"))
-            if (length(dissim_file) > 0) {
-                file.rename(dissim_file[1], paste0("output/", prefix, "_dissimilarity.csv"))
+            # Move dissimilarity file (has annotations appended to name)
+            dissim_files <- list.files(pattern = expected_dissim_pattern)
+            if (length(dissim_files) > 0) {
+                file.rename(dissim_files[1], paste0("output/", prefix, "_dissimilarity.csv"))
+                cat("Moved dissimilarity matrix to output/\n")
+            } else {
+                cat("Warning: Expected dissimilarity file not found with pattern:", expected_dissim_pattern, "\n")
             }
-            
+
             # Record summary
             if (!is.null(results[[1]]) && nrow(results[[1]]) > 0) {
                 n_sig <- nrow(results[[1]])
@@ -255,9 +273,9 @@ for (season in seasons) {
                 n_up <- 0
                 n_down <- 0
             }
-            
+
             n_rep <- ifelse(!is.null(rep_GOs), nrow(rep_GOs), 0)
-            
+
             results_summary <- rbind(results_summary, data.frame(
                 Organism = "Symbiont",
                 Season = season,
@@ -267,7 +285,7 @@ for (season in seasons) {
                 Upregulated = n_up,
                 Downregulated = n_down
             ))
-            
+
         }, error = function(e) {
             cat("ERROR in symbiont", season, div, ":", conditionMessage(e), "\n")
             results_summary <<- rbind(results_summary, data.frame(
@@ -293,17 +311,17 @@ cat("# Creating Combined Plots - SYMBIONT\n")
 cat("##############################################################\n")
 
 for (season in seasons) {
-    
+
     cat("\nGenerating combined plot for SYMBIONT", toupper(season), "...\n")
-    
+
     input_file <- paste0("symbiont_", season, "_signed_logP.csv")
     combined_pdf <- paste0("figures/symbiont_", season, "_combined_GO_MWU.pdf")
-    
+
     tryCatch({
         pdf(combined_pdf, width = 20, height = 14)
         layout(matrix(c(1, 1, 2,
                         1, 1, 3), nrow = 2, byrow = TRUE))
-        
+
         # BP (left)
         par(mar = c(4, 4, 4, 2))
         gomwuPlot(input_file, goAnnotations, "BP",
@@ -316,7 +334,7 @@ for (season in seasons) {
                   colors = c("dodgerblue2", "firebrick1", "skyblue2", "lightcoral")
         )
         title(main = paste0("SYMBIONT ", toupper(season), " - Biological Process (BP)"), cex.main = 1.5)
-        
+
         # CC (top-right)
         par(mar = c(4, 4, 4, 2))
         gomwuPlot(input_file, goAnnotations, "CC",
@@ -329,7 +347,7 @@ for (season in seasons) {
                   colors = c("dodgerblue2", "firebrick1", "skyblue2", "lightcoral")
         )
         title(main = paste0("SYMBIONT ", toupper(season), " - Cellular Component (CC)"), cex.main = 1.5)
-        
+
         # MF (bottom-right)
         par(mar = c(4, 4, 4, 2))
         gomwuPlot(input_file, goAnnotations, "MF",
@@ -342,10 +360,10 @@ for (season in seasons) {
                   colors = c("dodgerblue2", "firebrick1", "skyblue2", "lightcoral")
         )
         title(main = paste0("SYMBIONT ", toupper(season), " - Molecular Function (MF)"), cex.main = 1.5)
-        
+
         dev.off()
         cat("Saved combined plot:", combined_pdf, "\n")
-        
+
     }, error = function(e) {
         cat("ERROR creating combined plot:", conditionMessage(e), "\n")
         if (dev.cur() > 1) dev.off()
@@ -366,39 +384,39 @@ all_rep_combined <- do.call(rbind, lapply(seasons, function(s) {
 }))
 
 if (!is.null(all_rep_combined) && nrow(all_rep_combined) > 0) {
-    all_rep_combined <- all_rep_combined[, c("organism", "season", "division", "term", "direction", 
+    all_rep_combined <- all_rep_combined[, c("organism", "season", "division", "term", "direction",
                                               "pval", "p.adj", "nseqs", "cluster")]
-    
+
     write.csv(all_rep_combined, "output/symbiont_all_representative_GOs.csv", row.names = FALSE)
     cat("\nCombined representative GOs saved to: output/symbiont_all_representative_GOs.csv\n")
-    
+
     cat("\n=== SYMBIONT Representative GO Summary ===\n\n")
     for (s in seasons) {
         cat(toupper(s), ":\n")
         for (d in divisions) {
-            subset_data <- all_rep_combined[all_rep_combined$season == s & 
+            subset_data <- all_rep_combined[all_rep_combined$season == s &
                                             all_rep_combined$division == d, ]
             if (nrow(subset_data) > 0) {
                 n_up <- sum(subset_data$direction == "up")
                 n_down <- sum(subset_data$direction == "down")
-                cat("  ", d, ": ", nrow(subset_data), " representative terms (", 
+                cat("  ", d, ": ", nrow(subset_data), " representative terms (",
                     n_up, " up, ", n_down, " down)\n", sep="")
             }
         }
         cat("\n")
     }
-    
+
     cat("=== Top Representative GO Terms - SYMBIONT ===\n")
     for (s in seasons) {
         cat("\n", toupper(s), ":\n", sep="")
         for (d in divisions) {
-            subset_data <- all_rep_combined[all_rep_combined$season == s & 
+            subset_data <- all_rep_combined[all_rep_combined$season == s &
                                             all_rep_combined$division == d, ]
             if (nrow(subset_data) > 0) {
                 cat("  ", d, ":\n", sep="")
                 top_terms <- head(subset_data[order(subset_data$pval), ], 5)
                 for (i in 1:nrow(top_terms)) {
-                    cat("    ", top_terms$direction[i], ": ", top_terms$term[i], 
+                    cat("    ", top_terms$direction[i], ": ", top_terms$term[i],
                         " (p.adj=", format(top_terms$p.adj[i], digits=3), ")\n", sep="")
                 }
             }
@@ -407,13 +425,23 @@ if (!is.null(all_rep_combined) && nrow(all_rep_combined) > 0) {
 }
 
 # ==============================================================================
-# CLEANUP
+# CLEANUP - Remove intermediate files after moving results to output
 # ==============================================================================
 
-int_files <- list.files(pattern = "^BP_|^MF_|^CC_|^dissim_|^MWU_|\\.tmp$")
-if (length(int_files) > 0) file.remove(int_files)
-file.remove(c("symbiont_go_annotations.tab", "go.obo", 
-              "symbiont_summer_signed_logP.csv", "symbiont_winter_signed_logP.csv"))
+# Remove intermediate GO analysis files (after they've been moved to output/)
+int_files <- list.files(pattern = "^BP_|^MF_|^CC_|^dissim_|^MWU_|^cl_|\\.tmp$")
+if (length(int_files) > 0) {
+    cat("\nCleaning up", length(int_files), "intermediate files...\n")
+    file.remove(int_files)
+}
+
+# Remove copied input files
+input_copies <- c("symbiont_go_annotations.tab", "go.obo",
+                  "symbiont_summer_signed_logP.csv", "symbiont_winter_signed_logP.csv")
+existing_copies <- input_copies[file.exists(input_copies)]
+if (length(existing_copies) > 0) {
+    file.remove(existing_copies)
+}
 
 # ==============================================================================
 # SAVE SUMMARY
