@@ -522,6 +522,166 @@ create_season_sankey <- function(season_name) {
 summer_result <- create_season_sankey("summer")
 winter_result <- create_season_sankey("winter")
 
+# ==============================================================================
+# COMBINED SUMMER + WINTER SANKEY
+# ==============================================================================
+
+cat("\n==============================================================================\n")
+cat("Creating Combined Summer + Winter Sankey\n")
+cat("==============================================================================\n\n")
+
+# Load both seasons together
+host_summer <- load_gomwu_results("../10_GO_MWU/output", "host", "summer")
+host_winter <- load_gomwu_results("../10_GO_MWU/output", "host", "winter")
+symbiont_summer <- load_gomwu_results("../11_symbiont_GO_MWU/output", "symbiont", "summer")
+symbiont_winter <- load_gomwu_results("../11_symbiont_GO_MWU/output", "symbiont", "winter")
+
+all_combined <- bind_rows(host_summer, host_winter, symbiont_summer, symbiont_winter)
+
+cat("Loaded combined data - Total GO terms:", nrow(all_combined), "\n")
+
+# Filter for calcification
+calc_combined <- all_combined %>%
+    filter(p.adj < P_ADJ_CUTOFF) %>%
+    filter(str_detect(name, regex(paste(CALC_KEYWORDS, collapse = "|"), ignore_case = TRUE)))
+
+cat("Calcification terms at p.adj < 0.05:", nrow(calc_combined), "\n")
+
+# Assign parent categories (same function)
+assign_parent_category <- function(go_name) {
+    go_name_lower <- tolower(go_name)
+    case_when(
+        str_detect(go_name_lower, "oxidative phosphorylation") ~ "Oxidative Phosphorylation",
+        str_detect(go_name_lower, "sodium.*transport|potassium.*transport") ~ "Na/K Transport",
+        str_detect(go_name_lower, "phospholipid.*transport|organophosphate.*transport") ~ "Phospholipid Transport",
+        str_detect(go_name_lower, "protein phosphorylation|phosphotransferase.*alcohol|autophosphorylation") ~ "Protein Phosphorylation",
+        str_detect(go_name_lower, "calcium") ~ "Calcium Homeostasis",
+        str_detect(go_name_lower, "carbonate|carbonic") ~ "Carbon/Carbonate",
+        str_detect(go_name_lower, "proton.*transport|h\\+.*transport") ~ "Proton Transport",
+        str_detect(go_name_lower, "metal ion") ~ "Metal Ion Homeostasis",
+        str_detect(go_name_lower, "atpase") ~ "ATPase Activity",
+        str_detect(go_name_lower, "ion homeostasis|regulation.*ion transport") ~ "Ion Homeostasis/Regulation",
+        str_detect(go_name_lower, "cation|anion|ion transport") ~ "Ion Transport",
+        TRUE ~ NA_character_
+    )
+}
+
+calc_combined <- calc_combined %>%
+    mutate(
+        parent_category = assign_parent_category(name),
+        season_prefix = ifelse(season == "summer", "S", "W"),
+        source_node = paste(season_prefix, organism, division, sep = "-"),
+        organism_season = paste(organism, season, sep = "_")  # For 4-color scheme
+    ) %>%
+    filter(!is.na(parent_category))
+
+cat("Terms after filtering:", nrow(calc_combined), "\n")
+
+# Hierarchical filtering - top 10 parent categories overall
+parent_ranking_combined <- calc_combined %>%
+    group_by(parent_category) %>%
+    summarise(total_significance = sum(-log10(p.adj + 1e-10)), n_terms = n(), .groups = "drop") %>%
+    arrange(desc(total_significance))
+
+cat("\nCombined parent category ranking:\n")
+print(parent_ranking_combined)
+
+top_parents_combined <- head(parent_ranking_combined, 10)$parent_category
+
+calc_combined <- calc_combined %>%
+    filter(parent_category %in% top_parents_combined) %>%
+    mutate(go_term_display = str_trunc(name, 60))
+
+cat("\nFinal combined terms:", nrow(calc_combined), "\n")
+cat("Breakdown:\n")
+print(table(calc_combined$season, calc_combined$organism))
+
+# Build nodes
+source_nodes_combined <- calc_combined %>%
+    distinct(source_node, organism_season) %>%
+    mutate(group = organism_season)
+
+parent_nodes_combined <- calc_combined %>%
+    distinct(parent_category) %>%
+    mutate(group = "parent", organism_season = "parent")
+names(parent_nodes_combined)[1] <- "source_node"
+
+go_nodes_combined <- calc_combined %>%
+    distinct(go_term_display, parent_category, organism_season) %>%
+    mutate(group = organism_season)
+names(go_nodes_combined)[1] <- "source_node"
+go_nodes_combined <- go_nodes_combined %>% select(source_node, group, organism_season)
+
+nodes_combined <- bind_rows(
+    source_nodes_combined %>% select(source_node, group, organism_season),
+    parent_nodes_combined,
+    go_nodes_combined
+) %>%
+    distinct(source_node, .keep_all = TRUE) %>%
+    mutate(node_id = row_number() - 1)
+
+# Build links
+link1_combined <- calc_combined %>%
+    group_by(source_node, parent_category, organism_season) %>%
+    summarise(value = sum(-log10(p.adj + 1e-10)), .groups = "drop") %>%
+    left_join(nodes_combined %>% select(source_node, source_id = node_id), by = "source_node") %>%
+    left_join(nodes_combined %>% select(source_node, target_id = node_id), by = c("parent_category" = "source_node"))
+
+link2_combined <- calc_combined %>%
+    mutate(value = -log10(p.adj + 1e-10)) %>%
+    left_join(nodes_combined %>% select(source_node, source_id = node_id), by = c("parent_category" = "source_node")) %>%
+    left_join(nodes_combined %>% select(source_node, target_id = node_id), by = c("go_term_display" = "source_node"))
+
+links_combined <- bind_rows(
+    link1_combined %>% select(source = source_id, target = target_id, value, organism_season),
+    link2_combined %>% select(source = source_id, target = target_id, value, organism_season)
+)
+
+cat("Combined Sankey: Nodes =", nrow(nodes_combined), "| Links =", nrow(links_combined), "\n")
+
+# Prepare for Sankey
+nodes_combined_renamed <- nodes_combined
+colnames(nodes_combined_renamed)[colnames(nodes_combined_renamed) == "source_node"] <- "name"
+nodes_combined_for_sankey <- as.data.frame(nodes_combined_renamed)
+links_combined_for_sankey <- as.data.frame(links_combined)
+links_combined_for_sankey$group <- links_combined_for_sankey$organism_season
+
+# 4-color scheme: Orange (host summer), Green (symbiont summer), Purple (host winter), Light blue (symbiont winter)
+color_scale_combined <- 'd3.scaleOrdinal()
+    .domain(["host_summer", "symbiont_summer", "host_winter", "symbiont_winter", "parent"])
+    .range(["#E69F00", "#2ECC71", "#9B59B6", "#56B4E9", "#95A5A6"])'
+
+sankey_combined <- sankeyNetwork(
+    Links = links_combined_for_sankey,
+    Nodes = nodes_combined_for_sankey,
+    Source = "source",
+    Target = "target",
+    Value = "value",
+    NodeID = "name",
+    NodeGroup = "organism_season",
+    LinkGroup = "group",
+    fontSize = 10,
+    nodeWidth = 25,
+    nodePadding = 6,
+    iterations = 100,
+    sinksRight = FALSE,
+    colourScale = color_scale_combined,
+    fontFamily = "Arial"
+)
+
+html_combined <- "figures/Fig4_calcification_sankey_combined.html"
+saveWidget(sankey_combined, html_combined, selfcontained = TRUE)
+cat("\n✓ Saved combined plot:", html_combined, "\n")
+
+# Summary
+summary_combined <- calc_combined %>%
+    group_by(season, organism, division, parent_category) %>%
+    summarise(n_terms = n(), mean_padj = mean(p.adj), .groups = "drop") %>%
+    arrange(season, organism, parent_category)
+
+write.csv(summary_combined, "data/calcification_summary_combined.csv", row.names = FALSE)
+cat("✓ Saved combined summary\n")
+
 cat("\n==============================================================================\n")
 cat("SUMMARY\n")
 cat("==============================================================================\n")
@@ -536,7 +696,13 @@ if (!is.null(winter_result)) {
     print(winter_result$summary)
 }
 
-cat("\n✓ Sankey plots complete with colored flows!\n")
+cat("\n--- COMBINED (Summer + Winter) ---\n")
+print(summary_combined)
+
+cat("\n✓ All Sankey plots complete!\n")
+cat("  - Fig4_calcification_sankey_summer.html (Orange=Host, Green=Symbiont)\n")
+cat("  - Fig4_calcification_sankey_winter.html (Orange=Host, Green=Symbiont)\n")
+cat("  - Fig4_calcification_sankey_combined.html (4 colors by season+organism)\n")
 # ==============================================================================
 # FIGURE 5: Volcano Plots
 # ==============================================================================

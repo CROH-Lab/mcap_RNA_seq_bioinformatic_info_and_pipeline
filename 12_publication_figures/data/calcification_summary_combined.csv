@@ -1,0 +1,36 @@
+"season","organism","division","parent_category","n_terms","mean_padj"
+"summer","host","BP","Calcium Homeostasis",1,0.0355683347656201
+"summer","host","BP","Ion Homeostasis/Regulation",1,0.000574368009215899
+"summer","host","BP","Ion Transport",3,0.0386998931423037
+"summer","host","MF","Ion Transport",2,0.0185511642097998
+"summer","host","BP","Oxidative Phosphorylation",1,8.77529237781281e-09
+"summer","host","CC","Proton Transport",2,0.0209429813217702
+"summer","host","MF","Proton Transport",1,7.00119531847492e-05
+"summer","symbiont","MF","Calcium Homeostasis",1,0.0324354907951206
+"summer","symbiont","BP","Metal Ion Homeostasis",1,0.0489153352315799
+"winter","host","MF","ATPase Activity",2,0.00198258418767143
+"winter","host","BP","Ion Homeostasis/Regulation",1,0.0497353526701818
+"winter","host","BP","Ion Transport",2,0.0109739876174962
+"winter","host","MF","Ion Transport",4,0.0182151720746104
+"winter","host","MF","Metal Ion Homeostasis",1,0.0187864327104469
+"winter","host","BP","Na/K Transport",1,0.0301215102672729
+"winter","host","BP","Oxidative Phosphorylation",1,1.45982227896299e-07
+"winter","host","BP","Protein Phosphorylation",1,0.0117287045114014
+"winter","host","MF","Proton Transport",1,1.12025430865353e-05
+"winter","symbiont","CC","ATPase Activity",2,0.0211157024504422
+"winter","symbiont","MF","ATPase Activity",2,0.0296395154687747
+"winter","symbiont","BP","Calcium Homeostasis",3,0.0159076167323766
+"winter","symbiont","CC","Calcium Homeostasis",1,0.00201088168608599
+"winter","symbiont","MF","Calcium Homeostasis",7,0.0134206268216497
+"winter","symbiont","BP","Ion Homeostasis/Regulation",7,0.0197042395970729
+"winter","symbiont","BP","Ion Transport",13,0.0144452944974415
+"winter","symbiont","MF","Ion Transport",4,0.0067462321865955
+"winter","symbiont","BP","Metal Ion Homeostasis",1,5.19742674189159e-07
+"winter","symbiont","MF","Metal Ion Homeostasis",2,0.00734979026158731
+"winter","symbiont","BP","Na/K Transport",2,0.000354201282573016
+"winter","symbiont","MF","Na/K Transport",3,0.000811252083812726
+"winter","symbiont","BP","Phospholipid Transport",2,0.0100722373687363
+"winter","symbiont","MF","Phospholipid Transport",1,0.000103091231056308
+"winter","symbiont","BP","Protein Phosphorylation",2,0.00899213543038221
+"winter","symbiont","MF","Protein Phosphorylation",1,7.44614395147955e-08
+"winter","symbiont","CC","Proton Transport",1,0.0394000045316952
