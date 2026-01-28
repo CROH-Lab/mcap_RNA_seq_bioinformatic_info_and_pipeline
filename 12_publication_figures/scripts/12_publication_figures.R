@@ -249,13 +249,12 @@ create_deg_heatmap_all(sym_summer_vsd, sym_summer, "figures/Fig3C_heatmap_symbio
 create_deg_heatmap_all(sym_winter_vsd, sym_winter, "figures/Fig3D_heatmap_symbiont_winter.pdf")
 
 # ==============================================================================
-# FIGURE 4: Sankey Plot - Hierarchical Filtering
-# Filters at PARENT CATEGORY level, keeps all children of selected parents
-# Orange (host) and Green (symbiont)
+# FIGURE 4: Sankey Plot - Final with Priority Categories & Colored Flows
+# Orange (host) and Green (symbiont) with flows matching source organism
 # ==============================================================================
 
 cat("\n==============================================================================\n")
-cat("Figure 4: Sankey Plots - Hierarchical Calcification Terms\n")
+cat("Figure 4: Sankey Plots - Complete Calcification Pathways\n")
 cat("==============================================================================\n\n")
 
 suppressPackageStartupMessages({
@@ -269,15 +268,16 @@ CALC_KEYWORDS <- c(
     "ion transport", "ion homeostasis", "metal ion",
     "proton", "ATPase", "pH", 
     "solute", "biomineralization", "ossification",
-    "cation", "anion"
+    "cation", "anion", "sodium", "potassium",
+    "phosphorylation", "phospholipid", "oxidative"
 )
 
-P_ADJ_CUTOFF <- 0.05  # Same for both seasons
+P_ADJ_CUTOFF <- 0.05
 
-# Season-specific: How many top PARENT categories to show
+# How many top parent categories to show
 SEASON_CONFIG <- list(
-    summer = list(max_parent_categories = 10),  # Summer has fewer terms anyway
-    winter = list(max_parent_categories = 7)    # Winter: top 7 parents only
+    summer = list(max_parent_categories = 10),
+    winter = list(max_parent_categories = 8)  # Slightly more for new categories
 )
 
 # Load GO_MWU results
@@ -323,7 +323,7 @@ create_season_sankey <- function(season_name) {
     
     cat("  Loaded GO terms - Host:", nrow(host_gomwu), "| Symbiont:", nrow(symbiont_gomwu), "\n")
     
-    # Filter for calcification terms at p.adj < 0.05
+    # Filter for calcification terms
     calc_data <- all_gomwu %>%
         filter(p.adj < P_ADJ_CUTOFF) %>%
         filter(str_detect(name, regex(paste(CALC_KEYWORDS, collapse = "|"), ignore_case = TRUE)))
@@ -335,17 +335,36 @@ create_season_sankey <- function(season_name) {
         return(NULL)
     }
     
-    # Assign parent categories (NO "Other" - returns NA for unmatched)
+    # Assign parent categories - EXPANDED with priority categories
     assign_parent_category <- function(go_name) {
         go_name_lower <- tolower(go_name)
         case_when(
+            # Priority 3: Oxidative Phosphorylation (check first - most specific)
+            str_detect(go_name_lower, "oxidative phosphorylation") ~ "Oxidative Phosphorylation",
+            
+            # Priority 1: Specific Ion Transport (before general ion transport)
+            str_detect(go_name_lower, "sodium.*transport|potassium.*transport") ~ "Na/K Transport",
+            
+            # Priority 4: Phospholipid/Membrane Transport
+            str_detect(go_name_lower, "phospholipid.*transport|organophosphate.*transport") ~ "Phospholipid Transport",
+            
+            # Priority 2: Protein Phosphorylation (broad kinase activity)
+            str_detect(go_name_lower, "protein phosphorylation|phosphotransferase.*alcohol|autophosphorylation") ~ "Protein Phosphorylation",
+            
+            # Original categories (more specific matches first)
             str_detect(go_name_lower, "calcium") ~ "Calcium Homeostasis",
             str_detect(go_name_lower, "carbonate|carbonic") ~ "Carbon/Carbonate",
             str_detect(go_name_lower, "proton.*transport|h\\+.*transport") ~ "Proton Transport",
             str_detect(go_name_lower, "metal ion") ~ "Metal Ion Homeostasis",
             str_detect(go_name_lower, "atpase") ~ "ATPase Activity",
-            str_detect(go_name_lower, "cation|anion") ~ "Ion Transport",
-            TRUE ~ NA_character_  # Don't assign to "Other" - exclude these
+            
+            # Ion homeostasis & regulation (catch regulation terms)
+            str_detect(go_name_lower, "ion homeostasis|regulation.*ion transport") ~ "Ion Homeostasis/Regulation",
+            
+            # General ion transport (last, catches remaining)
+            str_detect(go_name_lower, "cation|anion|ion transport") ~ "Ion Transport",
+            
+            TRUE ~ NA_character_
         )
     }
     
@@ -355,89 +374,59 @@ create_season_sankey <- function(season_name) {
             source_node = paste(organism, division, sep = "-")
         )
     
-    # === DIAGNOSTIC OUTPUT: Show all parent categories before filtering ===
-    cat("\n  === PARENT CATEGORY BREAKDOWN (before hierarchical filtering) ===\n")
+    # Diagnostic output
+    cat("\n  === PARENT CATEGORY BREAKDOWN ===\n")
     
-    # Count by organism and parent category
     parent_breakdown <- calc_data %>%
-        filter(!is.na(parent_category)) %>%  # Exclude unmatched terms
+        filter(!is.na(parent_category)) %>%
         group_by(organism, parent_category) %>%
         summarise(n_terms = n(), .groups = "drop") %>%
         arrange(organism, desc(n_terms))
     
     cat("\n  HOST:\n")
     host_breakdown <- parent_breakdown %>% filter(organism == "host")
-    if (nrow(host_breakdown) > 0) {
-        print(host_breakdown)
-    } else {
-        cat("    No host terms with assigned parent categories\n")
-    }
+    if (nrow(host_breakdown) > 0) print(host_breakdown) else cat("    No host terms\n")
     
     cat("\n  SYMBIONT:\n")
     symbiont_breakdown <- parent_breakdown %>% filter(organism == "symbiont")
-    if (nrow(symbiont_breakdown) > 0) {
-        print(symbiont_breakdown)
-    } else {
-        cat("    No symbiont terms with assigned parent categories\n")
-    }
+    if (nrow(symbiont_breakdown) > 0) print(symbiont_breakdown) else cat("    No symbiont terms\n")
     
-    # Show terms that were EXCLUDED (didn't match any parent category)
+    # Show excluded terms
     excluded_terms <- calc_data %>%
         filter(is.na(parent_category)) %>%
         select(organism, division, name, p.adj) %>%
         arrange(organism, p.adj)
     
     if (nrow(excluded_terms) > 0) {
-        cat("\n  === EXCLUDED TERMS (no parent category match) ===\n")
+        cat("\n  === EXCLUDED TERMS ===\n")
         cat("  Total excluded:", nrow(excluded_terms), "\n")
-        cat("  Sample (first 10):\n")
-        print(head(excluded_terms, 10))
-        
-        # Save ALL excluded terms to CSV for review
         excluded_file <- paste0("data/excluded_calcification_terms_", season_name, ".csv")
         write.csv(excluded_terms, excluded_file, row.names = FALSE)
-        cat("\n  ✓ Saved all excluded terms to:", excluded_file, "\n")
+        cat("  ✓ Saved to:", excluded_file, "\n")
     }
     
-    # Remove terms without parent categories
     n_before <- nrow(calc_data)
     calc_data <- calc_data %>% filter(!is.na(parent_category))
     n_after <- nrow(calc_data)
+    cat("\n  Terms: ", n_before, " → ", n_after, " (excluded ", n_before - n_after, ")\n", sep = "")
     
-    cat("\n  Terms before filtering:", n_before, "\n")
-    cat("  Terms after removing unmatched:", n_after, "\n")
-    cat("  Excluded:", n_before - n_after, "\n")
-    
-    # === HIERARCHICAL FILTERING: Select top parent categories ===
-    # Rank parent categories by total significance (sum of -log10(p.adj))
+    # Hierarchical filtering
     parent_ranking <- calc_data %>%
         group_by(parent_category) %>%
-        summarise(
-            total_significance = sum(-log10(p.adj + 1e-10)),
-            n_terms = n(),
-            .groups = "drop"
-        ) %>%
+        summarise(total_significance = sum(-log10(p.adj + 1e-10)), n_terms = n(), .groups = "drop") %>%
         arrange(desc(total_significance))
     
     cat("\n  Parent category ranking:\n")
     print(parent_ranking)
     
-    # Keep top N parent categories
     top_parents <- head(parent_ranking, config$max_parent_categories)$parent_category
+    cat("\n  Selected top", config$max_parent_categories, "parents\n")
     
-    cat("\n  Selected top", config$max_parent_categories, "parent categories:\n")
-    cat("  ", paste(top_parents, collapse = ", "), "\n")
-    
-    # Filter to keep ALL GO terms belonging to top parent categories
-    calc_data_filtered <- calc_data %>%
+    calc_data <- calc_data %>%
         filter(parent_category %in% top_parents) %>%
-        mutate(go_term_display = str_trunc(name, 60))  # 60 char limit
+        mutate(go_term_display = str_trunc(name, 60))
     
-    cat("\n  Final GO terms after hierarchical filtering:", nrow(calc_data_filtered), "\n")
-    cat("  Breakdown by organism and division:\n")
-    print(table(calc_data_filtered$organism, calc_data_filtered$division))
-    
-    calc_data <- calc_data_filtered
+    cat("  Final GO terms:", nrow(calc_data), "\n")
     
     # Build nodes
     source_nodes <- calc_data %>%
@@ -451,7 +440,7 @@ create_season_sankey <- function(season_name) {
     
     go_nodes <- calc_data %>%
         distinct(go_term_display, parent_category, organism) %>%
-        mutate(group = organism)  # Color by source organism
+        mutate(group = organism)
     names(go_nodes)[1] <- "source_node"
     go_nodes <- go_nodes %>% select(source_node, group, organism)
     
@@ -463,7 +452,7 @@ create_season_sankey <- function(season_name) {
         distinct(source_node, .keep_all = TRUE) %>%
         mutate(node_id = row_number() - 1)
     
-    # Build links
+    # Build links WITH organism tracking for coloring
     link1 <- calc_data %>%
         group_by(source_node, parent_category, organism) %>%
         summarise(value = sum(-log10(p.adj + 1e-10)), .groups = "drop") %>%
@@ -476,11 +465,11 @@ create_season_sankey <- function(season_name) {
         left_join(nodes %>% select(source_node, target_id = node_id), by = c("go_term_display" = "source_node"))
     
     links <- bind_rows(
-        link1 %>% select(source = source_id, target = target_id, value),
-        link2 %>% select(source = source_id, target = target_id, value)
+        link1 %>% select(source = source_id, target = target_id, value, organism),
+        link2 %>% select(source = source_id, target = target_id, value, organism)
     )
     
-    cat("  Sankey structure - Nodes:", nrow(nodes), "| Links:", nrow(links), "\n")
+    cat("  Sankey: Nodes =", nrow(nodes), "| Links =", nrow(links), "\n")
     
     # Prepare for Sankey
     nodes_renamed <- nodes
@@ -488,7 +477,10 @@ create_season_sankey <- function(season_name) {
     nodes_for_sankey <- as.data.frame(nodes_renamed)
     links_for_sankey <- as.data.frame(links)
     
-    # Create Sankey - Orange (host) and Green (symbiont)
+    # CRITICAL: Add link group for coloring flows by source organism
+    links_for_sankey$group <- links_for_sankey$organism
+    
+    # Colors: Orange (host), Green (symbiont), Gray (parent)
     color_scale <- 'd3.scaleOrdinal()
         .domain(["host", "symbiont", "parent"])
         .range(["#E69F00", "#2ECC71", "#95A5A6"])'
@@ -501,6 +493,7 @@ create_season_sankey <- function(season_name) {
         Value = "value",
         NodeID = "name",
         NodeGroup = "organism",
+        LinkGroup = "group",  # Color links by source organism!
         fontSize = 11,
         nodeWidth = 25,
         nodePadding = 8,
@@ -510,12 +503,10 @@ create_season_sankey <- function(season_name) {
         fontFamily = "Arial"
     )
     
-    # Save HTML
     html_file <- paste0("figures/Fig4_calcification_sankey_", season_name, ".html")
     saveWidget(sankey, html_file, selfcontained = TRUE)
-    cat("  Saved:", html_file, "\n")
+    cat("  ✓ Saved:", html_file, "\n")
     
-    # Save summary
     summary_calcs <- calc_data %>%
         group_by(organism, division, parent_category) %>%
         summarise(n_terms = n(), mean_padj = mean(p.adj), .groups = "drop") %>%
@@ -545,8 +536,7 @@ if (!is.null(winter_result)) {
     print(winter_result$summary)
 }
 
-cat("\n✓ Sankey plots complete!\n")
-
+cat("\n✓ Sankey plots complete with colored flows!\n")
 # ==============================================================================
 # FIGURE 5: Volcano Plots
 # ==============================================================================

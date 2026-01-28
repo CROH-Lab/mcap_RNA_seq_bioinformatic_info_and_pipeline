@@ -1,16 +1,24 @@
 "organism","division","parent_category","n_terms","mean_padj"
 "host","MF","ATPase Activity",2,0.00198258418767143
+"host","BP","Ion Homeostasis/Regulation",1,0.0497353526701818
 "host","BP","Ion Transport",2,0.0109739876174962
 "host","MF","Ion Transport",4,0.0182151720746104
 "host","MF","Metal Ion Homeostasis",1,0.0187864327104469
-"host","MF","Proton Transport",1,1.12025430865353e-05
+"host","BP","Na/K Transport",1,0.0301215102672729
+"host","BP","Protein Phosphorylation",1,0.0117287045114014
 "symbiont","CC","ATPase Activity",2,0.0211157024504422
 "symbiont","MF","ATPase Activity",2,0.0296395154687747
 "symbiont","BP","Calcium Homeostasis",3,0.0159076167323766
 "symbiont","CC","Calcium Homeostasis",1,0.00201088168608599
 "symbiont","MF","Calcium Homeostasis",7,0.0134206268216497
-"symbiont","BP","Ion Transport",17,0.0137309651531993
+"symbiont","BP","Ion Homeostasis/Regulation",7,0.0197042395970729
+"symbiont","BP","Ion Transport",13,0.0144452944974415
 "symbiont","MF","Ion Transport",4,0.0067462321865955
 "symbiont","BP","Metal Ion Homeostasis",1,5.19742674189159e-07
 "symbiont","MF","Metal Ion Homeostasis",2,0.00734979026158731
-"symbiont","CC","Proton Transport",1,0.0394000045316952
+"symbiont","BP","Na/K Transport",2,0.000354201282573016
+"symbiont","MF","Na/K Transport",3,0.000811252083812726
+"symbiont","BP","Phospholipid Transport",2,0.0100722373687363
+"symbiont","MF","Phospholipid Transport",1,0.000103091231056308
+"symbiont","BP","Protein Phosphorylation",2,0.00899213543038221
+"symbiont","MF","Protein Phosphorylation",1,7.44614395147955e-08
