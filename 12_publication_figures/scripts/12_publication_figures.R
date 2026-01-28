@@ -249,212 +249,228 @@ create_deg_heatmap_all(sym_summer_vsd, sym_summer, "figures/Fig3C_heatmap_symbio
 create_deg_heatmap_all(sym_winter_vsd, sym_winter, "figures/Fig3D_heatmap_symbiont_winter.pdf")
 
 # ==============================================================================
-# FIGURE 4: Chord Diagram
+# FIGURE 4: Sankey Plot - Host-Symbiont Calcification Pathways
+# Creates both Summer and Winter plots, saves as HTML and PDF
 # ==============================================================================
 
 cat("\n==============================================================================\n")
-cat("Figure 4: Chord Diagram - Calcification/Ion Transport\n")
+cat("Figure 4: Sankey Plots - Calcification GO Terms (Summer & Winter)\n")
 cat("==============================================================================\n\n")
 
-calc_keywords <- c("calcif", "calcium", "carbonate", "bicarbon", "ion.transport", 
-                   "homeostasis", "channel", "pump", "exchanger", "ATPase", 
-                   "voltage.gated", "sodium", "potassium", "chloride", "proton",
-                   "pH", "acid", "carbonic.anhydrase", "SLC", "transporter")
-keyword_pattern <- paste(calc_keywords, collapse = "|")
+# Load packages
+suppressPackageStartupMessages({
+    library(networkD3)
+    library(htmlwidgets)
+})
 
-extract_category <- function(desc) {
-    if (is.na(desc) || desc == "") return("Other Transport")
-    desc_lower <- tolower(desc)
-    if (grepl("calcium.channel|voltage.gated.*calcium|voltage.dependent.*calcium", desc_lower)) return("Ca2+ Channel")
-    if (grepl("calcium.pump|calcium.transport.*atpase|plasma membrane calcium", desc_lower)) return("Ca2+ ATPase")
-    if (grepl("calcium.bind|calmodulin|ef.hand|calcium.dependent.protein", desc_lower)) return("Ca2+ Signaling")
-    if (grepl("sodium.*potassium|na\\+.*k\\+|nka|sodium.potassium", desc_lower)) return("Na+/K+ ATPase")
-    if (grepl("sodium|na\\+", desc_lower)) return("Na+ Transport")
-    if (grepl("potassium|k\\+", desc_lower)) return("K+ Channel")
-    if (grepl("chloride|anion|clc", desc_lower)) return("Cl- Transport")
-    if (grepl("carbonic.anhydrase", desc_lower)) return("Carbonic Anhydrase")
-    if (grepl("exchanger|antiporter|nhe|ncx", desc_lower)) return("Ion Exchanger")
-    if (grepl("proton|h\\+.*atpase|v.type|vacuolar", desc_lower)) return("H+ ATPase")
-    if (grepl("bicarbonate|hco3|slc4|slc26", desc_lower)) return("HCO3- Transport")
-    if (grepl("aquaporin|water.channel", desc_lower)) return("Aquaporin")
-    return("Other Transport")
+# Try to load webshot2 for PDF conversion (if not installed, skip PDF)
+has_webshot2 <- require(webshot2, quietly = TRUE)
+if (!has_webshot2) {
+    cat("Note: webshot2 not installed. Installing it for PDF export...\n")
+    install.packages("webshot2", repos = "https://cloud.r-project.org/", quiet = TRUE)
+    has_webshot2 <- require(webshot2, quietly = TRUE)
 }
 
-process_calc_degs <- function(deseq_degs, annot_df, organism_name, season_name) {
-    if (nrow(deseq_degs) == 0) return(data.frame())
-    
-    result <- deseq_degs %>%
-        left_join(annot_df, by = "gene_id") %>%
-        filter(grepl(keyword_pattern, description, ignore.case = TRUE))
-    
-    if (nrow(result) == 0) return(data.frame())
-    
-    result %>%
-        mutate(
-            organism = organism_name,
-            season = season_name,
-            category = vapply(description, extract_category, character(1)),
-            short_name = ifelse(!is.na(uniprot_entry), uniprot_entry, 
-                               sub(".*g(\\d+)\\.?t?.*", "g\\1", gene_id))
-        )
-}
+# Configuration
+CALC_KEYWORDS <- c(
+    "calcium", "carbonate", "carbonic", 
+    "ion transport", "ion homeostasis", "metal ion",
+    "proton", "ATPase", "pH", 
+    "solute", "biomineralization", "ossification",
+    "cation", "anion"
+)
+P_ADJ_CUTOFF <- 0.05
 
-host_calc_summer <- process_calc_degs(host_summer_degs, host_annot, "Host", "Summer")
-host_calc_winter <- process_calc_degs(host_winter_degs, host_annot, "Host", "Winter")
-sym_calc_summer <- process_calc_degs(sym_summer_degs, sym_annot, "Symbiont", "Summer")
-sym_calc_winter <- process_calc_degs(sym_winter_degs, sym_annot, "Symbiont", "Winter")
-
-cat("Calcification-related DEGs:\n")
-cat("  Host Summer:", nrow(host_calc_summer), "\n")
-cat("  Host Winter:", nrow(host_calc_winter), "\n")
-cat("  Symbiont Summer:", nrow(sym_calc_summer), "\n")
-cat("  Symbiont Winter:", nrow(sym_calc_winter), "\n")
-
-calc_dfs <- list(host_calc_summer, host_calc_winter, sym_calc_summer, sym_calc_winter)
-calc_dfs <- calc_dfs[sapply(calc_dfs, function(x) nrow(x) > 0)]
-
-if (length(calc_dfs) > 0) {
-    all_calc_degs <- bind_rows(calc_dfs)
-    cat("  Total:", nrow(all_calc_degs), "\n")
-    
-    write.csv(all_calc_degs, "data/all_calcification_degs.csv", row.names = FALSE)
-    
-    if (nrow(all_calc_degs) >= 5) {
+# Load GO_MWU results
+load_gomwu_results <- function(dir, organism, season, divisions = c("BP", "MF", "CC")) {
+    results <- list()
+    for (div in divisions) {
+        file_prefix <- ifelse(organism == "host", 
+                             paste0(season, "_", div),
+                             paste0("symbiont_", season, "_", div))
+        file_path <- file.path(dir, paste0(file_prefix, "_MWU_results.csv"))
         
-        # Order: Host first, then Symbiont, sorted by abs(log2FC)
-        all_calc_degs <- all_calc_degs %>%
-            arrange(desc(organism == "Host"), desc(abs(log2FoldChange)))
-        
-        # Create gene labels with organism prefix
-        all_calc_degs$gene_label <- paste0(
-            ifelse(all_calc_degs$organism == "Host", "H:", "S:"),
-            all_calc_degs$short_name
-        )
-        
-        # Make unique labels
-        all_calc_degs <- all_calc_degs %>%
-            group_by(gene_label) %>%
-            mutate(gene_label = ifelse(n() > 1, 
-                                        paste0(gene_label, ".", row_number()),
-                                        gene_label)) %>%
-            ungroup()
-        
-        # Get categories
-        categories <- unique(all_calc_degs$category)
-        cat("  Categories:", paste(categories, collapse = ", "), "\n")
-        
-        # Prepare chord data
-        chord_df <- all_calc_degs %>%
-            select(gene_label, category, log2FoldChange, season, organism) %>%
-            as.data.frame()
-        
-        # Define sectors: genes first, then categories
-        gene_sectors <- chord_df$gene_label
-        all_sectors <- c(gene_sectors, categories)
-        n_genes <- length(gene_sectors)
-        n_cats <- length(categories)
-        n_total <- n_genes + n_cats
-        
-        cat("  Creating chord diagram with", n_genes, "genes and", n_cats, "categories\n")
-        
-        # Create adjacency list
-        adj_list <- chord_df %>%
-            mutate(value = 1) %>%
-            select(from = gene_label, to = category, value)
-        
-        # Sector colors
-        gene_colors <- setNames(
-            ifelse(chord_df$organism == "Host", host_color, symbiont_color),
-            chord_df$gene_label
-        )
-        
-        cat_cols <- setNames(
-            colorRampPalette(brewer.pal(min(n_cats, 8), "Set2"))(n_cats),
-            categories
-        )
-        
-        all_sector_colors <- c(gene_colors, cat_cols)
-        
-        # Link colors by season
-        season_cols <- c("Summer" = summer_color, "Winter" = winter_color)
-        link_colors <- adjustcolor(season_cols[chord_df$season], alpha.f = 0.5)
-        
-        # Log2FC color function
-        lfc_range <- range(chord_df$log2FoldChange, na.rm = TRUE)
-        lfc_col_fun <- colorRamp2(c(min(-2, lfc_range[1]), 0, max(2, lfc_range[2])), 
-                                   c(down_color, "white", up_color))
-        
-        # Create chord diagram
-        pdf("figures/Fig4_chord_calcification.pdf", width = 16, height = 14)
-        
-        circos.clear()
-        circos.par(start.degree = 90, gap.degree = 2)
-        
-        chordDiagram(
-            adj_list,
-            order = all_sectors,
-            grid.col = all_sector_colors,
-            col = link_colors,
-            transparency = 0.3,
-            annotationTrack = "grid",
-            preAllocateTracks = list(track.height = 0.15)
-        )
-        
-        # Add labels
-        circos.track(track.index = 1, panel.fun = function(x, y) {
-            sector.name <- get.cell.meta.data("sector.index")
-            xlim <- get.cell.meta.data("xlim")
-            ylim <- get.cell.meta.data("ylim")
+        if (file.exists(file_path)) {
+            df <- read.table(file_path, header = TRUE, stringsAsFactors = FALSE, 
+                           sep = "", quote = "\"", comment.char = "")
+            names(df) <- gsub('^"', '', names(df))
+            names(df) <- gsub('"$', '', names(df))
+            names(df) <- trimws(names(df))
             
-            if (sector.name %in% chord_df$gene_label) {
-                # Gene labels - smaller, rotated
-                circos.text(mean(xlim), ylim[1] + 0.3, sector.name,
-                           facing = "clockwise", niceFacing = TRUE,
-                           adj = c(0, 0.5), cex = 0.35)
-            } else {
-                # Category labels - larger, bending
-                circos.text(mean(xlim), ylim[1] + 0.3, sector.name,
-                           facing = "bending.inside", niceFacing = TRUE,
-                           adj = c(0.5, 0), cex = 0.9, font = 2)
+            if (!"p.adj" %in% names(df)) {
+                if ("padj" %in% names(df)) {
+                    names(df)[names(df) == "padj"] <- "p.adj"
+                }
             }
-        }, bg.border = NA)
-        
-        # Add log2FC color bar for genes
-        for (i in 1:nrow(chord_df)) {
-            gene <- chord_df$gene_label[i]
-            lfc <- chord_df$log2FoldChange[i]
-            highlight.sector(gene, track.index = 1, 
-                           col = lfc_col_fun(lfc), 
-                           border = NA)
+            
+            df$organism <- organism
+            df$division <- div
+            df$season <- season
+            results[[paste(organism, div, sep="_")]] <- df
         }
-        
-        # Draw legends
-        lgd_lfc <- Legend(col_fun = lfc_col_fun, title = "Log2FC",
-                          title_position = "topleft", legend_height = unit(3, "cm"))
-        lgd_season <- Legend(labels = c("Summer", "Winter"),
-                             legend_gp = gpar(fill = c(summer_color, winter_color)),
-                             title = "Season", title_position = "topleft")
-        lgd_org <- Legend(labels = c("Host (H:)", "Symbiont (S:)"),
-                          legend_gp = gpar(fill = c(host_color, symbiont_color)),
-                          title = "Organism", title_position = "topleft")
-        
-        draw(lgd_lfc, x = unit(0.92, "npc"), y = unit(0.8, "npc"))
-        draw(lgd_season, x = unit(0.92, "npc"), y = unit(0.55, "npc"))
-        draw(lgd_org, x = unit(0.92, "npc"), y = unit(0.35, "npc"))
-        
-        circos.clear()
-        dev.off()
-        
-        cat("Saved: Fig4_chord_calcification.pdf\n")
-        
-        # Category summary
-        cat_summary <- all_calc_degs %>%
-            group_by(category, organism, season) %>%
-            summarise(count = n(), avg_lfc = mean(log2FoldChange, na.rm = TRUE), .groups = "drop")
-        write.csv(cat_summary, "data/calcification_category_summary.csv", row.names = FALSE)
     }
+    return(bind_rows(results))
 }
 
+# Function to create Sankey for a given season
+create_season_sankey <- function(season_name) {
+    cat("\n--- Processing", toupper(season_name), "---\n")
+    
+    host_gomwu <- load_gomwu_results("../10_GO_MWU/output", "host", season_name)
+    symbiont_gomwu <- load_gomwu_results("../11_symbiont_GO_MWU/output", "symbiont", season_name)
+    all_gomwu <- bind_rows(host_gomwu, symbiont_gomwu)
+    
+    cat("  Host GO terms:", nrow(host_gomwu), "\n")
+    cat("  Symbiont GO terms:", nrow(symbiont_gomwu), "\n")
+    
+    # Filter for calcification
+    calc_data <- all_gomwu %>%
+        filter(p.adj < P_ADJ_CUTOFF) %>%
+        filter(str_detect(name, regex(paste(CALC_KEYWORDS, collapse = "|"), ignore_case = TRUE)))
+    
+    cat("  Calcification terms found:\n")
+    print(table(calc_data$organism, calc_data$division))
+    
+    if (nrow(calc_data) == 0) {
+        cat("  Warning: No calcification terms found for", season_name, "\n")
+        return(NULL)
+    }
+    
+    # Assign parent categories
+    assign_parent_category <- function(go_name) {
+        go_name_lower <- tolower(go_name)
+        case_when(
+            str_detect(go_name_lower, "calcium") ~ "Calcium Homeostasis",
+            str_detect(go_name_lower, "carbonate|carbonic") ~ "Carbon/Carbonate",
+            str_detect(go_name_lower, "proton.*transport|h\\+.*transport") ~ "Proton Transport",
+            str_detect(go_name_lower, "metal ion") ~ "Metal Ion Homeostasis",
+            str_detect(go_name_lower, "atpase") ~ "ATPase Activity",
+            str_detect(go_name_lower, "cation|anion") ~ "Ion Transport",
+            TRUE ~ "Other Calcification"
+        )
+    }
+    
+    calc_data <- calc_data %>%
+        mutate(
+            parent_category = assign_parent_category(name),
+            source_node = paste(organism, division, sep = "-"),
+            go_term_display = str_trunc(name, 45)
+        )
+    
+    # Build nodes
+    source_nodes <- calc_data %>%
+        distinct(source_node, organism) %>%
+        mutate(group = organism)
+    
+    parent_nodes <- calc_data %>%
+        distinct(parent_category) %>%
+        mutate(group = "parent", organism = "parent")
+    names(parent_nodes)[1] <- "source_node"
+    
+    go_nodes <- calc_data %>%
+        distinct(go_term_display, parent_category) %>%
+        mutate(group = "go_term", organism = "go_term")
+    names(go_nodes)[1] <- "source_node"
+    go_nodes <- go_nodes %>% select(source_node, group, organism)
+    
+    nodes <- bind_rows(
+        source_nodes %>% select(source_node, group, organism),
+        parent_nodes,
+        go_nodes
+    ) %>%
+        distinct(source_node, .keep_all = TRUE) %>%
+        mutate(node_id = row_number() - 1)
+    
+    # Build links
+    link1 <- calc_data %>%
+        group_by(source_node, parent_category) %>%
+        summarise(value = sum(-log10(p.adj + 1e-10)), .groups = "drop") %>%
+        left_join(nodes %>% select(source_node, source_id = node_id), by = "source_node") %>%
+        left_join(nodes %>% select(source_node, target_id = node_id), by = c("parent_category" = "source_node"))
+    
+    link2 <- calc_data %>%
+        mutate(value = -log10(p.adj + 1e-10)) %>%
+        left_join(nodes %>% select(source_node, source_id = node_id), by = c("parent_category" = "source_node")) %>%
+        left_join(nodes %>% select(source_node, target_id = node_id), by = c("go_term_display" = "source_node"))
+    
+    links <- bind_rows(
+        link1 %>% select(source = source_id, target = target_id, value),
+        link2 %>% select(source = source_id, target = target_id, value)
+    )
+    
+    cat("  Nodes:", nrow(nodes), "| Links:", nrow(links), "\n")
+    
+    # Prepare for Sankey
+    nodes_renamed <- nodes
+    colnames(nodes_renamed)[colnames(nodes_renamed) == "source_node"] <- "name"
+    nodes_for_sankey <- as.data.frame(nodes_renamed)
+    links_for_sankey <- as.data.frame(links)
+    
+    # Create Sankey
+    color_scale <- 'd3.scaleOrdinal()
+        .domain(["host", "symbiont", "parent", "go_term"])
+        .range(["#E69F00", "#56B4E9", "#95A5A6", "#BDC3C7"])'
+    
+    sankey <- sankeyNetwork(
+        Links = links_for_sankey,
+        Nodes = nodes_for_sankey,
+        Source = "source",
+        Target = "target",
+        Value = "value",
+        NodeID = "name",
+        NodeGroup = "organism",
+        fontSize = 12,
+        nodeWidth = 30,
+        nodePadding = 10,
+        iterations = 100,
+        sinksRight = FALSE,
+        colourScale = color_scale,
+        fontFamily = "Arial"
+    )
+    
+    # Save HTML
+    html_file <- paste0("figures/Fig4_calcification_sankey_", season_name, ".html")
+    saveWidget(sankey, html_file, selfcontained = TRUE)
+    cat("  Saved HTML:", html_file, "\n")
+    
+    # Save PDF if webshot2 available
+    if (has_webshot2) {
+        pdf_file <- paste0("figures/Fig4_calcification_sankey_", season_name, ".pdf")
+        tryCatch({
+            webshot2::webshot(html_file, pdf_file, vwidth = 1400, vheight = 1000, delay = 2)
+            cat("  Saved PDF:", pdf_file, "\n")
+        }, error = function(e) {
+            cat("  Warning: Could not create PDF:", e$message, "\n")
+        })
+    }
+    
+    # Save summary
+    summary_calcs <- calc_data %>%
+        group_by(organism, division, parent_category) %>%
+        summarise(n_terms = n(), mean_padj = mean(p.adj), .groups = "drop") %>%
+        arrange(organism, parent_category)
+    
+    write.csv(summary_calcs, paste0("data/calcification_summary_", season_name, ".csv"), 
+              row.names = FALSE)
+    
+    return(summary_calcs)
+}
+
+# Create Sankies for both seasons
+summer_summary <- create_season_sankey("summer")
+winter_summary <- create_season_sankey("winter")
+
+cat("\n=== SUMMARY ===\n")
+if (!is.null(summer_summary)) {
+    cat("\nSUMMER:\n")
+    print(summer_summary)
+}
+if (!is.null(winter_summary)) {
+    cat("\nWINTER:\n")
+    print(winter_summary)
+}
+
+cat("\nSankey plots complete!\n")
 # ==============================================================================
 # FIGURE 5: Volcano Plots
 # ==============================================================================
