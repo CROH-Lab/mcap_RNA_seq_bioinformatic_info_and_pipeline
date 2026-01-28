@@ -335,7 +335,7 @@ create_season_sankey <- function(season_name) {
         return(NULL)
     }
     
-    # Assign parent categories
+    # Assign parent categories (NO "Other" - returns NA for unmatched)
     assign_parent_category <- function(go_name) {
         go_name_lower <- tolower(go_name)
         case_when(
@@ -345,7 +345,7 @@ create_season_sankey <- function(season_name) {
             str_detect(go_name_lower, "metal ion") ~ "Metal Ion Homeostasis",
             str_detect(go_name_lower, "atpase") ~ "ATPase Activity",
             str_detect(go_name_lower, "cation|anion") ~ "Ion Transport",
-            TRUE ~ "Other Calcification"
+            TRUE ~ NA_character_  # Don't assign to "Other" - exclude these
         )
     }
     
@@ -354,6 +354,53 @@ create_season_sankey <- function(season_name) {
             parent_category = assign_parent_category(name),
             source_node = paste(organism, division, sep = "-")
         )
+    
+    # === DIAGNOSTIC OUTPUT: Show all parent categories before filtering ===
+    cat("\n  === PARENT CATEGORY BREAKDOWN (before hierarchical filtering) ===\n")
+    
+    # Count by organism and parent category
+    parent_breakdown <- calc_data %>%
+        filter(!is.na(parent_category)) %>%  # Exclude unmatched terms
+        group_by(organism, parent_category) %>%
+        summarise(n_terms = n(), .groups = "drop") %>%
+        arrange(organism, desc(n_terms))
+    
+    cat("\n  HOST:\n")
+    host_breakdown <- parent_breakdown %>% filter(organism == "host")
+    if (nrow(host_breakdown) > 0) {
+        print(host_breakdown)
+    } else {
+        cat("    No host terms with assigned parent categories\n")
+    }
+    
+    cat("\n  SYMBIONT:\n")
+    symbiont_breakdown <- parent_breakdown %>% filter(organism == "symbiont")
+    if (nrow(symbiont_breakdown) > 0) {
+        print(symbiont_breakdown)
+    } else {
+        cat("    No symbiont terms with assigned parent categories\n")
+    }
+    
+    # Show terms that were EXCLUDED (didn't match any parent category)
+    excluded_terms <- calc_data %>%
+        filter(is.na(parent_category)) %>%
+        select(organism, division, name, p.adj)
+    
+    if (nrow(excluded_terms) > 0) {
+        cat("\n  === EXCLUDED TERMS (no parent category match) ===\n")
+        cat("  Total excluded:", nrow(excluded_terms), "\n")
+        cat("  Sample (first 10):\n")
+        print(head(excluded_terms, 10))
+    }
+    
+    # Remove terms without parent categories
+    n_before <- nrow(calc_data)
+    calc_data <- calc_data %>% filter(!is.na(parent_category))
+    n_after <- nrow(calc_data)
+    
+    cat("\n  Terms before filtering:", n_before, "\n")
+    cat("  Terms after removing unmatched:", n_after, "\n")
+    cat("  Excluded:", n_before - n_after, "\n")
     
     # === HIERARCHICAL FILTERING: Select top parent categories ===
     # Rank parent categories by total significance (sum of -log10(p.adj))
@@ -493,7 +540,6 @@ if (!is.null(winter_result)) {
 }
 
 cat("\n✓ Sankey plots complete!\n")
-
 # ==============================================================================
 # FIGURE 5: Volcano Plots
 # ==============================================================================

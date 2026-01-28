@@ -3,8 +3,6 @@
 "host","BP","Ion Transport",2,0.0109739876174962
 "host","MF","Ion Transport",4,0.0182151720746104
 "host","MF","Metal Ion Homeostasis",1,0.0187864327104469
-"host","BP","Other Calcification",10,0.0204240205607394
-"host","MF","Other Calcification",2,0.0156394066520389
 "host","MF","Proton Transport",1,1.12025430865353e-05
 "symbiont","CC","ATPase Activity",2,0.0211157024504422
 "symbiont","MF","ATPase Activity",2,0.0296395154687747
@@ -15,7 +13,4 @@
 "symbiont","MF","Ion Transport",4,0.0067462321865955
 "symbiont","BP","Metal Ion Homeostasis",1,5.19742674189159e-07
 "symbiont","MF","Metal Ion Homeostasis",2,0.00734979026158731
-"symbiont","BP","Other Calcification",24,0.0209421935048395
-"symbiont","CC","Other Calcification",3,0.00552151615885732
-"symbiont","MF","Other Calcification",12,0.0171932415204841
 "symbiont","CC","Proton Transport",1,0.0394000045316952

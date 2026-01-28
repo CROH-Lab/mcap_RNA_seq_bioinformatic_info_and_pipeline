@@ -2,12 +2,7 @@
 "host","BP","Calcium Homeostasis",1,0.0355683347656201
 "host","BP","Ion Transport",3,0.0386998931423037
 "host","MF","Ion Transport",2,0.0185511642097998
-"host","BP","Other Calcification",7,0.021330394163031
-"host","CC","Other Calcification",1,0.0216290050119912
-"host","MF","Other Calcification",1,0.00502085083404783
 "host","CC","Proton Transport",2,0.0209429813217702
 "host","MF","Proton Transport",1,7.00119531847492e-05
 "symbiont","MF","Calcium Homeostasis",1,0.0324354907951206
 "symbiont","BP","Metal Ion Homeostasis",1,0.0489153352315799
-"symbiont","BP","Other Calcification",2,0.0156367200889038
-"symbiont","MF","Other Calcification",2,0.0237923667243671
