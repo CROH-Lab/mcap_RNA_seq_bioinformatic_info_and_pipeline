@@ -384,13 +384,19 @@ create_season_sankey <- function(season_name) {
     # Show terms that were EXCLUDED (didn't match any parent category)
     excluded_terms <- calc_data %>%
         filter(is.na(parent_category)) %>%
-        select(organism, division, name, p.adj)
+        select(organism, division, name, p.adj) %>%
+        arrange(organism, p.adj)
     
     if (nrow(excluded_terms) > 0) {
         cat("\n  === EXCLUDED TERMS (no parent category match) ===\n")
         cat("  Total excluded:", nrow(excluded_terms), "\n")
         cat("  Sample (first 10):\n")
         print(head(excluded_terms, 10))
+        
+        # Save ALL excluded terms to CSV for review
+        excluded_file <- paste0("data/excluded_calcification_terms_", season_name, ".csv")
+        write.csv(excluded_terms, excluded_file, row.names = FALSE)
+        cat("\n  ✓ Saved all excluded terms to:", excluded_file, "\n")
     }
     
     # Remove terms without parent categories
@@ -540,6 +546,7 @@ if (!is.null(winter_result)) {
 }
 
 cat("\n✓ Sankey plots complete!\n")
+
 # ==============================================================================
 # FIGURE 5: Volcano Plots
 # ==============================================================================

@@ -1,0 +1,52 @@
+"organism","division","name","p.adj"
+"host","BP","oxidative phosphorylation",1.45982227896299e-07
+"host","BP","tissue morphogenesis",0.000556477967471867
+"host","BP","regulation of cell morphogenesis",0.00478887880508977
+"host","BP","regulation of protein phosphorylation",0.0117287045114014
+"host","MF","phosphorus-oxygen lyase activity",0.0128317357149329
+"host","MF","phospholipid binding",0.0184470775891448
+"host","BP","lymph vessel development",0.0222173672188482
+"host","BP","epithelial cell morphogenesis",0.0222173672188482
+"host","BP","positive regulation of cell cycle phase transition",0.0222173672188482
+"host","BP","sodium ion transport",0.0301215102672729
+"host","BP","imaginal disc-derived wing margin morphogenesis",0.0406570337472035
+"host","BP","regulation of monoatomic ion transport",0.0497353526701818
+"symbiont","MF","phosphotransferase activity, alcohol group as acceptor",7.44614395147955e-08
+"symbiont","BP","protein phosphorylation",2.0443077132237e-07
+"symbiont","MF","phospholipid transporter activity",0.000103091231056308
+"symbiont","BP","potassium ion transport",0.000186048229405333
+"symbiont","BP","anatomical structure formation involved in morphogenesis",0.000316388615470735
+"symbiont","BP","phospholipid transport",0.00032370877260445
+"symbiont","BP","sodium ion transport",0.000522354335740698
+"symbiont","MF","3',5'-cyclic-AMP phosphodiesterase activity",0.00221530516994667
+"symbiont","CC","proteasome core complex, alpha-subunit complex",0.00282838146673431
+"symbiont","BP","cellular component assembly involved in morphogenesis",0.00290910843248913
+"symbiont","MF","cyclic-nucleotide phosphodiesterase activity",0.00298610202828208
+"symbiont","CC","phragmoplast",0.00394676465177998
+"symbiont","BP","cellular anatomical entity morphogenesis",0.00410497293235443
+"symbiont","MF","phosphatidylcholine transporter activity",0.00548188296627977
+"symbiont","MF","phosphotransferase activity, carboxyl group as acceptor",0.00555083251926591
+"symbiont","BP","nucleoside triphosphate biosynthetic process",0.00786634453306966
+"symbiont","BP","purine nucleoside triphosphate biosynthetic process",0.00942278117003277
+"symbiont","CC","azurophil granule lumen",0.00978940235805767
+"symbiont","BP","protein autophosphorylation",0.0179840664299931
+"symbiont","MF","sphingolipid transporter activity",0.0194747124565586
+"symbiont","BP","organophosphate ester transport",0.0198207659648682
+"symbiont","BP","regulation of monoatomic ion transport",0.0198207659648682
+"symbiont","BP","response to amphetamine",0.0214321586138606
+"symbiont","BP","macroautophagy",0.0236828558748419
+"symbiont","BP","sorocarp morphogenesis",0.0237896803577464
+"symbiont","MF","phosphatidylinositol-4,5-bisphosphate binding",0.0244369395229933
+"symbiont","BP","monoatomic ion homeostasis",0.0262819830114147
+"symbiont","BP","nucleoside triphosphate metabolic process",0.0265538885140157
+"symbiont","BP","muscle hypertrophy",0.0273874977569641
+"symbiont","MF","phosphatase binding",0.0274355950128245
+"symbiont","MF","phospholipid binding",0.0290518789952413
+"symbiont","BP","autophagosome maturation",0.0321252675604871
+"symbiont","MF","3',5'-cyclic-GMP phosphodiesterase activity",0.0437178405601248
+"symbiont","BP","photosynthetic electron transport chain",0.0456677018198866
+"symbiont","MF","phosphatidylinositol-3,4,5-trisphosphate binding",0.0458646433217963
+"symbiont","BP","positive regulation of monoatomic ion transport",0.0461893490655794
+"symbiont","BP","negative regulation of cell cycle phase transition",0.0478855216466172
+"symbiont","BP","regulation of photoperiodism, flowering",0.0489753062665171
+"symbiont","BP","phosphatidylinositol-mediated signaling",0.049363923816549
