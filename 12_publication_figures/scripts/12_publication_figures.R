@@ -249,27 +249,19 @@ create_deg_heatmap_all(sym_summer_vsd, sym_summer, "figures/Fig3C_heatmap_symbio
 create_deg_heatmap_all(sym_winter_vsd, sym_winter, "figures/Fig3D_heatmap_symbiont_winter.pdf")
 
 # ==============================================================================
-# FIGURE 4: Sankey Plot - Host-Symbiont Calcification Pathways
-# Creates both Summer and Winter plots, saves as HTML and PDF
+# FIGURE 4: Sankey Plot - Hierarchical Filtering
+# Filters at PARENT CATEGORY level, keeps all children of selected parents
+# Orange (host) and Green (symbiont)
 # ==============================================================================
 
 cat("\n==============================================================================\n")
-cat("Figure 4: Sankey Plots - Calcification GO Terms (Summer & Winter)\n")
+cat("Figure 4: Sankey Plots - Hierarchical Calcification Terms\n")
 cat("==============================================================================\n\n")
 
-# Load packages
 suppressPackageStartupMessages({
     library(networkD3)
     library(htmlwidgets)
 })
-
-# Try to load webshot2 for PDF conversion (if not installed, skip PDF)
-has_webshot2 <- require(webshot2, quietly = TRUE)
-if (!has_webshot2) {
-    cat("Note: webshot2 not installed. Installing it for PDF export...\n")
-    install.packages("webshot2", repos = "https://cloud.r-project.org/", quiet = TRUE)
-    has_webshot2 <- require(webshot2, quietly = TRUE)
-}
 
 # Configuration
 CALC_KEYWORDS <- c(
@@ -279,7 +271,14 @@ CALC_KEYWORDS <- c(
     "solute", "biomineralization", "ossification",
     "cation", "anion"
 )
-P_ADJ_CUTOFF <- 0.05
+
+P_ADJ_CUTOFF <- 0.05  # Same for both seasons
+
+# Season-specific: How many top PARENT categories to show
+SEASON_CONFIG <- list(
+    summer = list(max_parent_categories = 10),  # Summer has fewer terms anyway
+    winter = list(max_parent_categories = 7)    # Winter: top 7 parents only
+)
 
 # Load GO_MWU results
 load_gomwu_results <- function(dir, organism, season, divisions = c("BP", "MF", "CC")) {
@@ -316,23 +315,23 @@ load_gomwu_results <- function(dir, organism, season, divisions = c("BP", "MF", 
 create_season_sankey <- function(season_name) {
     cat("\n--- Processing", toupper(season_name), "---\n")
     
+    config <- SEASON_CONFIG[[season_name]]
+    
     host_gomwu <- load_gomwu_results("../10_GO_MWU/output", "host", season_name)
     symbiont_gomwu <- load_gomwu_results("../11_symbiont_GO_MWU/output", "symbiont", season_name)
     all_gomwu <- bind_rows(host_gomwu, symbiont_gomwu)
     
-    cat("  Host GO terms:", nrow(host_gomwu), "\n")
-    cat("  Symbiont GO terms:", nrow(symbiont_gomwu), "\n")
+    cat("  Loaded GO terms - Host:", nrow(host_gomwu), "| Symbiont:", nrow(symbiont_gomwu), "\n")
     
-    # Filter for calcification
+    # Filter for calcification terms at p.adj < 0.05
     calc_data <- all_gomwu %>%
         filter(p.adj < P_ADJ_CUTOFF) %>%
         filter(str_detect(name, regex(paste(CALC_KEYWORDS, collapse = "|"), ignore_case = TRUE)))
     
-    cat("  Calcification terms found:\n")
-    print(table(calc_data$organism, calc_data$division))
+    cat("  Calcification terms at p.adj < 0.05:", nrow(calc_data), "\n")
     
     if (nrow(calc_data) == 0) {
-        cat("  Warning: No calcification terms found for", season_name, "\n")
+        cat("  Warning: No calcification terms found\n")
         return(NULL)
     }
     
@@ -353,9 +352,39 @@ create_season_sankey <- function(season_name) {
     calc_data <- calc_data %>%
         mutate(
             parent_category = assign_parent_category(name),
-            source_node = paste(organism, division, sep = "-"),
-            go_term_display = str_trunc(name, 45)
+            source_node = paste(organism, division, sep = "-")
         )
+    
+    # === HIERARCHICAL FILTERING: Select top parent categories ===
+    # Rank parent categories by total significance (sum of -log10(p.adj))
+    parent_ranking <- calc_data %>%
+        group_by(parent_category) %>%
+        summarise(
+            total_significance = sum(-log10(p.adj + 1e-10)),
+            n_terms = n(),
+            .groups = "drop"
+        ) %>%
+        arrange(desc(total_significance))
+    
+    cat("\n  Parent category ranking:\n")
+    print(parent_ranking)
+    
+    # Keep top N parent categories
+    top_parents <- head(parent_ranking, config$max_parent_categories)$parent_category
+    
+    cat("\n  Selected top", config$max_parent_categories, "parent categories:\n")
+    cat("  ", paste(top_parents, collapse = ", "), "\n")
+    
+    # Filter to keep ALL GO terms belonging to top parent categories
+    calc_data_filtered <- calc_data %>%
+        filter(parent_category %in% top_parents) %>%
+        mutate(go_term_display = str_trunc(name, 60))  # 60 char limit
+    
+    cat("\n  Final GO terms after hierarchical filtering:", nrow(calc_data_filtered), "\n")
+    cat("  Breakdown by organism and division:\n")
+    print(table(calc_data_filtered$organism, calc_data_filtered$division))
+    
+    calc_data <- calc_data_filtered
     
     # Build nodes
     source_nodes <- calc_data %>%
@@ -368,8 +397,8 @@ create_season_sankey <- function(season_name) {
     names(parent_nodes)[1] <- "source_node"
     
     go_nodes <- calc_data %>%
-        distinct(go_term_display, parent_category) %>%
-        mutate(group = "go_term", organism = "go_term")
+        distinct(go_term_display, parent_category, organism) %>%
+        mutate(group = organism)  # Color by source organism
     names(go_nodes)[1] <- "source_node"
     go_nodes <- go_nodes %>% select(source_node, group, organism)
     
@@ -383,7 +412,7 @@ create_season_sankey <- function(season_name) {
     
     # Build links
     link1 <- calc_data %>%
-        group_by(source_node, parent_category) %>%
+        group_by(source_node, parent_category, organism) %>%
         summarise(value = sum(-log10(p.adj + 1e-10)), .groups = "drop") %>%
         left_join(nodes %>% select(source_node, source_id = node_id), by = "source_node") %>%
         left_join(nodes %>% select(source_node, target_id = node_id), by = c("parent_category" = "source_node"))
@@ -398,7 +427,7 @@ create_season_sankey <- function(season_name) {
         link2 %>% select(source = source_id, target = target_id, value)
     )
     
-    cat("  Nodes:", nrow(nodes), "| Links:", nrow(links), "\n")
+    cat("  Sankey structure - Nodes:", nrow(nodes), "| Links:", nrow(links), "\n")
     
     # Prepare for Sankey
     nodes_renamed <- nodes
@@ -406,10 +435,10 @@ create_season_sankey <- function(season_name) {
     nodes_for_sankey <- as.data.frame(nodes_renamed)
     links_for_sankey <- as.data.frame(links)
     
-    # Create Sankey
+    # Create Sankey - Orange (host) and Green (symbiont)
     color_scale <- 'd3.scaleOrdinal()
-        .domain(["host", "symbiont", "parent", "go_term"])
-        .range(["#E69F00", "#56B4E9", "#95A5A6", "#BDC3C7"])'
+        .domain(["host", "symbiont", "parent"])
+        .range(["#E69F00", "#2ECC71", "#95A5A6"])'
     
     sankey <- sankeyNetwork(
         Links = links_for_sankey,
@@ -419,9 +448,9 @@ create_season_sankey <- function(season_name) {
         Value = "value",
         NodeID = "name",
         NodeGroup = "organism",
-        fontSize = 12,
-        nodeWidth = 30,
-        nodePadding = 10,
+        fontSize = 11,
+        nodeWidth = 25,
+        nodePadding = 8,
         iterations = 100,
         sinksRight = FALSE,
         colourScale = color_scale,
@@ -431,18 +460,7 @@ create_season_sankey <- function(season_name) {
     # Save HTML
     html_file <- paste0("figures/Fig4_calcification_sankey_", season_name, ".html")
     saveWidget(sankey, html_file, selfcontained = TRUE)
-    cat("  Saved HTML:", html_file, "\n")
-    
-    # Save PDF if webshot2 available
-    if (has_webshot2) {
-        pdf_file <- paste0("figures/Fig4_calcification_sankey_", season_name, ".pdf")
-        tryCatch({
-            webshot2::webshot(html_file, pdf_file, vwidth = 1400, vheight = 1000, delay = 2)
-            cat("  Saved PDF:", pdf_file, "\n")
-        }, error = function(e) {
-            cat("  Warning: Could not create PDF:", e$message, "\n")
-        })
-    }
+    cat("  Saved:", html_file, "\n")
     
     # Save summary
     summary_calcs <- calc_data %>%
@@ -453,24 +471,29 @@ create_season_sankey <- function(season_name) {
     write.csv(summary_calcs, paste0("data/calcification_summary_", season_name, ".csv"), 
               row.names = FALSE)
     
-    return(summary_calcs)
+    return(list(summary = summary_calcs, parent_ranking = parent_ranking))
 }
 
 # Create Sankies for both seasons
-summer_summary <- create_season_sankey("summer")
-winter_summary <- create_season_sankey("winter")
+summer_result <- create_season_sankey("summer")
+winter_result <- create_season_sankey("winter")
 
-cat("\n=== SUMMARY ===\n")
-if (!is.null(summer_summary)) {
-    cat("\nSUMMER:\n")
-    print(summer_summary)
-}
-if (!is.null(winter_summary)) {
-    cat("\nWINTER:\n")
-    print(winter_summary)
+cat("\n==============================================================================\n")
+cat("SUMMARY\n")
+cat("==============================================================================\n")
+
+if (!is.null(summer_result)) {
+    cat("\n--- SUMMER ---\n")
+    print(summer_result$summary)
 }
 
-cat("\nSankey plots complete!\n")
+if (!is.null(winter_result)) {
+    cat("\n--- WINTER ---\n")
+    print(winter_result$summary)
+}
+
+cat("\n✓ Sankey plots complete!\n")
+
 # ==============================================================================
 # FIGURE 5: Volcano Plots
 # ==============================================================================
