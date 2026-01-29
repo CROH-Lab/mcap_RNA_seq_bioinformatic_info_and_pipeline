@@ -727,7 +727,7 @@ deseq_sym_summer <- read.csv("../07_deseq2/results/Dtre_Summer_BvsD.csv", row.na
 deseq_sym_winter <- read.csv("../07_deseq2/results/Dtre_Winter_BvsD.csv", row.names = 1)
 
 # Load GO annotations to map genes to GO terms
-host_go_annot <- read.delim("../10_GO_MWU/input/host_go_annotations.tab", 
+host_go_annot <- read.delim("../10_GO_MWU/input/go_annotations.tab", 
                              header = FALSE, stringsAsFactors = FALSE)
 colnames(host_go_annot) <- c("gene_id", "GO_term")
 
