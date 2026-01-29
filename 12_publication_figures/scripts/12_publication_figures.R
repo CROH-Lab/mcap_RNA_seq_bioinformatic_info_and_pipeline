@@ -713,6 +713,215 @@ cat("      Symbiont Summer=#006341, Symbiont Winter=#8fe2b0\n")
 cat("      Excludes: Protein Phosphorylation, Na/K Transport, Phospholipid Transport\n")
 
 # ==============================================================================
+# FIGURE 4D: Dot Plot - GO Terms × Organism/Season
+# ==============================================================================
+
+cat("\n==============================================================================\n")
+cat("Figure 4D: Dot Plot - Calcification GO Terms\n")
+cat("==============================================================================\n\n")
+
+# Load DESeq2 results to get log2FC values
+deseq_host_summer <- read.csv("../07_deseq2/results/Mcap_Summer_BvsD.csv", row.names = 1)
+deseq_host_winter <- read.csv("../07_deseq2/results/Mcap_Winter_BvsD.csv", row.names = 1)
+deseq_sym_summer <- read.csv("../07_deseq2/results/Dtre_Summer_BvsD.csv", row.names = 1)
+deseq_sym_winter <- read.csv("../07_deseq2/results/Dtre_Winter_BvsD.csv", row.names = 1)
+
+# Load GO annotations to map genes to GO terms
+host_go_annot <- read.delim("../10_GO_MWU/input/host_go_annotations.tab", 
+                             header = FALSE, stringsAsFactors = FALSE)
+colnames(host_go_annot) <- c("gene_id", "GO_term")
+
+symbiont_go_annot <- read.delim("../11_symbiont_GO_MWU/input/symbiont_go_annotations.tab",
+                                 header = FALSE, stringsAsFactors = FALSE)
+colnames(symbiont_go_annot) <- c("gene_id", "GO_term")
+
+cat("Loaded annotations - Host:", nrow(host_go_annot), "| Symbiont:", nrow(symbiont_go_annot), "\n")
+
+# Function to calculate mean log2FC for each GO term
+calculate_go_stats <- function(deseq_results, go_annotations, go_terms_of_interest, organism_name, season_name) {
+    
+    results_list <- list()
+    
+    for (i in 1:nrow(go_terms_of_interest)) {
+        go_id <- go_terms_of_interest$term[i]
+        go_name <- go_terms_of_interest$name[i]
+        parent_cat <- go_terms_of_interest$parent_category[i]
+        
+        # Get genes with this GO term
+        genes_in_term <- go_annotations %>%
+            filter(grepl(go_id, GO_term)) %>%
+            pull(gene_id) %>%
+            unique()
+        
+        if (length(genes_in_term) == 0) next
+        
+        # Match with DESeq2 results
+        degs_in_term <- deseq_results %>%
+            filter(rownames(deseq_results) %in% genes_in_term) %>%
+            filter(!is.na(padj) & padj < 0.05)
+        
+        if (nrow(degs_in_term) == 0) next
+        
+        results_list[[length(results_list) + 1]] <- data.frame(
+            organism = organism_name,
+            season = season_name,
+            parent_category = parent_cat,
+            go_term = str_trunc(go_name, 50),
+            n_genes = nrow(degs_in_term),
+            mean_log2fc = mean(degs_in_term$log2FoldChange, na.rm = TRUE),
+            stringsAsFactors = FALSE
+        )
+    }
+    
+    return(bind_rows(results_list))
+}
+
+# Get significant GO terms from both seasons (already filtered earlier)
+if (!is.null(summer_result)) {
+    summer_go_terms <- calc_combined %>%
+        filter(season == "summer" & !is.na(parent_category)) %>%
+        select(term, name, parent_category, organism) %>%
+        distinct()
+    
+    cat("Processing Summer GO terms...\n")
+    host_summer_stats <- calculate_go_stats(deseq_host_summer, host_go_annot, 
+                                             summer_go_terms %>% filter(organism == "host"),
+                                             "Host", "Summer")
+    sym_summer_stats <- calculate_go_stats(deseq_sym_summer, symbiont_go_annot,
+                                            summer_go_terms %>% filter(organism == "symbiont"),
+                                            "Symbiont", "Summer")
+}
+
+if (!is.null(winter_result)) {
+    winter_go_terms <- calc_combined %>%
+        filter(season == "winter" & !is.na(parent_category)) %>%
+        select(term, name, parent_category, organism) %>%
+        distinct()
+    
+    cat("Processing Winter GO terms...\n")
+    host_winter_stats <- calculate_go_stats(deseq_host_winter, host_go_annot,
+                                             winter_go_terms %>% filter(organism == "host"),
+                                             "Host", "Winter")
+    sym_winter_stats <- calculate_go_stats(deseq_sym_winter, symbiont_go_annot,
+                                            winter_go_terms %>% filter(organism == "symbiont"),
+                                            "Symbiont", "Winter")
+}
+
+# Combine all stats
+dotplot_data <- bind_rows(host_summer_stats, sym_summer_stats, 
+                          host_winter_stats, sym_winter_stats) %>%
+    mutate(
+        condition = paste(organism, season, sep = "\n"),
+        condition = factor(condition, levels = c("Host\nSummer", "Host\nWinter", 
+                                                  "Symbiont\nSummer", "Symbiont\nWinter"))
+    )
+
+cat("Dot plot data points:", nrow(dotplot_data), "\n")
+
+# Create dot plot
+fig4d_dotplot <- ggplot(dotplot_data, aes(x = condition, y = reorder(go_term, as.numeric(factor(parent_category))))) +
+    geom_point(aes(size = n_genes, color = mean_log2fc)) +
+    scale_color_gradient2(
+        low = "#4575B4", mid = "white", high = "#D73027", 
+        midpoint = 0, name = "Mean\nlog2FC",
+        limits = c(-max(abs(dotplot_data$mean_log2fc)), max(abs(dotplot_data$mean_log2fc)))
+    ) +
+    scale_size_continuous(name = "# DEGs", range = c(2, 10)) +
+    facet_grid(parent_category ~ ., scales = "free_y", space = "free_y") +
+    labs(x = "", y = "") +
+    theme_pub +
+    theme(
+        axis.text.x = element_text(size = 10, angle = 0),
+        axis.text.y = element_text(size = 8),
+        strip.text.y = element_text(size = 10, face = "bold", angle = 0, hjust = 0),
+        panel.grid.major = element_line(color = "grey90"),
+        legend.position = "right"
+    )
+
+ggsave("figures/Fig4D_dotplot_calcification.pdf", fig4d_dotplot, width = 10, height = 14)
+ggsave("figures/Fig4D_dotplot_calcification.png", fig4d_dotplot, width = 10, height = 14, dpi = 300)
+cat("✓ Saved: Fig4D_dotplot_calcification.pdf/png\n")
+
+# ==============================================================================
+# FIGURE 4E: Heatmap - GO Terms × Organism/Season
+# ==============================================================================
+
+cat("\n==============================================================================\n")
+cat("Figure 4E: Heatmap - Calcification GO Terms\n")
+cat("==============================================================================\n\n")
+
+# Prepare matrix for heatmap
+heatmap_matrix <- dotplot_data %>%
+    select(go_term, condition, mean_log2fc) %>%
+    pivot_wider(names_from = condition, values_from = mean_log2fc, values_fill = 0) %>%
+    column_to_rownames("go_term") %>%
+    as.matrix()
+
+# Gene count annotation
+gene_counts <- dotplot_data %>%
+    group_by(go_term) %>%
+    summarise(total_genes = sum(n_genes), .groups = "drop") %>%
+    arrange(match(go_term, rownames(heatmap_matrix)))
+
+# Parent category annotation
+parent_annot <- dotplot_data %>%
+    select(go_term, parent_category) %>%
+    distinct() %>%
+    arrange(match(go_term, rownames(heatmap_matrix)))
+
+# Create row annotation
+row_ha <- rowAnnotation(
+    `Parent Category` = parent_annot$parent_category,
+    `Total DEGs` = anno_barplot(gene_counts$total_genes, width = unit(2, "cm")),
+    col = list(`Parent Category` = setNames(
+        rainbow(length(unique(parent_annot$parent_category))),
+        unique(parent_annot$parent_category)
+    ))
+)
+
+# Column annotation (organism/season)
+col_ha <- HeatmapAnnotation(
+    Condition = colnames(heatmap_matrix),
+    col = list(Condition = c(
+        "Host\nSummer" = "#ff671f",
+        "Host\nWinter" = "#ffb81c",
+        "Symbiont\nSummer" = "#006341",
+        "Symbiont\nWinter" = "#8fe2b0"
+    ))
+)
+
+# Create heatmap
+pdf("figures/Fig4E_heatmap_calcification.pdf", width = 8, height = 14)
+ht <- Heatmap(
+    heatmap_matrix,
+    name = "Mean log2FC",
+    col = circlize::colorRamp2(
+        c(-max(abs(heatmap_matrix)), 0, max(abs(heatmap_matrix))),
+        c("#4575B4", "white", "#D73027")
+    ),
+    top_annotation = col_ha,
+    right_annotation = row_ha,
+    cluster_rows = FALSE,
+    cluster_columns = FALSE,
+    show_row_names = TRUE,
+    show_column_names = TRUE,
+    row_names_gp = gpar(fontsize = 8),
+    column_names_gp = gpar(fontsize = 10),
+    row_split = parent_annot$parent_category,
+    row_title_rot = 0,
+    row_gap = unit(2, "mm"),
+    border = TRUE
+)
+draw(ht)
+dev.off()
+
+cat("✓ Saved: Fig4E_heatmap_calcification.pdf\n")
+
+cat("\n✓ Figure 4 complete with all subfigures!\n")
+cat("  - Fig4A-C: Sankey plots (summer, winter, combined)\n")
+cat("  - Fig4D: Dot plot (GO terms × conditions)\n")
+cat("  - Fig4E: Heatmap (GO terms × conditions)\n")
+# ==============================================================================
 # FIGURE 5: Volcano Plots
 # ==============================================================================
 
