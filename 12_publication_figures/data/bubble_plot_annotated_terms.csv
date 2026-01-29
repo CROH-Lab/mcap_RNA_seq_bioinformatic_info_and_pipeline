@@ -1,143 +1,75 @@
 "organism","season","division","go_name","p.adj","delta.rank","nseqs"
-"Host","summer","BP","translational initiation",4.32374995566834e-10,-1099,233
 "Host","summer","BP","oxidative phosphorylation",8.77529237781281e-09,-1377,126
 "Host","summer","BP","response to endoplasmic reticulum stress",1.47882711492969e-05,-796,249
-"Host","summer","BP","peptide transport",5.19713079148507e-05,-396,1004
 "Host","summer","BP","protein localization to mitochondrion",0.00022977313271818,-1141,94
 "Host","summer","BP","chemosensory behavior",0.000244867927441304,953,133
 "Host","summer","BP","regulation of monoatomic ion transport",0.000574368009215899,423,649
 "Host","summer","BP","response to acid chemical",0.000617851205990762,622,282
 "Host","summer","BP","localization within membrane",0.00205459491495829,-489,393
-"Host","summer","BP","positive regulation of cell cycle phase transition",0.00380129606100199,395,569
-"Host","summer","BP","regulation of Wnt signaling pathway",0.00435282947484768,460,399
-"Host","summer","BP","regulation of nervous system development",0.00482968346330782,242,1697
-"Host","summer","BP","cognition",0.00571201678435219,435,425
-"Host","summer","BP","obsolete regulation of phosphatidylinositol 3-kinase signaling",0.00635920612168291,336,728
-"Host","summer","BP","regulation of protein stability",0.00681005659432193,-455,368
-"Host","summer","BP","regulation of small GTPase mediated signal transduction",0.00681005659432193,637,183
-"Host","summer","BP","antigen processing and presentation of peptide antigen via MHC class I",0.00764000865176944,-1513,31
-"Host","summer","BP","gastrulation with mouth forming second",0.00803670310455405,564,226
 "Host","summer","BP","mitochondrion organization",0.0143151678481103,-323,664
-"Host","summer","BP","regulation of G protein-coupled receptor signaling pathway",0.0153150975082142,834,91
-"Host","summer","BP","regulation of vasoconstriction",0.0175172838895703,580,186
 "Host","summer","BP","response to fatty acid",0.0204447833336567,849,83
-"Host","summer","BP","regulation of organ growth",0.0216272094763393,495,245
 "Host","summer","BP","cell redox homeostasis",0.022520529380172,-1435,28
-"Host","summer","BP","cytoskeleton organization",0.022520529380172,187,2312
 "Host","summer","BP","inorganic anion transport",0.0227993896489522,518,217
 "Host","summer","BP","inner mitochondrial membrane organization",0.0230084347018233,-1254,36
 "Host","summer","BP","regulation of cytosolic calcium ion concentration",0.0355683347656201,404,328
-"Host","summer","BP","regulation of ERAD pathway",0.0392417399228826,-1267,31
 "Host","summer","BP","mitochondrial transport",0.0399484404538055,-562,158
 "Host","summer","BP","ossification",0.0451165863230957,538,165
-"Host","summer","BP","regulation of DNA-templated transcription initiation",0.0454752495840943,-1172,34
-"Host","summer","BP","peptidyl-serine modification",0.0481837034548633,508,181
-"Host","summer","BP","regulation of peptide transport",0.0499730156478459,239,876
 "Host","summer","BP","mitochondrial gene expression",0.0499730156478459,-620,118
 "Host","summer","CC","obsolete intrinsic component of plasma membrane",2.02584812684478e-10,563,630
 "Host","summer","CC","plasma membrane region",2.02584812684478e-10,545,658
-"Host","summer","CC","anchoring junction",7.79219842854082e-06,590,290
+"Host","summer","CC","mitochondrial protein-containing complex",2.27012771524673e-06,-697,226
 "Host","summer","CC","synaptic membrane",2.41082604247001e-05,781,147
 "Host","summer","CC","endoplasmic reticulum protein-containing complex",2.41082604247001e-05,-964,95
 "Host","summer","CC","neuron projection membrane",0.000191018369181948,876,93
 "Host","summer","CC","rough endoplasmic reticulum membrane",0.000708485998887435,-1339,34
-"Host","summer","CC","muscle tendon junction",0.00178511832117045,1358,29
-"Host","summer","CC","apical junction complex",0.0024611807972723,844,72
-"Host","summer","CC","cell division site",0.00298851919243874,783,80
 "Host","summer","CC","cell projection membrane",0.00301260128495719,507,193
-"Host","summer","CC","neuron projection terminus",0.00610196925730254,540,148
-"Host","summer","CC","chromosomal region",0.00761453592689457,428,226
 "Host","summer","CC","endoplasmic reticulum chaperone complex",0.00761453592689457,-1821,12
 "Host","summer","CC","proton-transporting two-sector ATPase complex",0.017598478659272,-919,39
 "Host","summer","CC","rough endoplasmic reticulum",0.0181501325756362,-667,73
 "Host","summer","CC","proton-transporting ATP synthase complex",0.0242874839842683,-1400,15
+"Host","summer","CC","mitochondrial matrix",0.0242874839842683,-301,342
 "Host","summer","CC","obsolete endoplasmic reticulum part",0.0242874839842683,-210,767
-"Host","summer","CC","cluster of actin-based cell projections",0.0242874839842683,481,130
 "Host","summer","MF","oxidoreduction-driven active transmembrane transporter activity",3.70633774441269e-07,-1980,38
 "Host","summer","MF","proton transmembrane transporter activity",7.00119531847492e-05,-1108,83
 "Host","summer","MF","primary active transmembrane transporter activity",0.00124980322845184,-769,125
 "Host","summer","MF","active monoatomic ion transmembrane transporter activity",0.00192077100476197,-944,78
 "Host","summer","MF","gated channel activity",0.00274882139006119,663,152
 "Host","summer","MF","channel activity",0.00474263858155469,509,235
-"Host","summer","MF","channel regulator activity",0.00871775262169773,879,70
 "Host","summer","MF","monoatomic cation channel activity",0.0133510650404387,557,163
 "Host","summer","MF","ligand-gated monoatomic ion channel activity",0.0159190409096359,689,102
 "Host","summer","MF","ligand-gated monoatomic cation channel activity",0.0237512633791609,796,70
-"Host","summer","MF","DNA-binding transcription factor activity",0.02886207090412,296,502
 "Host","summer","MF","voltage-gated channel activity",0.02886207090412,747,74
-"Host","summer","MF","translation initiation factor activity",0.0463043198317385,-889,46
 "Host","winter","BP","oxidative phosphorylation",1.45982227896299e-07,1273,126
 "Host","winter","BP","mitochondrion organization",8.09024109979525e-05,455,668
 "Host","winter","BP","inner mitochondrial membrane organization",0.000444844544416162,1719,36
-"Host","winter","BP","translational initiation",0.000521763370371291,673,234
 "Host","winter","BP","chemosensory behavior",0.000556477967471867,-911,124
-"Host","winter","BP","regulation of Rac protein signal transduction",0.000556477967471867,-1455,48
 "Host","winter","BP","mitochondrial electron transport, ubiquinol to cytochrome c",0.00186463980774118,2148,19
-"Host","winter","BP","regulation of cell projection assembly",0.00196278661996675,-750,157
 "Host","winter","BP","mitochondrial gene expression",0.0023565353533226,845,118
-"Host","winter","BP","regulation of small GTPase mediated signal transduction",0.00285966457011659,-672,183
-"Host","winter","BP","cell recognition",0.00313499775848952,-678,176
-"Host","winter","BP","regulation of keratinocyte proliferation",0.00349929733187285,-1162,58
-"Host","winter","BP","regulation of cell morphogenesis",0.00478887880508977,-394,513
-"Host","winter","BP","regulation of vasoconstriction",0.00530967555090101,-650,175
-"Host","winter","BP","post-transcriptional regulation of gene expression",0.00530967555090101,417,444
-"Host","winter","BP","sensory perception of chemical stimulus",0.00553921659831313,-888,92
-"Host","winter","BP","cytoskeleton organization",0.00635747318691952,-226,1739
-"Host","winter","BP","leukocyte migration",0.00645451010747921,-805,108
-"Host","winter","BP","sensory perception of light stimulus",0.00662293504627826,-711,138
 "Host","winter","BP","inorganic anion transport",0.00793817203470542,-631,171
 "Host","winter","BP","mitochondrial transport",0.0112544841416774,628,163
-"Host","winter","BP","regulation of receptor signaling pathway via STAT",0.0112544841416774,-275,944
-"Host","winter","BP","regulation of protein phosphorylation",0.0117287045114014,-197,2236
-"Host","winter","BP","DNA replication",0.014009803200287,389,415
-"Host","winter","BP","regulation of protein stability",0.021335989533715,393,373
-"Host","winter","BP","protein localization to nucleus",0.0222173672188482,511,209
-"Host","winter","BP","positive regulation of cell cycle phase transition",0.0222173672188482,-327,535
-"Host","winter","BP","regulation of nervous system development",0.0222173672188482,-201,1685
-"Host","winter","BP","positive regulation of small GTPase mediated signal transduction",0.0222173672188482,-1202,37
 "Host","winter","BP","membrane depolarization",0.0222173672188482,-1239,35
-"Host","winter","BP","regulation of axon guidance",0.0232025870795767,-775,88
-"Host","winter","BP","detection of stimulus",0.0263879513779609,-379,372
-"Host","winter","BP","smooth muscle contraction",0.0268531176669473,-829,74
-"Host","winter","BP","protein transport",0.0268531176669473,241,992
-"Host","winter","BP","negative regulation of mRNA metabolic process",0.0268531176669473,897,63
-"Host","winter","BP","viral gene expression",0.0301215102672729,955,54
 "Host","winter","BP","sodium ion transport",0.0301215102672729,-605,136
-"Host","winter","BP","regulation of chemotaxis",0.031134111137315,-551,163
 "Host","winter","BP","plasma membrane organization",0.0332068182360904,-683,102
-"Host","winter","BP","regulation of defense response to virus",0.0343013310290735,831,68
-"Host","winter","BP","cell junction organization",0.0447964770652793,-324,439
-"Host","winter","BP","negative regulation of epithelial to mesenchymal transition",0.0487508147124002,-707,86
 "Host","winter","BP","regulation of monoatomic ion transport",0.0497353526701818,-269,635
-"Host","winter","BP","cellular response to ionizing radiation",0.0497353526701818,753,75
+"Host","winter","CC","mitochondrial protein-containing complex",6.09270878161228e-09,823,228
 "Host","winter","CC","plasma membrane bounded cell projection cytoplasm",6.19692459359339e-09,-1039,139
-"Host","winter","CC","anchoring junction",2.04955211918333e-08,-707,287
-"Host","winter","CC","cytoplasmic region",2.06561105619132e-06,-534,381
 "Host","winter","CC","obsolete intrinsic component of plasma membrane",3.92307441742481e-06,-419,606
 "Host","winter","CC","synaptic membrane",3.92307441742481e-06,-842,139
 "Host","winter","CC","plasma membrane region",1.97960989786569e-05,-382,639
+"Host","winter","CC","mitochondrial matrix",4.34539801108161e-05,490,343
 "Host","winter","CC","cell projection membrane",7.0117069244724e-05,-638,187
 "Host","winter","CC","neuron projection membrane",7.53826468271636e-05,-1091,62
-"Host","winter","CC","potassium channel complex",0.00287269263944453,-1113,38
 "Host","winter","CC","membrane raft",0.00997664506971217,-463,179
 "Host","winter","CC","secretory granule membrane",0.0124212033565228,-442,188
-"Host","winter","CC","cluster of actin-based cell projections",0.01460628755835,-521,128
-"Host","winter","CC","septate junction",0.0154805301184517,-1446,16
-"Host","winter","CC","apical junction complex",0.0163240018423499,-689,70
 "Host","winter","CC","dendrite membrane",0.0194342671163199,-1220,21
-"Host","winter","CC","ciliary transition zone",0.0277765373193554,-703,58
 "Host","winter","CC","membrane protein complex",0.0361889400991233,227,563
-"Host","winter","CC","neuron projection terminus",0.0483619940935549,-418,143
-"Host","winter","CC","neuromuscular junction",0.0488728456657864,-523,90
 "Host","winter","CC","lamellipodium membrane",0.049365957801703,-1550,10
 "Host","winter","MF","gated channel activity",3.82091176050046e-06,-987,140
-"Host","winter","MF","polypeptide conformation or assembly isomerase activity",6.24424538660489e-06,-1069,108
 "Host","winter","MF","channel activity",6.24424538660489e-06,-740,222
 "Host","winter","MF","oxidoreduction-driven active transmembrane transporter activity",1.07081328889816e-05,1713,38
 "Host","winter","MF","proton transmembrane transporter activity",1.12025430865353e-05,1156,83
 "Host","winter","MF","ligand-gated monoatomic ion channel activity",0.000148096737235434,-980,94
 "Host","winter","MF","ATPase regulator activity",0.000148096737235434,1616,34
-"Host","winter","MF","translation factor activity, RNA binding",0.000873087986036841,922,87
 "Host","winter","MF","extracellular ligand-gated monoatomic ion channel activity",0.00257156094334511,-1468,29
 "Host","winter","MF","ATPase activator activity",0.00381707163810742,1565,24
 "Host","winter","MF","outward rectifier potassium channel activity",0.00403958960339568,-1794,18
@@ -147,242 +79,95 @@
 "Host","winter","MF","catalytic activity, acting on a nucleic acid",0.00719202894694606,340,483
 "Host","winter","MF","ligand-gated monoatomic anion channel activity",0.00790408216878428,-1241,33
 "Host","winter","MF","ligand-gated monoatomic cation channel activity",0.0130243995454279,-843,66
-"Host","winter","MF","translation initiation factor activity",0.0156241607721894,974,47
-"Host","winter","MF","obsolete protein transporter activity",0.0156241607721894,734,84
-"Host","winter","MF","translation elongation factor activity",0.0177821497465172,1258,27
 "Host","winter","MF","sodium channel activity",0.0184470775891448,-1243,27
 "Host","winter","MF","primary active transmembrane transporter activity",0.0184470775891448,587,123
 "Host","winter","MF","transmitter-gated monoatomic ion channel activity",0.0184470775891448,-1528,18
 "Host","winter","MF","metal ion transmembrane transporter activity",0.0187864327104469,-441,219
 "Host","winter","MF","active monoatomic ion transmembrane transporter activity",0.0203910215959604,739,75
-"Host","winter","MF","macromolecular conformation isomerase activity",0.0218493215257327,-426,224
-"Host","winter","MF","mRNA regulatory element binding translation repressor activity",0.0433310158208275,-1745,11
 "Host","winter","MF","excitatory extracellular ligand-gated monoatomic ion channel activity",0.0450104605392683,-1356,18
 "Host","winter","MF","neurotransmitter transmembrane transporter activity",0.0450104605392683,-1198,23
 "Host","winter","MF","obsolete inorganic anion transmembrane transporter activity",0.0468562043184909,-640,80
-"Symbiont","summer","BP","cytoplasmic translation",1.86342551319675e-21,-1278,275
 "Symbiont","summer","BP","protein targeting to membrane",6.31398361050901e-18,-1404,188
-"Symbiont","summer","BP","translational initiation",2.05382340218051e-13,-1156,212
 "Symbiont","summer","BP","establishment of protein localization to membrane",8.89440201554283e-13,-1096,224
 "Symbiont","summer","BP","localization within membrane",2.71271012072873e-10,-737,414
 "Symbiont","summer","BP","nucleic acid catabolic process",3.80628435878813e-07,-657,375
-"Symbiont","summer","BP","establishment of protein localization to organelle",5.96483123343495e-07,-572,489
 "Symbiont","summer","BP","response to cadmium ion",0.000819321965777178,629,232
-"Symbiont","summer","BP","positive regulation of phospholipid metabolic process",0.00191830072470469,2253,16
-"Symbiont","summer","BP","developmental pigmentation",0.00439919204300061,1269,46
-"Symbiont","summer","BP","negative regulation of protein polymerization",0.00447030069725028,1085,61
-"Symbiont","summer","BP","establishment of protein localization to chloroplast",0.00447030069725028,1800,22
 "Symbiont","summer","BP","cellular homeostasis",0.00447030069725028,398,490
 "Symbiont","summer","BP","sulfur amino acid metabolic process",0.00465723536000399,1037,66
-"Symbiont","summer","BP","negative regulation of cytoskeleton organization",0.0136194538683769,797,97
-"Symbiont","summer","BP","mitotic centrosome separation",0.0143323980439655,2002,15
-"Symbiont","summer","BP","regulation of brassinosteroid mediated signaling pathway",0.0156439158936542,1923,16
 "Symbiont","summer","BP","obsolete aspartate family amino acid metabolic process",0.0233479244247497,887,71
-"Symbiont","summer","BP","pigmentation",0.0354265374717852,817,78
-"Symbiont","summer","BP","protein transport along microtubule",0.0358278436882356,1849,15
-"Symbiont","summer","BP","negative regulation of microtubule polymerization or depolymerization",0.0466759816501823,1428,24
 "Symbiont","summer","BP","metal ion transport",0.0489153352315799,394,326
 "Symbiont","summer","CC","rough endoplasmic reticulum membrane",3.93786802915305e-06,-1131,60
 "Symbiont","summer","CC","rough endoplasmic reticulum",4.31589959416512e-05,-862,86
 "Symbiont","summer","CC","cytoplasmic side of membrane",0.00235767829208577,-607,118
 "Symbiont","summer","CC","side of membrane",0.0142170595905504,-442,172
-"Symbiont","summer","MF","polypeptide conformation or assembly isomerase activity",0.0266080465173024,547,141
-"Symbiont","summer","MF","molecular function inhibitor activity",0.0269368319413946,-566,129
 "Symbiont","summer","MF","calcium ion transmembrane transporter activity",0.0324354907951206,601,108
-"Symbiont","winter","BP","cytoplasmic translation",1.91606678838273e-34,-1597,275
-"Symbiont","winter","BP","translational initiation",2.77669124222021e-18,-1333,212
 "Symbiont","winter","BP","establishment of protein localization to membrane",5.25107643145056e-16,-1211,226
 "Symbiont","winter","BP","nucleic acid catabolic process",6.69262323057458e-15,-919,374
 "Symbiont","winter","BP","protein targeting to membrane",1.57175321166148e-13,-1214,189
-"Symbiont","winter","BP","protein-RNA complex organization",5.34100320377736e-11,-796,370
 "Symbiont","winter","BP","monoatomic cation transport",8.2054113840383e-10,664,485
 "Symbiont","winter","BP","monoatomic ion transmembrane transport",2.37683958141821e-08,568,580
-"Symbiont","winter","BP","protein phosphorylation",2.0443077132237e-07,510,650
 "Symbiont","winter","BP","metal ion transport",5.19742674189159e-07,680,328
-"Symbiont","winter","BP","establishment of protein localization to organelle",8.87537656543031e-07,-553,490
-"Symbiont","winter","BP","sporulation",3.473383986552e-06,833,190
-"Symbiont","winter","BP","lipid localization",5.17878270049896e-06,887,162
-"Symbiont","winter","BP","nuclear transport",1.93360959088721e-05,-631,297
 "Symbiont","winter","BP","obsolete inorganic ion transmembrane transport",2.21410455969598e-05,557,381
-"Symbiont","winter","BP","lipid transport",3.44125485751509e-05,963,118
 "Symbiont","winter","BP","localization within membrane",3.93691635131347e-05,-521,417
 "Symbiont","winter","BP","monoatomic anion transport",4.46001724898485e-05,574,334
-"Symbiont","winter","BP","organic hydroxy compound transport",0.000132811847737179,1361,52
 "Symbiont","winter","BP","potassium ion transport",0.000186048229405333,886,120
-"Symbiont","winter","BP","regulation of peptidase activity",0.000221870022281063,-840,131
-"Symbiont","winter","BP","regulation of system process",0.000272475723391272,650,217
 "Symbiont","winter","BP","regulation of membrane lipid distribution",0.000316388615470735,1798,27
-"Symbiont","winter","BP","external encapsulating structure organization",0.000316388615470735,686,190
-"Symbiont","winter","BP","anatomical structure formation involved in morphogenesis",0.000316388615470735,401,589
-"Symbiont","winter","BP","regulation of chloride transport",0.000316388615470735,2584,13
-"Symbiont","winter","BP","phospholipid transport",0.00032370877260445,1454,41
-"Symbiont","winter","BP","regulation of DNA endoreduplication",0.000343616473333643,1720,29
 "Symbiont","winter","BP","regulation of retinoic acid receptor signaling pathway",0.000453550597890073,-2356,15
 "Symbiont","winter","BP","sodium ion transport",0.000522354335740698,877,108
 "Symbiont","winter","BP","membrane depolarization",0.000535823157932998,1150,62
-"Symbiont","winter","BP","formation of translation preinitiation complex",0.000580847352663404,-1962,21
-"Symbiont","winter","BP","protein trimerization",0.00078910849735824,-1805,24
-"Symbiont","winter","BP","body fluid secretion",0.000830036417206937,2353,14
-"Symbiont","winter","BP","obsolete activation of MAPKK activity",0.00130208551725908,1685,26
 "Symbiont","winter","BP","acid secretion",0.00131214296515775,1594,29
 "Symbiont","winter","BP","action potential",0.00131323386159294,913,89
 "Symbiont","winter","BP","intracellular monoatomic anion homeostasis",0.00142133088770419,2201,15
-"Symbiont","winter","BP","positive regulation of DNA endoreduplication",0.00154706870080134,2264,14
-"Symbiont","winter","BP","culmination involved in sorocarp development",0.00155141230527235,994,73
-"Symbiont","winter","BP","regulation of muscle system process",0.00250883828225496,804,105
 "Symbiont","winter","BP","monoatomic anion homeostasis",0.00250883828225496,1174,49
 "Symbiont","winter","BP","organic cation transport",0.00321284766928087,774,109
 "Symbiont","winter","BP","regulation of substrate adhesion-dependent cell spreading",0.00321284766928087,-2007,16
 "Symbiont","winter","BP","positive regulation of transmembrane transport",0.00368150653598744,792,102
 "Symbiont","winter","BP","regulation of transmembrane transport",0.00377826861141326,570,199
-"Symbiont","winter","BP","obsolete regulation of cysteine-type endopeptidase activity",0.00395076534744102,-756,111
-"Symbiont","winter","BP","vascular transport",0.00486351249872919,2456,10
-"Symbiont","winter","BP","cell wall organization",0.00486351249872919,789,98
-"Symbiont","winter","BP","epithelial cell differentiation",0.00494696604020425,540,212
 "Symbiont","winter","BP","chemical homeostasis",0.00525485796256332,335,574
-"Symbiont","winter","BP","regulation of striated muscle contraction",0.00536905227888198,1022,57
-"Symbiont","winter","BP","regulation of skeletal muscle tissue regeneration",0.005383071855749,1920,16
 "Symbiont","winter","BP","monoatomic anion transmembrane transport",0.005383071855749,508,236
 "Symbiont","winter","BP","calcium ion transport",0.0055442897914959,646,143
 "Symbiont","winter","BP","obsolete regulation of anion channel activity",0.00582339288288656,1848,17
-"Symbiont","winter","BP","obsolete regulation of telomerase activity",0.00582339288288656,-1139,45
-"Symbiont","winter","BP","regulation of amide metabolic process",0.00586318518982756,-382,422
-"Symbiont","winter","BP","xenobiotic transport",0.00629171456797189,726,110
-"Symbiont","winter","BP","neuromuscular junction development",0.00629171456797189,895,72
-"Symbiont","winter","BP","positive regulation of NF-kappaB transcription factor activity",0.00632316092148973,1104,47
 "Symbiont","winter","BP","tissue homeostasis",0.00665699456257085,783,93
-"Symbiont","winter","BP","central nervous system neuron differentiation",0.00756355137356837,1241,36
-"Symbiont","winter","BP","translation reinitiation",0.00786727495773379,-2337,10
-"Symbiont","winter","BP","digestion",0.00786727495773379,1201,38
 "Symbiont","winter","BP","calcium-mediated signaling",0.00786727495773379,858,75
 "Symbiont","winter","BP","membrane protein proteolysis",0.00786727495773379,2134,12
-"Symbiont","winter","BP","regulation of sterol transport",0.00787341449297877,2132,12
 "Symbiont","winter","BP","positive regulation of monoatomic ion transmembrane transport",0.00788162656858379,800,86
-"Symbiont","winter","BP","maturation of SSU-rRNA",0.00881905669213458,-695,112
 "Symbiont","winter","BP","ammonium transmembrane transport",0.00911314683182931,1377,28
-"Symbiont","winter","BP","fat cell differentiation",0.00925898677574658,-1550,22
-"Symbiont","winter","BP","regulation of proteolysis",0.00930032739315779,-364,422
 "Symbiont","winter","BP","lipid homeostasis",0.00951729159681619,789,85
-"Symbiont","winter","BP","synaptic transmission, glutamatergic",0.00978028385884401,1474,24
 "Symbiont","winter","BP","multicellular organismal-level homeostasis",0.0108288739047091,386,361
-"Symbiont","winter","BP","positive regulation of MAPK cascade",0.0110819402252693,615,137
-"Symbiont","winter","BP","positive regulation of amide metabolic process",0.0111425213402909,-533,183
-"Symbiont","winter","BP","positive regulation of mitotic sister chromatid separation",0.0111425213402909,-860,69
-"Symbiont","winter","BP","supramolecular fiber organization",0.0111425213402909,448,261
-"Symbiont","winter","BP","regulation of canonical NF-kappaB signal transduction",0.0126616351656297,1129,39
-"Symbiont","winter","BP","regulation of wound healing",0.0127318996219269,1190,35
-"Symbiont","winter","BP","regulation of mononuclear cell migration",0.0128744605916592,-1283,30
-"Symbiont","winter","BP","eggshell formation",0.0131805884750077,1239,32
 "Symbiont","winter","BP","negative regulation of monoatomic anion transport",0.0140695955301504,1929,13
-"Symbiont","winter","BP","intestinal absorption",0.014137213679386,1795,15
 "Symbiont","winter","BP","regulation of monoatomic anion transmembrane transport",0.0141669568943741,1390,25
 "Symbiont","winter","BP","inorganic anion transport",0.0144005324757643,784,79
 "Symbiont","winter","BP","positive regulation of cell-substrate adhesion",0.0144301966259028,-1334,27
-"Symbiont","winter","BP","obsolete negative regulation of telomerase activity",0.0146844659071754,-1630,18
-"Symbiont","winter","BP","sensory perception",0.0151840505801029,453,239
 "Symbiont","winter","BP","response to cadmium ion",0.015441655963491,-459,231
-"Symbiont","winter","BP","positive regulation of lipid localization",0.015441655963491,1180,34
-"Symbiont","winter","BP","regulation of mitotic sister chromatid separation",0.0161137014948057,-681,102
-"Symbiont","winter","BP","septation initiation signaling",0.0161137014948057,2058,11
-"Symbiont","winter","BP","positive regulation of kinase activity",0.0161137014948057,461,226
-"Symbiont","winter","BP","regulation of smooth muscle cell proliferation",0.0163701913444745,922,55
-"Symbiont","winter","BP","obsolete toxin transport",0.0163701913444745,-1391,24
-"Symbiont","winter","BP","regulation of vascular associated smooth muscle cell proliferation",0.0173453947132175,2041,11
-"Symbiont","winter","BP","pollen germination",0.0174117596825577,1354,25
 "Symbiont","winter","BP","organelle membrane fusion",0.0179840664299931,-797,72
-"Symbiont","winter","BP","protein autophosphorylation",0.0179840664299931,412,277
-"Symbiont","winter","BP","regulation of unidimensional cell growth",0.0184822628463795,1064,40
-"Symbiont","winter","BP","regulation of response to wounding",0.0184822628463795,925,53
-"Symbiont","winter","BP","sterol transport",0.0188818759660748,1340,25
-"Symbiont","winter","BP","regulation of mRNA processing",0.0195894561611107,-534,159
-"Symbiont","winter","BP","regulation of telomere maintenance via telomere lengthening",0.0196950896082728,-917,53
-"Symbiont","winter","BP","organophosphate ester transport",0.0198207659648682,609,121
 "Symbiont","winter","BP","regulation of monoatomic ion transport",0.0198207659648682,442,234
 "Symbiont","winter","BP","response to lithium ion",0.0198796668955327,-1612,17
-"Symbiont","winter","BP","negative regulation of lipid metabolic process",0.0203613686063292,913,53
 "Symbiont","winter","BP","potassium ion export across plasma membrane",0.021019788506902,1706,15
-"Symbiont","winter","BP","regulation of circadian sleep/wake cycle, sleep",0.0214321586138606,1373,23
-"Symbiont","winter","BP","negative regulation of amide metabolic process",0.021944722848089,-594,124
-"Symbiont","winter","BP","obsolete activation of MAPK activity",0.0219838028873614,715,85
-"Symbiont","winter","BP","sexual sporulation",0.0221523315510278,629,110
 "Symbiont","winter","BP","anatomical structure homeostasis",0.0237896803577464,424,242
-"Symbiont","winter","BP","biological process involved in intraspecies interaction between organisms",0.0240306487748974,432,232
-"Symbiont","winter","BP","leukocyte proliferation",0.024271122989818,-1728,14
-"Symbiont","winter","BP","chemical synaptic transmission, postsynaptic",0.0242809325296642,1726,14
-"Symbiont","winter","BP","viral translation",0.0244299970100732,-1565,17
-"Symbiont","winter","BP","positive regulation of peptidase activity",0.0249287326050378,-719,81
-"Symbiont","winter","BP","regulation of chromosome organization",0.0252151064558728,-352,351
-"Symbiont","winter","BP","regulation of body fluid levels",0.0255306049588253,652,98
-"Symbiont","winter","BP","regulation of synaptic transmission, glutamatergic",0.0255306049588253,1556,17
-"Symbiont","winter","BP","cytoplasmic translational initiation",0.0257474003153614,-844,58
-"Symbiont","winter","BP","positive regulation of chromosome organization",0.0257844339438478,-463,196
+"Symbiont","winter","BP","mitochondrial protein catabolic process",0.024271122989818,1865,12
 "Symbiont","winter","BP","monoatomic ion homeostasis",0.0262819830114147,321,420
-"Symbiont","winter","BP","negative regulation of protein metabolic process",0.0262819830114147,-289,528
-"Symbiont","winter","BP","translational termination",0.0265538885140157,-1205,28
-"Symbiont","winter","BP","regulation of amine transport",0.0266682967406854,1144,31
-"Symbiont","winter","BP","obsolete negative regulation of transferase activity",0.0270264589757969,-494,169
-"Symbiont","winter","BP","cortical microtubule organization",0.0270264589757969,1760,13
-"Symbiont","winter","BP","regulation of organ growth",0.0271820330818947,1073,35
-"Symbiont","winter","BP","positive regulation of chromosome separation",0.0273040284929944,-641,99
+"Symbiont","winter","BP","mitochondrial respiratory chain complex assembly",0.0265538885140157,-1545,17
 "Symbiont","winter","BP","obsolete monovalent inorganic anion homeostasis",0.0276378144375382,1348,22
 "Symbiont","winter","BP","regulation of membrane permeability",0.0277847119288339,-1000,40
-"Symbiont","winter","BP","positive regulation of proteolysis",0.0280417652476132,-388,274
-"Symbiont","winter","BP","cholesterol transport",0.0284257757939967,1483,18
-"Symbiont","winter","BP","positive regulation of wound healing",0.0288649987821697,1405,20
-"Symbiont","winter","BP","obsolete peptidyl-asparagine modification",0.0294986926538886,-992,40
-"Symbiont","winter","BP","regulation of positive chemotaxis",0.0303927168337544,1514,17
-"Symbiont","winter","BP","peptidyl-proline modification",0.0305568425749767,-598,110
-"Symbiont","winter","BP","regulation of cell growth",0.0306744909006377,435,211
-"Symbiont","winter","BP","positive regulation of striated muscle contraction",0.0307134768832082,1392,20
-"Symbiont","winter","BP","cytoplasmic microtubule organization",0.0314801560532563,784,63
-"Symbiont","winter","BP","autophagosome maturation",0.0321252675604871,-1005,38
-"Symbiont","winter","BP","regulation of protein stability",0.0324305388377512,-506,152
-"Symbiont","winter","BP","liver regeneration",0.0326391998069922,-1315,22
-"Symbiont","winter","BP","positive regulation of RNA splicing",0.0334311782740672,-862,51
-"Symbiont","winter","BP","positive regulation of protein-containing complex assembly",0.0335030162641693,-507,149
-"Symbiont","winter","BP","obsolete regulation of cAMP-mediated signaling",0.0337376089688676,1202,26
 "Symbiont","winter","BP","negative regulation of calcium ion transmembrane transport",0.0343112854479001,-1695,13
-"Symbiont","winter","BP","maintenance of translational fidelity",0.0349008115229988,-1115,30
-"Symbiont","winter","BP","regulation of establishment or maintenance of cell polarity",0.035118740107,711,74
-"Symbiont","winter","BP","negative regulation of intracellular steroid hormone receptor signaling pathway",0.0354978051458566,-1269,23
-"Symbiont","winter","BP","regulation of lipid transport",0.0356650879340466,1129,29
-"Symbiont","winter","BP","regulation of leukocyte migration",0.036066723647159,-1026,35
 "Symbiont","winter","BP","dicarboxylic acid transport",0.0378364666131619,830,53
-"Symbiont","winter","BP","negative regulation of intracellular transport",0.0378364666131619,-1101,30
-"Symbiont","winter","BP","glutamate secretion",0.0384892310332953,1502,16
-"Symbiont","winter","BP","negative regulation of small molecule metabolic process",0.0384892310332953,878,47
 "Symbiont","winter","BP","regulation of cell-substrate adhesion",0.039299853601618,-895,45
-"Symbiont","winter","BP","DNA-templated DNA replication maintenance of fidelity",0.0398282143347443,865,48
-"Symbiont","winter","BP","positive regulation of translational initiation",0.0408707450230075,-1072,31
-"Symbiont","winter","BP","regulation of protein sumoylation",0.0419077169635065,1364,19
-"Symbiont","winter","BP","striated muscle contraction",0.0423094699315104,928,41
-"Symbiont","winter","BP","generation of catalytic spliceosome for first transesterification step",0.0429829909579092,-1708,12
-"Symbiont","winter","BP","protein localization to nucleus",0.0432459281813204,-511,136
 "Symbiont","winter","BP","multicellular organismal-level chemical homeostasis",0.0435707250503053,999,35
-"Symbiont","winter","BP","positive regulation of carbohydrate metabolic process",0.0448742730623825,942,39
 "Symbiont","winter","BP","photosynthetic electron transport chain",0.0456677018198866,-1853,10
 "Symbiont","winter","BP","organic acid transport",0.0457454857980072,478,153
 "Symbiont","winter","BP","positive regulation of monoatomic ion transport",0.0461893490655794,510,134
-"Symbiont","winter","BP","protein stabilization",0.0464150744486041,-597,97
-"Symbiont","winter","BP","fungal-type cell wall organization or biogenesis",0.0464215756263772,549,115
-"Symbiont","winter","BP","negative regulation of cell cycle phase transition",0.0478855216466172,-388,232
-"Symbiont","winter","BP","regulation of digestive system process",0.0479219282454584,1333,19
-"Symbiont","winter","BP","regulation of alternative mRNA splicing, via spliceosome",0.0486073556222873,-700,69
-"Symbiont","winter","BP","obsolete positive regulation of cysteine-type endopeptidase activity involved in apoptotic process",0.0489753062665171,-737,62
-"Symbiont","winter","BP","positive regulation of lipid storage",0.0489753062665171,1232,22
-"Symbiont","winter","BP","regulation of chromosome separation",0.0489753062665171,-467,157
 "Symbiont","winter","BP","non-proteinogenic amino acid biosynthetic process",0.0489753062665171,-1493,15
-"Symbiont","winter","BP","regulation of photoperiodism, flowering",0.0489753062665171,-1543,14
 "Symbiont","winter","BP","regulation of organic acid transport",0.0490196776623215,1092,28
 "Symbiont","winter","CC","obsolete intrinsic component of plasma membrane",3.40953630766447e-17,813,332
 "Symbiont","winter","CC","rough endoplasmic reticulum membrane",0.000155460173888133,-957,60
 "Symbiont","winter","CC","neuron projection membrane",0.000253721667457742,1517,22
+"Symbiont","winter","CC","mitochondrial protein-containing complex",0.000253721667457742,-641,126
 "Symbiont","winter","CC","plasma membrane region",0.000292708375368426,392,341
 "Symbiont","winter","CC","rough endoplasmic reticulum",0.000563466493421048,-733,86
-"Symbiont","winter","CC","voltage-gated potassium channel complex",0.00063497613783111,1132,35
 "Symbiont","winter","CC","plasma membrane protein complex",0.000699347944500649,515,171
 "Symbiont","winter","CC","cell projection membrane",0.00103466301611289,641,103
 "Symbiont","winter","CC","calcium channel complex",0.00201088168608599,1116,30
+"Symbiont","winter","CC","respiratory chain complex",0.00318259042055048,-944,39
 "Symbiont","winter","CC","endoplasmic reticulum lumen",0.00406911909892821,-591,96
 "Symbiont","winter","CC","dendrite membrane",0.00589300781508929,1391,16
 "Symbiont","winter","CC","leading edge membrane",0.00596673049420289,788,50
@@ -392,19 +177,14 @@
 "Symbiont","winter","CC","brush border membrane",0.00685658875625371,1217,20
 "Symbiont","winter","CC","inner mitochondrial membrane protein complex",0.00753845630903075,-748,52
 "Symbiont","winter","CC","endoplasmic reticulum-Golgi intermediate compartment membrane",0.00909065893921184,-1050,25
-"Symbiont","winter","CC","cell-cell junction",0.00975866125625365,-253,459
 "Symbiont","winter","CC","monoatomic ion channel complex",0.00991300736141196,510,105
-"Symbiont","winter","CC","cell cortex region",0.00991300736141196,525,99
 "Symbiont","winter","CC","endoplasmic reticulum protein-containing complex",0.0101332955401771,-467,125
 "Symbiont","winter","CC","VCP-NPL4-UFD1 AAA ATPase complex",0.0131187952258381,-1001,25
 "Symbiont","winter","CC","neuronal cell body membrane",0.0145544518479979,1133,19
-"Symbiont","winter","CC","cell division site",0.018435090280604,405,142
-"Symbiont","winter","CC","neuromuscular junction",0.0186954340506265,616,60
 "Symbiont","winter","CC","membrane raft",0.0200521052079878,419,129
+"Symbiont","winter","CC","obsolete mitochondrial part",0.0235254000198139,-196,620
 "Symbiont","winter","CC","ATPase complex",0.0291126096750464,-532,72
-"Symbiont","winter","CC","cytosolic translation preinitiation complex",0.0339440495959376,-805,30
 "Symbiont","winter","CC","postsynaptic membrane",0.0339440495959376,596,55
-"Symbiont","winter","CC","cytoplasmic region",0.0344371281313006,207,491
 "Symbiont","winter","CC","proton-transporting two-sector ATPase complex",0.0394000045316952,-758,32
 "Symbiont","winter","CC","obsolete mitochondrial membrane part",0.0394000045316952,-370,137
 "Symbiont","winter","CC","lumenal side of endoplasmic reticulum membrane",0.0394000045316952,-1072,16
@@ -416,47 +196,30 @@
 "Symbiont","winter","MF","monoatomic cation transmembrane transporter activity",3.2077553569118e-09,624,392
 "Symbiont","winter","MF","voltage-gated channel activity",3.70188143942702e-08,1083,110
 "Symbiont","winter","MF","monoatomic ion channel activity",7.33175978449126e-07,770,184
-"Symbiont","winter","MF","macromolecular conformation isomerase activity",4.20762105441977e-06,523,366
 "Symbiont","winter","MF","active transmembrane transporter activity",1.48801577214436e-05,517,337
-"Symbiont","winter","MF","ABC-type transporter activity",1.48801577214436e-05,1467,40
 "Symbiont","winter","MF","potassium ion transmembrane transporter activity",2.07882441700821e-05,892,106
 "Symbiont","winter","MF","primary active transmembrane transporter activity",3.56235259797456e-05,638,201
 "Symbiont","winter","MF","transmembrane signaling receptor activity",4.37114991592262e-05,1106,64
 "Symbiont","winter","MF","calcium ion transmembrane transporter activity",9.01646208170219e-05,827,108
 "Symbiont","winter","MF","calcium ion binding",0.000103091231056308,546,248
-"Symbiont","winter","MF","phospholipid transporter activity",0.000103091231056308,1355,39
 "Symbiont","winter","MF","sodium ion transmembrane transporter activity",0.000170912797134625,878,89
-"Symbiont","winter","MF","lipid transporter activity",0.000184381852197428,1005,67
 "Symbiont","winter","MF","potassium channel activity",0.000285848680963393,1054,58
 "Symbiont","winter","MF","xenobiotic transmembrane transporter activity",0.000299955621229311,2125,14
 "Symbiont","winter","MF","monoatomic anion transmembrane transporter activity",0.000442083643415103,537,216
 "Symbiont","winter","MF","nucleic acid conformation isomerase activity",0.00115844137899076,493,230
 "Symbiont","winter","MF","obsolete inorganic anion transmembrane transporter activity",0.00189449235578934,847,71
-"Symbiont","winter","MF","P-type sodium transporter activity",0.00224205521013347,1742,16
 "Symbiont","winter","MF","calcium channel activity",0.00387998327497806,957,49
 "Symbiont","winter","MF","ligand-gated monoatomic ion channel activity",0.00451908924110734,925,51
-"Symbiont","winter","MF","translation initiation factor activity",0.00531166742525922,-863,57
 "Symbiont","winter","MF","ammonium channel activity",0.00547106392481402,1223,28
-"Symbiont","winter","MF","phosphatidylcholine transporter activity",0.00548188296627977,1662,15
-"Symbiont","winter","MF","polypeptide conformation or assembly isomerase activity",0.00722082992807594,531,142
-"Symbiont","winter","MF","intramembrane lipid transporter activity",0.010056391777166,1473,17
 "Symbiont","winter","MF","voltage-gated calcium channel activity",0.0119429462962718,1071,31
 "Symbiont","winter","MF","delayed rectifier potassium channel activity",0.0119429462962718,1331,20
-"Symbiont","winter","MF","transcription factor binding",0.0134187904402939,-390,236
 "Symbiont","winter","MF","P-type calcium transporter activity",0.0142636038329728,1191,24
 "Symbiont","winter","MF","alkali metal ion binding",0.0146995798457901,1043,31
-"Symbiont","winter","MF","translation factor activity, RNA binding",0.0189228853205068,-513,123
-"Symbiont","winter","MF","sphingolipid transporter activity",0.0194747124565586,1619,12
 "Symbiont","winter","MF","transmembrane receptor protein serine/threonine kinase activity",0.020256081465455,1316,18
 "Symbiont","winter","MF","obsolete ATPase-coupled inorganic anion transmembrane transporter activity",0.0221501515789255,1340,17
-"Symbiont","winter","MF","translation initiation factor binding",0.0243425747707681,-887,38
-"Symbiont","winter","MF","K48-linked polyubiquitin modification-dependent protein binding",0.0246483495394222,-1088,25
 "Symbiont","winter","MF","P-type transmembrane transporter activity",0.025294803160127,753,52
 "Symbiont","winter","MF","iron ion binding",0.0258718905265196,-607,79
 "Symbiont","winter","MF","calcium-dependent cysteine-type endopeptidase activity",0.0309086758811097,784,44
 "Symbiont","winter","MF","calcium-dependent phospholipid binding",0.0327559226143422,1121,21
-"Symbiont","winter","MF","translation regulator activity",0.0327559226143422,-616,70
-"Symbiont","winter","MF","ligase activity, forming carbon-oxygen bonds",0.0363304724556392,-666,58
 "Symbiont","winter","MF","ATPase activity, coupled to transmembrane movement of ions, rotational mechanism",0.0371288793586239,-878,33
 "Symbiont","winter","MF","dicarboxylic acid transmembrane transporter activity",0.0457031536187609,838,34
-"Symbiont","winter","MF","oxidoreductase activity, acting on single donors with incorporation of molecular oxygen",0.0485930983482594,1026,22

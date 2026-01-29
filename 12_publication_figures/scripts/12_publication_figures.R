@@ -728,10 +728,40 @@ cat("===========================================================================
 # -----------------------------------------------------------------------------
 
 # Keywords for annotation (case-insensitive)
+# Using word boundaries (\b) for short words that could match inside other words
+# e.g., "ion" should not match "translation", "region", "junction"
 ANNOTATION_KEYWORDS <- c(
-    "ion", "transport", "atpase", "proton", "calcium", "carbon", 
-    "channel", "acid", "chemosensory", "respiration", "membrane", 
-    "potential", "ossification", "adhesion", "homeostasis", "reticulum"
+    "\\bion\\b",           # ion as standalone word only
+    "\\bions\\b",          # ions as standalone
+    "ion transport",       # compound terms are safe
+    "ion channel",
+    "ion homeostasis",
+    "atpase",
+    "anion",
+    "solute", 
+    "proton", 
+    "calcium", 
+    "carbonate",           # more specific than "carbon"
+    "carbonic",
+    "bicarbonate",
+    "channel activity",    # more specific
+    "\\bacid\\b",          # acid as word, not "acidic" substring issues
+    "acidification",
+    "chemosensory", 
+    "respiration",
+    "respiratory",
+    "oxidative phosphorylation",
+    "electron transport",
+    "\\bmembrane\\b",      # membrane as word boundary to reduce noise
+    "transmembrane",
+    "potential",
+    "ossification", 
+    "biomineralization",
+    "calcification",
+    "adhesion", 
+    "homeostasis", 
+    "reticulum",
+    "mitochondri"          # catches mitochondria, mitochondrial, mitochondrion
 )
 
 # Significance cutoff for plotting (orange line)
