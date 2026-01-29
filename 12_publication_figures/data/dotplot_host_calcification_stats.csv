@@ -1,0 +1,12 @@
+"season","division","parent_category","go_term","go_term_display","go_id","go_padj","n_genes","mean_log2fc"
+"summer","MF","Ion Transport","monoatomic cation channel activity","monoatomic cation channel activity","GO:0005261",0.0133510650404387,0,0.0860388938199943
+"summer","MF","Proton Transport","proton transmembrane transporter activity","proton transmembrane transporter acti...","GO:0015078",7.00119531847492e-05,1,-0.0633345350940851
+"summer","MF","Ion Transport","ligand-gated monoatomic cation channel activity","ligand-gated monoatomic cation channe...","GO:0099094",0.0237512633791609,0,0.0982650020077742
+"winter","MF","ATPase Activity","ATPase activator activity","ATPase activator activity","GO:0001671",0.00381707163810742,1,0.33177611690256
+"winter","MF","Ion Transport","monoatomic cation channel activity","monoatomic cation channel activity","GO:0005261",0.00507600226573861,1,-0.114190535158709
+"winter","MF","Proton Transport","proton transmembrane transporter activity","proton transmembrane transporter acti...","GO:0015078",1.12025430865353e-05,0,0.109473863652822
+"winter","MF","Ion Transport","obsolete inorganic anion transmembrane transporter activity","obsolete inorganic anion transmembran...","GO:0015103",0.0468562043184909,1,-0.150495620299365
+"winter","MF","Metal Ion Homeostasis","metal ion transmembrane transporter activity","metal ion transmembrane transporter a...","GO:0046873",0.0187864327104469,2,-0.0843137101808925
+"winter","MF","ATPase Activity","ATPase regulator activity","ATPase regulator activity","GO:0060590",0.000148096737235434,1,0.415139517235845
+"winter","MF","Ion Transport","ligand-gated monoatomic cation channel activity","ligand-gated monoatomic cation channe...","GO:0099094",0.0130243995454279,1,-0.216475619918106
+"winter","MF","Ion Transport","ligand-gated monoatomic anion channel activity","ligand-gated monoatomic anion channel...","GO:0099095",0.00790408216878428,0,-0.339266258476914

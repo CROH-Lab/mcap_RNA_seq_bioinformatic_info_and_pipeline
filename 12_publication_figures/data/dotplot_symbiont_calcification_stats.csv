@@ -1,0 +1,34 @@
+"season","division","parent_category","go_term","go_term_display","go_id","go_padj","n_genes","mean_log2fc"
+"summer","BP","Metal Ion Homeostasis","metal ion transport","metal ion transport","GO:0030001",0.0489153352315799,0,0.0394625060759671
+"summer","MF","Calcium Homeostasis","calcium ion transmembrane transporter activity","calcium ion transmembrane transporter...","GO:0015085",0.0324354907951206,0,0.0550027840199259
+"winter","BP","Ion Transport","generation of catalytic spliceosome for first transesterification step","generation of catalytic spliceosome f...","GO:0000349",0.0429829909579092,0,-0.135652440140464
+"winter","BP","Ion Transport","obsolete regulation of anion channel activity","obsolete regulation of anion channel ...","GO:0010359",0.00582339288288656,0,0.158887747834414
+"winter","BP","Ion Transport","organic cation transport","organic cation transport","GO:0015695",0.00321284766928087,0,0.0862957395660353
+"winter","BP","Ion Transport","obsolete peptidyl-asparagine modification","obsolete peptidyl-asparagine modifica...","GO:0018196;GO:0018279",0.0294986926538886,0,-0.0697857988925608
+"winter","BP","Calcium Homeostasis","calcium-mediated signaling","calcium-mediated signaling","GO:0019722",0.00786727495773379,1,0.119014353031351
+"winter","BP","Metal Ion Homeostasis","metal ion transport","metal ion transport","GO:0030001",5.19742674189159e-07,2,0.0595505812113111
+"winter","BP","Ion Homeostasis/Regulation","intracellular monoatomic anion homeostasis","intracellular monoatomic anion homeos...","GO:0030002;GO:0030320",0.00142133088770419,0,0.142125860385428
+"winter","BP","Ion Transport","regulation of DNA endoreduplication","regulation of DNA endoreduplication","GO:0032875",0.000343616473333643,1,0.185473200438694
+"winter","BP","Ion Transport","positive regulation of DNA endoreduplication","positive regulation of DNA endoredupl...","GO:0032877",0.00154706870080134,0,0.215785085089361
+"winter","BP","Ion Homeostasis/Regulation","regulation of monoatomic ion transport","regulation of monoatomic ion transport","GO:0043269",0.0198207659648682,2,0.0626007782025005
+"winter","BP","Ion Homeostasis/Regulation","positive regulation of monoatomic ion transport","positive regulation of monoatomic ion...","GO:0043270",0.0461893490655794,1,0.0665739488524125
+"winter","BP","Ion Transport","DNA-templated DNA replication maintenance of fidelity","DNA-templated DNA replication mainten...","GO:0045005",0.0398282143347443,0,0.0873361944992338
+"winter","BP","Ion Homeostasis/Regulation","monoatomic anion homeostasis","monoatomic anion homeostasis","GO:0055081",0.00250883828225496,0,0.127352939627148
+"winter","BP","Ion Homeostasis/Regulation","obsolete monovalent inorganic anion homeostasis","obsolete monovalent inorganic anion h...","GO:0055083",0.0276378144375382,0,0.132795543419433
+"winter","BP","Ion Transport","monoatomic anion transmembrane transport","monoatomic anion transmembrane transport","GO:0098656",0.005383071855749,2,0.0610113439865846
+"winter","BP","Ion Transport","regulation of monoatomic anion transmembrane transport","regulation of monoatomic anion transm...","GO:1903959",0.0141669568943741,0,0.155046526934669
+"winter","MF","Calcium Homeostasis","calcium-dependent cysteine-type endopeptidase activity","calcium-dependent cysteine-type endop...","GO:0004198",0.0309086758811097,0,0.0920804068660144
+"winter","MF","Calcium Homeostasis","voltage-gated calcium channel activity","voltage-gated calcium channel activity","GO:0005245",0.0119429462962718,1,0.160819770287945
+"winter","MF","Calcium Homeostasis","calcium channel activity","calcium channel activity","GO:0005262",0.00387998327497806,1,0.126062485635912
+"winter","MF","Calcium Homeostasis","P-type calcium transporter activity","P-type calcium transporter activity","GO:0005388",0.0142636038329728,0,0.102374779396077
+"winter","MF","Calcium Homeostasis","calcium ion binding","calcium ion binding","GO:0005509",0.000103091231056308,2,0.0745801514947142
+"winter","MF","Calcium Homeostasis","calcium-dependent phospholipid binding","calcium-dependent phospholipid binding","GO:0005544",0.0327559226143422,0,0.109893982167633
+"winter","MF","Ion Transport","monoatomic anion transmembrane transporter activity","monoatomic anion transmembrane transp...","GO:0008509;GO:0008514",0.000442083643415103,1,0.0526805847381169
+"winter","MF","Calcium Homeostasis","calcium ion transmembrane transporter activity","calcium ion transmembrane transporter...","GO:0015085",9.01646208170219e-05,1,0.101100388594575
+"winter","MF","Ion Transport","obsolete inorganic anion transmembrane transporter activity","obsolete inorganic anion transmembran...","GO:0015103",0.00189449235578934,1,0.0993003397794233
+"winter","MF","ATPase Activity","obsolete ATPase-coupled inorganic anion transmembrane transporter activity","obsolete ATPase-coupled inorganic ani...","GO:0043225",0.0221501515789255,0,0.197458376554344
+"winter","MF","ATPase Activity","ATPase activity, coupled to transmembrane movement of ions, rotational mechanism","ATPase activity, coupled to transmemb...","GO:0044769",0.0371288793586239,0,-0.0758935015042202
+"winter","MF","Metal Ion Homeostasis","metal ion transmembrane transporter activity","metal ion transmembrane transporter a...","GO:0046873",6.77384521199822e-10,2,0.0931850031992131
+"winter","CC","Proton Transport","proton-transporting two-sector ATPase complex","proton-transporting two-sector ATPase...","GO:0016469",0.0394000045316952,0,-0.0758490364687655
+"winter","CC","ATPase Activity","VCP-NPL4-UFD1 AAA ATPase complex","VCP-NPL4-UFD1 AAA ATPase complex","GO:0034098",0.0131187952258381,0,-0.0893968804809224
+"winter","CC","ATPase Activity","ATPase complex","ATPase complex","GO:1904949",0.0291126096750464,0,-0.0171846692835089
