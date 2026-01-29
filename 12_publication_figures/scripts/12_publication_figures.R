@@ -713,329 +713,289 @@ cat("      Symbiont Summer=#006341, Symbiont Winter=#8fe2b0\n")
 cat("      Excludes: Protein Phosphorylation, Na/K Transport, Phospholipid Transport\n")
 
 # ==============================================================================
-# FIGURE 4D-E: Dot Plots - Host and Symbiont Calcification GO Terms (FIXED)
-# Structure: Faceted by parent category, Summer/Winter separated by dashed line
-# X-axis: Mean log2FC, Size: # genes, Color: p.adj
+# FIGURE 4D-E: GO_MWU Bubble Plots - Host and Symbiont
+# Y-axis: -log10(p.adj), X-axis: delta.rank (direction), Size: nseqs
+# Faceted by Division (BP/MF/CC) × Season (Summer/Winter)
+# Only annotate terms matching calcification/transport keywords
 # ==============================================================================
 
 cat("\n==============================================================================\n")
-cat("Figure 4D-E: Dot Plots - Calcification GO Terms (Host & Symbiont)\n")
+cat("Figure 4D-E: GO_MWU Bubble Plots\n")
 cat("==============================================================================\n\n")
 
-# Load DESeq2 results for gene-level statistics
-deseq_host_summer <- read.csv("../07_deseq2/results/Mcap_Summer_BvsD.csv", row.names = 1)
-deseq_host_winter <- read.csv("../07_deseq2/results/Mcap_Winter_BvsD.csv", row.names = 1)
-deseq_sym_summer <- read.csv("../07_deseq2/results/Dtre_Summer_BvsD.csv", row.names = 1)
-deseq_sym_winter <- read.csv("../07_deseq2/results/Dtre_Winter_BvsD.csv", row.names = 1)
-
-# Load GO annotations
-host_go_annot <- read.delim("../10_GO_MWU/input/go_annotations.tab",
-                             header = FALSE, stringsAsFactors = FALSE)
-colnames(host_go_annot) <- c("gene_id", "GO_term")
-
-symbiont_go_annot <- read.delim("../11_symbiont_GO_MWU/input/symbiont_go_annotations.tab",
-                                 header = FALSE, stringsAsFactors = FALSE)
-colnames(symbiont_go_annot) <- c("gene_id", "GO_term")
-
-cat("Loaded GO annotations - Host:", nrow(host_go_annot), "| Symbiont:", nrow(symbiont_go_annot), "\n")
-
 # -----------------------------------------------------------------------------
-# Function to calculate GO term statistics (mean log2FC, gene count)
+# Configuration
 # -----------------------------------------------------------------------------
 
-calculate_go_term_stats <- function(go_terms_df, deseq_results, go_annotations) {
+# Keywords for annotation (case-insensitive)
+ANNOTATION_KEYWORDS <- c(
+    "ion", "transport", "atpase", "proton", "calcium", "carbon", 
+    "channel", "acid", "chemosensory", "respiration", "membrane", 
+    "potential", "ossification", "adhesion", "homeostasis", "reticulum"
+)
+
+# Significance cutoff for plotting (orange line)
+BUBBLE_P_ADJ_CUTOFF <- 0.05
+
+# Colors matching reference image (BP=green, CC=red, MF=blue)
+division_colors <- c(
+    "BP" = "#4DAF4A",  # Green
+    "CC" = "#E41A1C",  # Red  
+    "MF" = "#377EB8"   # Blue
+)
+
+# -----------------------------------------------------------------------------
+# Load GO_MWU Results
+# -----------------------------------------------------------------------------
+
+load_gomwu_bubble_results <- function(base_dir, prefix = "", organism_label) {
     
-    results_list <- list()
+    seasons <- c("summer", "winter")
+    divisions <- c("BP", "MF", "CC")
     
-    for (i in 1:nrow(go_terms_df)) {
-        go_id <- go_terms_df$term[i]
-        go_name <- go_terms_df$name[i]
-        go_padj <- go_terms_df$p.adj[i]
-        parent_cat <- go_terms_df$parent_category[i]
-        division <- go_terms_df$division[i]
-        season <- go_terms_df$season[i]
-        
-        # Get genes with this GO term
-        genes_in_term <- go_annotations %>%
-            filter(grepl(go_id, GO_term, fixed = TRUE)) %>%
-            pull(gene_id) %>%
-            unique()
-        
-        if (length(genes_in_term) == 0) next
-        
-        # Match with DESeq2 results (all genes for mean LFC calculation)
-        matched_genes <- deseq_results %>%
-            filter(rownames(deseq_results) %in% genes_in_term) %>%
-            filter(!is.na(log2FoldChange))
-        
-        if (nrow(matched_genes) == 0) next
-        
-        # Count significant DEGs for dot size
-        sig_genes <- matched_genes %>% filter(!is.na(padj) & padj < 0.05)
-        
-        results_list[[length(results_list) + 1]] <- data.frame(
-            season = season,
-            division = division,
-            parent_category = parent_cat,
-            go_term = go_name,
-            go_id = go_id,
-            go_padj = go_padj,
-            n_genes = nrow(sig_genes),
-            mean_log2fc = mean(matched_genes$log2FoldChange, na.rm = TRUE),
-            stringsAsFactors = FALSE
-        )
+    all_results <- list()
+    
+    for (season in seasons) {
+        for (div in divisions) {
+            
+            # Construct filename
+            if (prefix == "") {
+                filename <- file.path(base_dir, "output", 
+                                     paste0(season, "_", div, "_MWU_results.csv"))
+            } else {
+                filename <- file.path(base_dir, "output",
+                                     paste0(prefix, "_", season, "_", div, "_MWU_results.csv"))
+            }
+            
+            if (file.exists(filename)) {
+                df <- read.table(filename, header = TRUE, stringsAsFactors = FALSE,
+                                sep = "", quote = "\"", comment.char = "")
+                
+                # Clean column names
+                names(df) <- gsub('^"', '', names(df))
+                names(df) <- gsub('"$', '', names(df))
+                names(df) <- trimws(names(df))
+                
+                df$season <- season
+                df$division <- div
+                df$organism <- organism_label
+                
+                all_results[[paste(organism_label, season, div, sep = "_")]] <- df
+            } else {
+                cat("  Warning: File not found -", filename, "\n")
+            }
+        }
     }
     
-    return(bind_rows(results_list))
+    return(bind_rows(all_results))
 }
 
-# -----------------------------------------------------------------------------
-# Get filtered GO terms from combined Sankey analysis
-# -----------------------------------------------------------------------------
+cat("Loading Host GO_MWU results...\n")
+host_gomwu <- load_gomwu_bubble_results("../10_GO_MWU", prefix = "", "Host")
+cat("  Loaded", nrow(host_gomwu), "GO terms\n")
 
-host_go_terms <- calc_combined %>%
-    filter(organism == "host") %>%
-    select(term, name, p.adj, parent_category, division, season) %>%
-    distinct()
-
-symbiont_go_terms <- calc_combined %>%
-    filter(organism == "symbiont") %>%
-    select(term, name, p.adj, parent_category, division, season) %>%
-    distinct()
-
-cat("Filtered GO terms - Host:", nrow(host_go_terms), "| Symbiont:", nrow(symbiont_go_terms), "\n")
+cat("Loading Symbiont GO_MWU results...\n")
+symbiont_gomwu <- load_gomwu_bubble_results("../11_symbiont_GO_MWU", prefix = "symbiont", "Symbiont")
+cat("  Loaded", nrow(symbiont_gomwu), "GO terms\n")
 
 # -----------------------------------------------------------------------------
-# Calculate statistics for each organism
+# Process Data for Plotting
 # -----------------------------------------------------------------------------
 
-cat("\nCalculating Host GO term statistics...\n")
-host_summer_stats <- calculate_go_term_stats(
-    host_go_terms %>% filter(season == "summer"),
-    deseq_host_summer, host_go_annot
-)
-host_winter_stats <- calculate_go_term_stats(
-    host_go_terms %>% filter(season == "winter"),
-    deseq_host_winter, host_go_annot
-)
-host_stats <- bind_rows(host_summer_stats, host_winter_stats)
-cat("  Host stats rows:", nrow(host_stats), "\n")
-
-cat("Calculating Symbiont GO term statistics...\n")
-sym_summer_stats <- calculate_go_term_stats(
-    symbiont_go_terms %>% filter(season == "summer"),
-    deseq_sym_summer, symbiont_go_annot
-)
-sym_winter_stats <- calculate_go_term_stats(
-    symbiont_go_terms %>% filter(season == "winter"),
-    deseq_sym_winter, symbiont_go_annot
-)
-symbiont_stats <- bind_rows(sym_summer_stats, sym_winter_stats)
-cat("  Symbiont stats rows:", nrow(symbiont_stats), "\n")
-
-# -----------------------------------------------------------------------------
-# FIXED Dot plot function with proper discrete y-axis handling
-# -----------------------------------------------------------------------------
-
-create_calcification_dotplot <- function(stats_df, organism_name, org_color) {
+process_for_bubble <- function(gomwu_data, p_cutoff = 0.05) {
     
-    if (nrow(stats_df) == 0 || all(stats_df$n_genes == 0)) {
-        cat("  Warning: No valid data for", organism_name, "\n")
-        return(NULL)
-    }
-    
-    # Filter out terms with 0 genes
-    stats_df <- stats_df %>% filter(n_genes > 0)
-    
-    if (nrow(stats_df) == 0) {
-        cat("  Warning: No terms with genes for", organism_name, "\n")
-        return(NULL)
-    }
-    
-    # Create factors for proper ordering
-    stats_df <- stats_df %>%
+    df <- gomwu_data %>%
+        filter(!is.na(p.adj)) %>%
         mutate(
-            division = factor(division, levels = c("BP", "MF", "CC")),
-            season_factor = factor(season, levels = c("summer", "winter"))
+            # Y-axis: -log10(p.adj), cap at reasonable value
+            neg_log10_padj = pmin(-log10(p.adj), 30),
+            
+            # X-axis: delta.rank (already signed for direction)
+            # Normalize to z-score-like scale for better visualization
+            x_value = delta.rank / 100,  # Scale down for readability
+            
+            # Clean up GO term name
+            go_name = name,
+            
+            # Season labels
+            season_label = factor(
+                ifelse(season == "summer", "Summer", "Winter"),
+                levels = c("Summer", "Winter")
+            ),
+            
+            # Division factor
+            division = factor(division, levels = c("BP", "CC", "MF"))
         )
     
-    # Create UNIQUE label for each term-season combination
-    # This prevents the same GO term appearing twice from overlapping
-    stats_df <- stats_df %>%
+    # Check if term matches any annotation keyword
+    keyword_pattern <- paste(ANNOTATION_KEYWORDS, collapse = "|")
+    df <- df %>%
         mutate(
-            season_tag = ifelse(season == "summer", "[S]", "[W]"),
-            go_label = paste0(division, "[ ", str_trunc(go_term, 38), " ", season_tag)
+            matches_keyword = str_detect(tolower(go_name), regex(keyword_pattern, ignore_case = TRUE)),
+            # Only annotate if significant AND matches keyword
+            annotate_label = ifelse(p.adj < p_cutoff & matches_keyword, 
+                                    str_trunc(go_name, 35), NA)
         )
     
-    # Order within each parent category: Summer first, then Winter
-    # Within each season: BP > MF > CC, then by significance
-    stats_df <- stats_df %>%
-        arrange(parent_category, season_factor, division, go_padj)
+    return(df)
+}
+
+host_bubble_data <- process_for_bubble(host_gomwu, BUBBLE_P_ADJ_CUTOFF)
+symbiont_bubble_data <- process_for_bubble(symbiont_gomwu, BUBBLE_P_ADJ_CUTOFF)
+
+cat("\nHost data for plotting:", nrow(host_bubble_data), "terms\n")
+cat("  Significant (p.adj <", BUBBLE_P_ADJ_CUTOFF, "):", 
+    sum(host_bubble_data$p.adj < BUBBLE_P_ADJ_CUTOFF, na.rm = TRUE), "\n")
+cat("  To be annotated:", sum(!is.na(host_bubble_data$annotate_label)), "\n")
+
+cat("\nSymbiont data for plotting:", nrow(symbiont_bubble_data), "terms\n")
+cat("  Significant (p.adj <", BUBBLE_P_ADJ_CUTOFF, "):", 
+    sum(symbiont_bubble_data$p.adj < BUBBLE_P_ADJ_CUTOFF, na.rm = TRUE), "\n")
+cat("  To be annotated:", sum(!is.na(symbiont_bubble_data$annotate_label)), "\n")
+
+# -----------------------------------------------------------------------------
+# Create Bubble Plot Function
+# -----------------------------------------------------------------------------
+
+create_gomwu_bubble <- function(bubble_data, organism_name, org_color) {
     
-    # Create ordered factor for y-axis - this is the KEY fix
-    # We need to create the factor levels in REVERSE order because ggplot 
-    # plots factors from bottom to top
-    ordered_labels <- stats_df %>%
-        group_by(parent_category) %>%
-        mutate(row_num = row_number()) %>%
-        ungroup() %>%
-        arrange(parent_category, desc(row_num)) %>%
-        pull(go_label)
+    # Significance threshold line
+    sig_line <- -log10(BUBBLE_P_ADJ_CUTOFF)
     
-    stats_df$go_label <- factor(stats_df$go_label, levels = unique(ordered_labels))
-    
-    # Calculate boundary positions for dashed lines (between summer and winter)
-    # We need numeric positions for geom_hline
-    boundary_data <- stats_df %>%
-        group_by(parent_category) %>%
-        mutate(y_numeric = as.numeric(go_label)) %>%
-        summarise(
-            has_summer = any(season == "summer"),
-            has_winter = any(season == "winter"),
-            summer_min_y = ifelse(has_summer, min(y_numeric[season == "summer"]), NA),
-            winter_max_y = ifelse(has_winter, max(y_numeric[season == "winter"]), NA),
-            # Boundary is between highest winter term and lowest summer term
-            boundary_y = (summer_min_y + winter_max_y) / 2,
-            # Midpoints for season labels
-            summer_mid_y = ifelse(has_summer, mean(y_numeric[season == "summer"]), NA),
-            winter_mid_y = ifelse(has_winter, mean(y_numeric[season == "winter"]), NA),
-            .groups = "drop"
-        ) %>%
-        filter(has_summer & has_winter)  # Only add lines where both seasons exist
-    
-    # X-axis range for positioning season annotations
-    x_max <- max(stats_df$mean_log2fc, na.rm = TRUE)
-    x_min <- min(stats_df$mean_log2fc, na.rm = TRUE)
-    x_range <- x_max - x_min
-    x_annot <- x_max + 0.15 * x_range
-    
-    # Base plot using discrete y-axis (factor)
-    p <- ggplot(stats_df, aes(x = mean_log2fc, y = go_label)) +
+    p <- ggplot(bubble_data, aes(x = x_value, y = neg_log10_padj)) +
         
-        # Points
-        geom_point(aes(size = n_genes, fill = -log10(go_padj + 1e-10)), 
-                   shape = 21, color = "gray30", alpha = 0.85, stroke = 0.5) +
+        # Points - all terms
+        geom_point(aes(size = nseqs, fill = division), 
+                   shape = 21, alpha = 0.6, color = "gray30", stroke = 0.3) +
         
-        # Vertical reference line at 0
-        geom_vline(xintercept = 0, linetype = "solid", color = "gray50", linewidth = 0.5) +
+        # Significance threshold line
+        geom_hline(yintercept = sig_line, color = "darkorange", 
+                   linetype = "solid", linewidth = 0.8) +
         
-        # Fill scale for GO term significance
-        scale_fill_viridis_c(
-            name = expression(-log[10]~italic(p)[adj]),
-            option = "plasma",
-            direction = -1
+        # Vertical line at 0 (no change)
+        geom_vline(xintercept = 0, color = "gray50", 
+                   linetype = "dashed", linewidth = 0.5) +
+        
+        # Labels for keyword-matching significant terms
+        geom_text_repel(
+            aes(label = annotate_label),
+            size = 2.5,
+            max.overlaps = 20,
+            box.padding = 0.3,
+            point.padding = 0.2,
+            segment.color = "gray50",
+            segment.size = 0.3,
+            min.segment.length = 0.2,
+            na.rm = TRUE
         ) +
         
-        # Size scale for gene count
+        # Color scale
+        scale_fill_manual(
+            values = division_colors,
+            name = "GO Division",
+            labels = c("BP" = "Biological Process", 
+                      "CC" = "Cellular Component", 
+                      "MF" = "Molecular Function")
+        ) +
+        
+        # Size scale
         scale_size_continuous(
-            name = "# DEGs",
-            range = c(2, 8),
-            breaks = function(x) unique(round(pretty(x, n = 4)))
+            name = "# Genes",
+            range = c(1, 12),
+            breaks = c(10, 50, 100, 200, 500)
         ) +
         
-        # X-axis expansion for annotations
-        scale_x_continuous(expand = expansion(mult = c(0.08, 0.25))) +
-        
-        # Facet by parent category
-        facet_grid(parent_category ~ ., scales = "free_y", space = "free_y") +
+        # Facet: columns = division, rows = season
+        facet_grid(season_label ~ division, scales = "free_x") +
         
         # Labels
         labs(
-            x = expression(Mean~Log[2]~Fold~Change~(OA~vs~Ambient)),
-            y = "",
-            title = organism_name
+            x = "Delta Rank (Direction Score)",
+            y = expression(-log[10]~italic(p)[adj]),
+            title = paste0("GO Enrichment: ", organism_name)
         ) +
         
         # Theme
         theme_bw(base_size = 11) +
         theme(
-            axis.text.y = element_text(size = 7, hjust = 1, family = "mono"),
-            axis.text.x = element_text(size = 10),
-            axis.title.x = element_text(size = 11, face = "bold"),
-            strip.text.y = element_text(size = 9, face = "bold", angle = 0, hjust = 0),
-            strip.background = element_rect(fill = "gray95", color = "gray70"),
-            panel.grid.major.y = element_blank(),
-            panel.grid.major.x = element_line(color = "gray90", linewidth = 0.3),
-            panel.grid.minor = element_blank(),
+            plot.title = element_text(size = 14, face = "bold.italic", 
+                                      hjust = 0.5, color = org_color),
+            axis.title = element_text(size = 11, face = "bold"),
+            axis.text = element_text(size = 9),
+            strip.text = element_text(size = 10, face = "bold"),
+            strip.background = element_rect(fill = "gray95"),
             legend.position = "right",
             legend.box = "vertical",
-            plot.title = element_text(size = 14, face = "bold.italic", hjust = 0.5,
-                                      color = org_color),
-            panel.spacing = unit(0.5, "lines")
+            panel.grid.minor = element_blank(),
+            panel.spacing = unit(0.8, "lines")
+        ) +
+        
+        # Guides
+        guides(
+            fill = guide_legend(override.aes = list(size = 5), order = 1),
+            size = guide_legend(order = 2)
         )
-    
-    # Add horizontal dashed lines at season boundaries
-    if (nrow(boundary_data) > 0) {
-        p <- p + geom_hline(data = boundary_data, aes(yintercept = boundary_y),
-                           linetype = "dashed", color = "gray30", linewidth = 0.6)
-    }
-    
-    # Add season annotations
-    summer_annot <- boundary_data %>%
-        filter(!is.na(summer_mid_y)) %>%
-        mutate(x = x_annot, y = summer_mid_y, label = "Summer")
-    
-    winter_annot <- boundary_data %>%
-        filter(!is.na(winter_mid_y)) %>%
-        mutate(x = x_annot, y = winter_mid_y, label = "Winter")
-    
-    if (nrow(summer_annot) > 0) {
-        p <- p + geom_text(data = summer_annot, aes(x = x, y = y, label = label),
-                          size = 2.8, fontface = "bold", color = summer_color,
-                          hjust = 0)
-    }
-    
-    if (nrow(winter_annot) > 0) {
-        p <- p + geom_text(data = winter_annot, aes(x = x, y = y, label = label),
-                          size = 2.8, fontface = "bold", color = winter_color,
-                          hjust = 0)
-    }
     
     return(p)
 }
 
 # -----------------------------------------------------------------------------
-# Generate final dot plots
+# Generate Plots
 # -----------------------------------------------------------------------------
 
-cat("\nGenerating final dot plots...\n")
+cat("\nGenerating Host bubble plot...\n")
+fig4d_host_bubble <- create_gomwu_bubble(
+    host_bubble_data, 
+    "M. capitata (Host)", 
+    host_color
+)
 
-fig4d_host <- create_calcification_dotplot(host_stats, "M. capitata (Host)", host_color)
-fig4e_symbiont <- create_calcification_dotplot(symbiont_stats, "D. trenchii (Symbiont)", symbiont_color)
+cat("Generating Symbiont bubble plot...\n")
+fig4e_symbiont_bubble <- create_gomwu_bubble(
+    symbiont_bubble_data, 
+    "D. trenchii (Symbiont)", 
+    symbiont_color
+)
 
-# Calculate appropriate heights based on number of terms
-host_n_terms <- nrow(host_stats %>% filter(n_genes > 0))
-sym_n_terms <- nrow(symbiont_stats %>% filter(n_genes > 0))
+# -----------------------------------------------------------------------------
+# Save Plots
+# -----------------------------------------------------------------------------
 
-host_height <- max(6, host_n_terms * 0.35 + 2)
-sym_height <- max(6, sym_n_terms * 0.35 + 2)
+ggsave("figures/Fig4D_bubble_host_GOMWU.pdf", fig4d_host_bubble, 
+       width = 14, height = 8, dpi = 300)
+ggsave("figures/Fig4D_bubble_host_GOMWU.png", fig4d_host_bubble, 
+       width = 14, height = 8, dpi = 300)
+cat("✓ Saved: Fig4D_bubble_host_GOMWU.pdf/png\n")
 
-cat("  Host terms:", host_n_terms, "| Plot height:", round(host_height, 1), "in\n")
-cat("  Symbiont terms:", sym_n_terms, "| Plot height:", round(sym_height, 1), "in\n")
+ggsave("figures/Fig4E_bubble_symbiont_GOMWU.pdf", fig4e_symbiont_bubble, 
+       width = 14, height = 8, dpi = 300)
+ggsave("figures/Fig4E_bubble_symbiont_GOMWU.png", fig4e_symbiont_bubble, 
+       width = 14, height = 8, dpi = 300)
+cat("✓ Saved: Fig4E_bubble_symbiont_GOMWU.pdf/png\n")
 
-# Save individual plots
-if (!is.null(fig4d_host)) {
-    ggsave("figures/Fig4D_dotplot_host_calcification.pdf", fig4d_host, 
-           width = 10, height = host_height, dpi = 300)
-    ggsave("figures/Fig4D_dotplot_host_calcification.png", fig4d_host, 
-           width = 10, height = host_height, dpi = 300)
-    cat("✓ Saved: Fig4D_dotplot_host_calcification.pdf/png\n")
-}
+# -----------------------------------------------------------------------------
+# Save Summary Statistics
+# -----------------------------------------------------------------------------
 
-if (!is.null(fig4e_symbiont)) {
-    ggsave("figures/Fig4E_dotplot_symbiont_calcification.pdf", fig4e_symbiont, 
-           width = 10, height = sym_height, dpi = 300)
-    ggsave("figures/Fig4E_dotplot_symbiont_calcification.png", fig4e_symbiont, 
-           width = 10, height = sym_height, dpi = 300)
-    cat("✓ Saved: Fig4E_dotplot_symbiont_calcification.pdf/png\n")
-}
+# Summary of annotated terms
+annotated_summary <- bind_rows(
+    host_bubble_data %>% 
+        filter(!is.na(annotate_label)) %>%
+        select(organism, season, division, go_name, p.adj, delta.rank, nseqs),
+    symbiont_bubble_data %>%
+        filter(!is.na(annotate_label)) %>%
+        select(organism, season, division, go_name, p.adj, delta.rank, nseqs)
+) %>%
+    arrange(organism, season, division, p.adj)
 
-# Save data summaries
-write.csv(host_stats, "data/dotplot_host_calcification_stats.csv", row.names = FALSE)
-write.csv(symbiont_stats, "data/dotplot_symbiont_calcification_stats.csv", row.names = FALSE)
-cat("✓ Saved: dotplot statistics to data/\n")
+write.csv(annotated_summary, "data/bubble_plot_annotated_terms.csv", row.names = FALSE)
+cat("✓ Saved: bubble_plot_annotated_terms.csv\n")
 
-cat("\n✓ Figure 4D-E dot plots complete!\n")
+# Print summary
+cat("\n=== Annotated Terms Summary ===\n")
+print(table(annotated_summary$organism, annotated_summary$season))
+
+cat("\n✓ Figure 4D-E bubble plots complete!\n")
 
 # ==============================================================================
 # FIGURE 5: Volcano Plots
