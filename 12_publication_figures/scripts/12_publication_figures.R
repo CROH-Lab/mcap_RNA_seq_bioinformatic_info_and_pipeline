@@ -713,7 +713,7 @@ cat("      Symbiont Summer=#006341, Symbiont Winter=#8fe2b0\n")
 cat("      Excludes: Protein Phosphorylation, Na/K Transport, Phospholipid Transport\n")
 
 # ==============================================================================
-# FIGURE 4D-E: Dot Plots - Host and Symbiont Calcification GO Terms
+# FIGURE 4D-E: Dot Plots - Host and Symbiont Calcification GO Terms (FIXED)
 # Structure: Faceted by parent category, Summer/Winter separated by dashed line
 # X-axis: Mean log2FC, Size: # genes, Color: p.adj
 # ==============================================================================
@@ -778,7 +778,6 @@ calculate_go_term_stats <- function(go_terms_df, deseq_results, go_annotations) 
             division = division,
             parent_category = parent_cat,
             go_term = go_name,
-            go_term_display = str_trunc(go_name, 40),
             go_id = go_id,
             go_padj = go_padj,
             n_genes = nrow(sig_genes),
@@ -835,7 +834,7 @@ symbiont_stats <- bind_rows(sym_summer_stats, sym_winter_stats)
 cat("  Symbiont stats rows:", nrow(symbiont_stats), "\n")
 
 # -----------------------------------------------------------------------------
-# Dot plot function with Summer/Winter separation and division brackets
+# FIXED Dot plot function with proper discrete y-axis handling
 # -----------------------------------------------------------------------------
 
 create_calcification_dotplot <- function(stats_df, organism_name, org_color) {
@@ -853,55 +852,72 @@ create_calcification_dotplot <- function(stats_df, organism_name, org_color) {
         return(NULL)
     }
     
-    # Create combined label with division prefix bracket
+    # Create factors for proper ordering
     stats_df <- stats_df %>%
         mutate(
             division = factor(division, levels = c("BP", "MF", "CC")),
-            season_factor = factor(season, levels = c("summer", "winter")),
-            go_label = paste0(division, "[ ", str_trunc(go_term, 38))
+            season_factor = factor(season, levels = c("summer", "winter"))
         )
     
-    # Order: Parent category > Season (summer first) > Division (BP, MF, CC) > significance
+    # Create UNIQUE label for each term-season combination
+    # This prevents the same GO term appearing twice from overlapping
     stats_df <- stats_df %>%
-        arrange(parent_category, season_factor, division, go_padj) %>%
-        group_by(parent_category) %>%
-        mutate(y_pos = row_number()) %>%
-        ungroup()
+        mutate(
+            season_tag = ifelse(season == "summer", "[S]", "[W]"),
+            go_label = paste0(division, "[ ", str_trunc(go_term, 38), " ", season_tag)
+        )
     
-    # Find season boundaries within each parent category for dashed lines
-    boundaries <- stats_df %>%
+    # Order within each parent category: Summer first, then Winter
+    # Within each season: BP > MF > CC, then by significance
+    stats_df <- stats_df %>%
+        arrange(parent_category, season_factor, division, go_padj)
+    
+    # Create ordered factor for y-axis - this is the KEY fix
+    # We need to create the factor levels in REVERSE order because ggplot 
+    # plots factors from bottom to top
+    ordered_labels <- stats_df %>%
         group_by(parent_category) %>%
+        mutate(row_num = row_number()) %>%
+        ungroup() %>%
+        arrange(parent_category, desc(row_num)) %>%
+        pull(go_label)
+    
+    stats_df$go_label <- factor(stats_df$go_label, levels = unique(ordered_labels))
+    
+    # Calculate boundary positions for dashed lines (between summer and winter)
+    # We need numeric positions for geom_hline
+    boundary_data <- stats_df %>%
+        group_by(parent_category) %>%
+        mutate(y_numeric = as.numeric(go_label)) %>%
         summarise(
             has_summer = any(season == "summer"),
             has_winter = any(season == "winter"),
-            summer_max_y = ifelse(has_summer, max(y_pos[season == "summer"]), NA),
-            winter_min_y = ifelse(has_winter, min(y_pos[season == "winter"]), NA),
-            boundary_y = (summer_max_y + winter_min_y) / 2,
-            summer_mid_y = ifelse(has_summer, mean(y_pos[season == "summer"]), NA),
-            winter_mid_y = ifelse(has_winter, mean(y_pos[season == "winter"]), NA),
+            summer_min_y = ifelse(has_summer, min(y_numeric[season == "summer"]), NA),
+            winter_max_y = ifelse(has_winter, max(y_numeric[season == "winter"]), NA),
+            # Boundary is between highest winter term and lowest summer term
+            boundary_y = (summer_min_y + winter_max_y) / 2,
+            # Midpoints for season labels
+            summer_mid_y = ifelse(has_summer, mean(y_numeric[season == "summer"]), NA),
+            winter_mid_y = ifelse(has_winter, mean(y_numeric[season == "winter"]), NA),
             .groups = "drop"
         ) %>%
-        filter(!is.na(boundary_y))
+        filter(has_summer & has_winter)  # Only add lines where both seasons exist
     
     # X-axis range for positioning season annotations
     x_max <- max(stats_df$mean_log2fc, na.rm = TRUE)
     x_min <- min(stats_df$mean_log2fc, na.rm = TRUE)
     x_range <- x_max - x_min
-    x_annot <- x_max + 0.18 * x_range
+    x_annot <- x_max + 0.15 * x_range
     
-    # Base plot
-    p <- ggplot(stats_df, aes(x = mean_log2fc, y = y_pos)) +
+    # Base plot using discrete y-axis (factor)
+    p <- ggplot(stats_df, aes(x = mean_log2fc, y = go_label)) +
         
-        # Points with fill for significance and outline
+        # Points
         geom_point(aes(size = n_genes, fill = -log10(go_padj + 1e-10)), 
                    shape = 21, color = "gray30", alpha = 0.85, stroke = 0.5) +
         
-        # Vertical reference line at 0 (no change)
+        # Vertical reference line at 0
         geom_vline(xintercept = 0, linetype = "solid", color = "gray50", linewidth = 0.5) +
-        
-        # Horizontal dashed lines at season boundaries
-        geom_hline(data = boundaries, aes(yintercept = boundary_y),
-                   linetype = "dashed", color = "gray30", linewidth = 0.6) +
         
         # Fill scale for GO term significance
         scale_fill_viridis_c(
@@ -917,15 +933,8 @@ create_calcification_dotplot <- function(stats_df, organism_name, org_color) {
             breaks = function(x) unique(round(pretty(x, n = 4)))
         ) +
         
-        # Y-axis labels with division brackets
-        scale_y_continuous(
-            breaks = stats_df$y_pos,
-            labels = stats_df$go_label,
-            expand = expansion(mult = c(0.03, 0.12))
-        ) +
-        
-        # X-axis
-        scale_x_continuous(expand = expansion(mult = c(0.08, 0.22))) +
+        # X-axis expansion for annotations
+        scale_x_continuous(expand = expansion(mult = c(0.08, 0.25))) +
         
         # Facet by parent category
         facet_grid(parent_category ~ ., scales = "free_y", space = "free_y") +
@@ -945,7 +954,7 @@ create_calcification_dotplot <- function(stats_df, organism_name, org_color) {
             axis.title.x = element_text(size = 11, face = "bold"),
             strip.text.y = element_text(size = 9, face = "bold", angle = 0, hjust = 0),
             strip.background = element_rect(fill = "gray95", color = "gray70"),
-            panel.grid.major.y = element_line(color = "gray95", linewidth = 0.3),
+            panel.grid.major.y = element_blank(),
             panel.grid.major.x = element_line(color = "gray90", linewidth = 0.3),
             panel.grid.minor = element_blank(),
             legend.position = "right",
@@ -955,12 +964,18 @@ create_calcification_dotplot <- function(stats_df, organism_name, org_color) {
             panel.spacing = unit(0.5, "lines")
         )
     
-    # Add season annotations (Summer/Winter labels)
-    summer_annot <- boundaries %>%
+    # Add horizontal dashed lines at season boundaries
+    if (nrow(boundary_data) > 0) {
+        p <- p + geom_hline(data = boundary_data, aes(yintercept = boundary_y),
+                           linetype = "dashed", color = "gray30", linewidth = 0.6)
+    }
+    
+    # Add season annotations
+    summer_annot <- boundary_data %>%
         filter(!is.na(summer_mid_y)) %>%
         mutate(x = x_annot, y = summer_mid_y, label = "Summer")
     
-    winter_annot <- boundaries %>%
+    winter_annot <- boundary_data %>%
         filter(!is.na(winter_mid_y)) %>%
         mutate(x = x_annot, y = winter_mid_y, label = "Winter")
     
@@ -989,11 +1004,14 @@ fig4d_host <- create_calcification_dotplot(host_stats, "M. capitata (Host)", hos
 fig4e_symbiont <- create_calcification_dotplot(symbiont_stats, "D. trenchii (Symbiont)", symbiont_color)
 
 # Calculate appropriate heights based on number of terms
-host_height <- max(8, nrow(host_stats %>% filter(n_genes > 0)) * 0.28 + 2)
-sym_height <- max(8, nrow(symbiont_stats %>% filter(n_genes > 0)) * 0.28 + 2)
+host_n_terms <- nrow(host_stats %>% filter(n_genes > 0))
+sym_n_terms <- nrow(symbiont_stats %>% filter(n_genes > 0))
 
-cat("  Host plot height:", round(host_height, 1), "in\n")
-cat("  Symbiont plot height:", round(sym_height, 1), "in\n")
+host_height <- max(6, host_n_terms * 0.35 + 2)
+sym_height <- max(6, sym_n_terms * 0.35 + 2)
+
+cat("  Host terms:", host_n_terms, "| Plot height:", round(host_height, 1), "in\n")
+cat("  Symbiont terms:", sym_n_terms, "| Plot height:", round(sym_height, 1), "in\n")
 
 # Save individual plots
 if (!is.null(fig4d_host)) {
