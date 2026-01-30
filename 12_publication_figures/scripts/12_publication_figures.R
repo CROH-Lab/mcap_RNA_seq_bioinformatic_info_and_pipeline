@@ -713,12 +713,16 @@ cat("      Symbiont Summer=#006341, Symbiont Winter=#8fe2b0\n")
 cat("      Excludes: Protein Phosphorylation, Na/K Transport, Phospholipid Transport\n")
 
 # ==============================================================================
-# FIGURE 4D-E: GO_MWU Bubble Plots - VERSION 5
-# Comprehensive abbreviations based on actual plot terms
+# FIGURE 4D-E: GO_MWU Bubble Plots - VERSION 5 (Staggered Lanes)
+# Y-axis: -log10(p.adj), X-axis: delta.rank (direction), Size: nseqs
+# Faceted by Division (BP/MF/CC) × Season (Summer/Winter)
+# Annotations: Top 10 significant terms + keyword matches (bolded)
+# Labels positioned by delta rank sign: positive=RIGHT, negative=LEFT
+# Staggered lanes: Bold=inner, Plain=outer
 # ==============================================================================
 
 cat("\n==============================================================================\n")
-cat("Figure 4D-E: GO_MWU Bubble Plots (Updated v5 - Comprehensive Abbreviations)\n")
+cat("Figure 4D-E: GO_MWU Bubble Plots (v5 - Staggered Lanes)\n")
 cat("==============================================================================\n\n")
 
 # -----------------------------------------------------------------------------
@@ -754,14 +758,12 @@ division_colors <- c(
 )
 
 # -----------------------------------------------------------------------------
-# GO Term Simplification Function - COMPREHENSIVE VERSION
+# GO Term Simplification Function
 # -----------------------------------------------------------------------------
 
 simplify_go_term <- function(term) {
     
-    # =========================================================================
-    # STEP 1: Remove uninformative words completely
-    # =========================================================================
+    # Remove uninformative words
     remove_words <- c(
         "\\bobsolete\\s*",
         "\\bmonoatomic\\s*",
@@ -773,9 +775,7 @@ simplify_go_term <- function(term) {
         term <- str_replace_all(term, regex(pattern, ignore_case = TRUE), "")
     }
     
-    # =========================================================================
-    # STEP 2: Ion symbols (plain text)
-    # =========================================================================
+    # Ion symbols
     ion_replacements <- c(
         "\\bcalcium\\b" = "Ca2+",
         "\\bsodium\\b" = "Na+",
@@ -794,30 +794,20 @@ simplify_go_term <- function(term) {
                                 ion_replacements[pattern])
     }
     
-    # =========================================================================
-    # STEP 3: Multi-word phrases (replace BEFORE single words)
-    # Order matters - longer phrases first!
-    # =========================================================================
+    # Multi-word phrase abbreviations
     phrase_abbrevs <- c(
-        # Cellular structures - multi-word
         "endoplasmic reticulum" = "ER",
         "plasma membrane" = "PM",
         "cell membrane" = "membrane",
         "rough ER" = "rough ER",
         "ER-Golgi intermediate compartment" = "ER-Golgi",
-        
-        # Regulation phrases
         "positive regulation of" = "+reg.",
         "negative regulation of" = "-reg.",
         "regulation of" = "reg.",
-        
-        # Remove these phrases entirely (low information)
         "response to " = "",
         "involved in " = "",
         "establishment of " = "",
         " involved in.*$" = "",
-        
-        # Simplify compound descriptors
         "-containing complex" = "",
         "-transporting " = " ",
         "-driven active" = "-driven",
@@ -826,44 +816,32 @@ simplify_go_term <- function(term) {
         "-directed " = "-dir. ",
         "-transcribed " = "-txd ",
         "-type " = " ",
-        
-        # Common multi-word terms
         "transmembrane transporter" = "TM transporter",
         "transmembrane transport" = "TM transport",
         "ion transmembrane" = "ion TM",
         "active transmembrane" = "active TM",
-        
         "ATP synthase" = "ATP synth.",
         "two-sector ATPase" = "ATPase",
-        
         "nervous system" = "NS",
         "central nervous system" = "CNS",
-        
         "nucleic acid" = "nucl. acid",
         "amino acid" = "AA",
         "fatty acid" = "FA",
-        
         "cell-cell" = "cell-cell",
         "protein-RNA" = "prot.-RNA"
     )
-    
     for (pattern in names(phrase_abbrevs)) {
         term <- str_replace_all(term, regex(pattern, ignore_case = TRUE), 
                                 phrase_abbrevs[pattern])
     }
     
-    # =========================================================================
-    # STEP 4: Single word abbreviations
-    # =========================================================================
+    # Single word abbreviations
     word_abbrevs <- c(
-        # Requested abbreviations
         "\\bchemosensory\\b" = "chemosen.",
         "\\bprotein\\b" = "prot.",
         "\\bcomplex\\b" = "cplx",
         "\\bligand\\b" = "lig.",
         "\\borganic\\b" = "org.",
-        
-        # Cellular/molecular terms
         "\\bmitochondrial\\b" = "mito.",
         "\\bmitochondrion\\b" = "mito.",
         "\\bcytoplasmic\\b" = "cyto.",
@@ -877,16 +855,12 @@ simplify_go_term <- function(term) {
         "\\bpreribosome\\b" = "preribo.",
         "\\bribonucleoprotein\\b" = "RNP",
         "\\bspliceosomal\\b" = "spliceo.",
-        
-        # Channel/transport terms
         "\\btransmembrane\\b" = "TM",
         "\\btransporter\\b" = "transporter",
         "\\btransport\\b" = "transport",
         "\\bchannel\\b" = "ch.",
         "\\bvoltage-gated\\b" = "V-gated",
         "\\btransmitter-gated\\b" = "transmit.-gated",
-        
-        # Structure terms
         "\\borganelle\\b" = "organelle",
         "\\benvelope\\b" = "env.",
         "\\bmembrane\\b" = "memb.",
@@ -901,8 +875,6 @@ simplify_go_term <- function(term) {
         "\\bjunction\\b" = "junct.",
         "\\banchoring\\b" = "anchor.",
         "\\bsynaptic\\b" = "synap.",
-        
-        # Process terms
         "\\blocalization\\b" = "local.",
         "\\borganization\\b" = "org.",
         "\\bbiosynthetic\\b" = "biosynth.",
@@ -920,8 +892,6 @@ simplify_go_term <- function(term) {
         "\\bbiogenesis\\b" = "biogen.",
         "\\bdevelopment\\b" = "dev.",
         "\\bsignaling\\b" = "signal.",
-        
-        # Descriptor terms
         "\\bstructural\\b" = "struct.",
         "\\bconstituent\\b" = "const.",
         "\\bmolecule\\b" = "mol.",
@@ -932,16 +902,12 @@ simplify_go_term <- function(term) {
         "\\bintracellular\\b" = "IC",
         "\\binorganic\\b" = "inorg.",
         "\\bmonovalent\\b" = "monoval.",
-        
-        # Movement/motor terms
         "\\bmicrotubule\\b" = "MT",
         "\\bcytoskeletal\\b" = "cytoskel.",
         "\\blocomotory\\b" = "locomo.",
         "\\bmovement\\b" = "movmt",
         "\\bmotor\\b" = "motor",
         "\\bdynein\\b" = "dynein",
-        
-        # Other common terms
         "\\bpolypeptide\\b" = "polypep.",
         "\\bconformation\\b" = "conform.",
         "\\bdehydrogenase\\b" = "DH",
@@ -955,34 +921,26 @@ simplify_go_term <- function(term) {
         "\\bsensory\\b" = "sens.",
         "\\borgan\\b" = "organ"
     )
-    
     for (pattern in names(word_abbrevs)) {
         term <- str_replace_all(term, regex(pattern, ignore_case = TRUE), 
                                 word_abbrevs[pattern])
     }
     
-    # =========================================================================
-    # STEP 5: Final cleanup
-    # =========================================================================
+    # Cleanup
+    term <- str_replace_all(term, "\\s+", " ")
+    term <- str_replace_all(term, "^\\s+|\\s+$", "")
+    term <- str_replace_all(term, "\\s*-\\s*", "-")
+    term <- str_replace_all(term, "\\s+,", ",")
+    term <- str_replace_all(term, ",\\s*$", "")
+    term <- str_replace_all(term, "\\s*\\.$", "")
+    term <- str_replace_all(term, "^\\s*of\\s+", "")
+    term <- str_replace_all(term, "\\s+of$", "")
+    term <- str_replace_all(term, "\\s+to$", "")
+    term <- str_replace_all(term, "\\s+or$", "")
     
-    # Clean up spacing and punctuation
-    term <- str_replace_all(term, "\\s+", " ")           # collapse spaces
-    term <- str_replace_all(term, "^\\s+|\\s+$", "")     # trim
-    term <- str_replace_all(term, "\\s*-\\s*", "-")      # clean hyphens
-    term <- str_replace_all(term, "\\s+,", ",")          # comma spacing
-    term <- str_replace_all(term, ",\\s*$", "")          # trailing comma
-    term <- str_replace_all(term, "\\s*\\.$", "")        # trailing period
-    term <- str_replace_all(term, "^\\s*of\\s+", "")     # leading "of"
-    term <- str_replace_all(term, "\\s+of$", "")         # trailing "of"
-    term <- str_replace_all(term, "\\s+to$", "")         # trailing "to"
-    term <- str_replace_all(term, "\\s+or$", "")         # trailing "or"
-    
-    # =========================================================================
-    # STEP 6: Limit to 4 words max (more readable than 3)
-    # =========================================================================
+    # Limit to 4 words
     words <- str_split(term, "\\s+")[[1]]
-    words <- words[words != ""]  # remove empty strings
-    
+    words <- words[words != ""]
     if (length(words) > 4) {
         term <- paste(words[1:4], collapse = " ")
     } else {
@@ -993,56 +951,6 @@ simplify_go_term <- function(term) {
 }
 
 # -----------------------------------------------------------------------------
-# Test the function with actual terms from the plots
-# -----------------------------------------------------------------------------
-
-cat("Testing simplification function with actual plot terms:\n")
-cat(strrep("=", 80), "\n")
-
-test_terms <- c(
-    # From Host plot
-    "chemosensory behavior",
-    "protein localization to mitochondrion",
-    "ligand-gated ion channel activity",
-    "ligand-gated cation channel activity",
-    "transmitter-gated ion channel activity",
-    "excitatory extracellular ligand-gated monoatomic ion channel activity",
-    "regulation of cytosolic calcium ion concentration",
-    "oxidoreductase activity, acting on NAD(P)H",
-    "polypeptide conformation or assembly isomerase activity",
-    "dynein light intermediate chain binding",
-    "mitochondrial protein-containing complex",
-    "rough endoplasmic reticulum membrane",
-    "endoplasmic reticulum chaperone complex",
-    "structural constituent of ribosome",
-    "oxidoreduction-driven active transmembrane transporter activity",
-    
-    # From Symbiont plot
-    "nuclear-transcribed mRNA catabolic process",
-    "organic cyclic compound biosynthetic process",
-    "protein-RNA complex organization",
-    "localization within membrane",
-    "calcium ion-mediated signaling",
-    "monovalent inorganic anion transport",
-    "ER-Golgi intermediate compartment membrane",
-    "lumenal side of endoplasmic reticulum membrane",
-    "sno(s)RNA-containing ribonucleoprotein complex",
-    "phosphatidylinositol bisphosphate binding",
-    "calcium ion-dependent cysteine-type endopeptidase activity",
-    "calcium ion-dependent phospholipid binding",
-    "voltage-gated calcium ion channel activity",
-    "plus-end-directed microtubule motor activity",
-    "alkali metal ion binding"
-)
-
-for (t in test_terms) {
-    simplified <- simplify_go_term(t)
-    cat(sprintf("%-60s -> %s\n", substr(t, 1, 60), simplified))
-}
-
-cat(strrep("=", 80), "\n\n")
-
-# -----------------------------------------------------------------------------
 # Load GO_MWU Results
 # -----------------------------------------------------------------------------
 
@@ -1050,12 +958,10 @@ load_gomwu_bubble_results <- function(base_dir, prefix = "", organism_label) {
     
     seasons <- c("summer", "winter")
     divisions <- c("BP", "MF", "CC")
-    
     all_results <- list()
     
     for (season in seasons) {
         for (div in divisions) {
-            
             if (prefix == "") {
                 filename <- file.path(base_dir, "output",
                                      paste0(season, "_", div, "_MWU_results.csv"))
@@ -1067,22 +973,18 @@ load_gomwu_bubble_results <- function(base_dir, prefix = "", organism_label) {
             if (file.exists(filename)) {
                 df <- read.table(filename, header = TRUE, stringsAsFactors = FALSE,
                                 sep = "", quote = "\"", comment.char = "")
-                
                 names(df) <- gsub('^"', '', names(df))
                 names(df) <- gsub('"$', '', names(df))
                 names(df) <- trimws(names(df))
-                
                 df$season <- season
                 df$division <- div
                 df$organism <- organism_label
-                
                 all_results[[paste(organism_label, season, div, sep = "_")]] <- df
             } else {
                 cat("  Warning: File not found -", filename, "\n")
             }
         }
     }
-    
     return(bind_rows(all_results))
 }
 
@@ -1108,7 +1010,6 @@ process_for_bubble <- function(gomwu_data, p_cutoff = 0.05, top_n = 10) {
             matches_keyword = str_detect(tolower(go_name), regex(keyword_pattern, ignore_case = TRUE))
         )
     
-    # Identify top N significant terms per facet
     top_significant <- df %>%
         filter(p.adj < p_cutoff) %>%
         group_by(season_label, division) %>%
@@ -1117,20 +1018,16 @@ process_for_bubble <- function(gomwu_data, p_cutoff = 0.05, top_n = 10) {
         mutate(is_top_significant = TRUE) %>%
         select(go_name, season_label, division, is_top_significant)
     
-    # Join and create annotation columns
     df <- df %>%
         left_join(top_significant, by = c("go_name", "season_label", "division")) %>%
         mutate(
             is_top_significant = replace_na(is_top_significant, FALSE),
             should_annotate = (p.adj < p_cutoff & matches_keyword) | is_top_significant,
-            
-            # Apply simplification function
             annotate_label = ifelse(
                 should_annotate, 
                 sapply(go_name, simplify_go_term),
                 NA_character_
             ),
-            
             label_fontface = case_when(
                 !should_annotate ~ NA_character_,
                 matches_keyword ~ "bold",
@@ -1147,7 +1044,7 @@ process_for_bubble <- function(gomwu_data, p_cutoff = 0.05, top_n = 10) {
 }
 
 # -----------------------------------------------------------------------------
-# Create Bubble Plot Function
+# Create Bubble Plot Function - STAGGERED LANES
 # -----------------------------------------------------------------------------
 
 create_gomwu_bubble <- function(bubble_data, organism_name, org_color) {
@@ -1163,26 +1060,12 @@ create_gomwu_bubble <- function(bubble_data, organism_name, org_color) {
     plain_left <- label_data %>% filter(label_fontface == "plain", label_side == "left")
     plain_right <- label_data %>% filter(label_fontface == "plain", label_side == "right")
     
-    # Calculate x-axis range and boundaries
+    # STAGGERED nudge distances
+    # Bold = 20% (inner lane, closer to points)
+    # Plain = 38% (outer lane, further out)
     x_range <- range(bubble_data$x_value, na.rm = TRUE)
-    x_span <- diff(x_range)
-    
-    # Expansion factor (must match scale_x_continuous expand)
-    x_expand <- 0.45
-    x_min_plot <- x_range[1] - (x_span * x_expand)
-    x_max_plot <- x_range[2] + (x_span * x_expand)
-    
-    # Nudge distances - staggered lanes
-    nudge_bold <- x_span * 0.18
-    nudge_plain <- x_span * 0.35
-    
-    # Label boundaries - keep labels INSIDE the plot with margin
-    x_left_limit <- x_min_plot + (x_span * 0.02)   # Small margin from edge
-    x_right_limit <- x_max_plot - (x_span * 0.02)
-    
-    # Y-axis boundaries
-    y_range <- range(bubble_data$neg_log10_padj, na.rm = TRUE)
-    y_max <- y_range[2] * 1.08  # 8% headroom
+    nudge_bold <- diff(x_range) * 0.20   # Inner lane
+    nudge_plain <- diff(x_range) * 0.38  # Outer lane
     
     p <- ggplot(bubble_data, aes(x = x_value, y = neg_log10_padj)) +
         
@@ -1202,24 +1085,23 @@ create_gomwu_bubble <- function(bubble_data, organism_name, org_color) {
         geom_text_repel(
             data = bold_left,
             aes(label = annotate_label),
-            size = 2.3,
+            size = 2.4,
             fontface = "bold",
             color = "black",
-            xlim = c(x_left_limit, 0),  # Constrain to left half
-            ylim = c(0, y_max),
+            xlim = c(-Inf, NA),
+            ylim = c(0, NA),  # Keep labels within plot
             hjust = 1,
             direction = "y",
             nudge_x = -nudge_bold,
             segment.color = "gray40",
-            segment.size = 0.3,
+            segment.size = 0.4,
             segment.linetype = "solid",
             min.segment.length = 0,
-            box.padding = 0.15,
-            point.padding = 0.1,
-            force = 3,
-            force_pull = 0.1,
-            max.overlaps = Inf,
-            max.iter = 10000,
+            box.padding = 0.2,
+            point.padding = 0.15,
+            force = 4,
+            force_pull = 0,
+            max.overlaps = 50,
             seed = 42,
             na.rm = TRUE
         ) +
@@ -1228,24 +1110,23 @@ create_gomwu_bubble <- function(bubble_data, organism_name, org_color) {
         geom_text_repel(
             data = bold_right,
             aes(label = annotate_label),
-            size = 2.3,
+            size = 2.4,
             fontface = "bold",
             color = "black",
-            xlim = c(0, x_right_limit),  # Constrain to right half
-            ylim = c(0, y_max),
+            xlim = c(NA, Inf),
+            ylim = c(0, NA),
             hjust = 0,
             direction = "y",
             nudge_x = nudge_bold,
             segment.color = "gray40",
-            segment.size = 0.3,
+            segment.size = 0.4,
             segment.linetype = "solid",
             min.segment.length = 0,
-            box.padding = 0.15,
-            point.padding = 0.1,
-            force = 3,
-            force_pull = 0.1,
-            max.overlaps = Inf,
-            max.iter = 10000,
+            box.padding = 0.2,
+            point.padding = 0.15,
+            force = 4,
+            force_pull = 0,
+            max.overlaps = 50,
             seed = 42,
             na.rm = TRUE
         ) +
@@ -1254,25 +1135,24 @@ create_gomwu_bubble <- function(bubble_data, organism_name, org_color) {
         geom_text_repel(
             data = plain_left,
             aes(label = annotate_label),
-            size = 2.1,
+            size = 2.2,
             fontface = "plain",
             color = "gray30",
-            xlim = c(x_left_limit, -nudge_bold),  # Outer lane only
-            ylim = c(0, y_max),
+            xlim = c(-Inf, NA),
+            ylim = c(0, NA),
             hjust = 1,
             direction = "y",
             nudge_x = -nudge_plain,
-            segment.color = "gray55",
-            segment.size = 0.25,
+            segment.color = "gray60",
+            segment.size = 0.3,
             segment.linetype = "dashed",
             min.segment.length = 0,
-            box.padding = 0.15,
-            point.padding = 0.1,
-            force = 3,
-            force_pull = 0.1,
-            max.overlaps = Inf,
-            max.iter = 10000,
-            seed = 123,
+            box.padding = 0.2,
+            point.padding = 0.15,
+            force = 4,
+            force_pull = 0,
+            max.overlaps = 50,
+            seed = 123,  # Different seed for plain labels
             na.rm = TRUE
         ) +
         
@@ -1280,24 +1160,23 @@ create_gomwu_bubble <- function(bubble_data, organism_name, org_color) {
         geom_text_repel(
             data = plain_right,
             aes(label = annotate_label),
-            size = 2.1,
+            size = 2.2,
             fontface = "plain",
             color = "gray30",
-            xlim = c(nudge_bold, x_right_limit),  # Outer lane only
-            ylim = c(0, y_max),
+            xlim = c(NA, Inf),
+            ylim = c(0, NA),
             hjust = 0,
             direction = "y",
             nudge_x = nudge_plain,
-            segment.color = "gray55",
-            segment.size = 0.25,
+            segment.color = "gray60",
+            segment.size = 0.3,
             segment.linetype = "dashed",
             min.segment.length = 0,
-            box.padding = 0.15,
-            point.padding = 0.1,
-            force = 3,
-            force_pull = 0.1,
-            max.overlaps = Inf,
-            max.iter = 10000,
+            box.padding = 0.2,
+            point.padding = 0.15,
+            force = 4,
+            force_pull = 0,
+            max.overlaps = 50,
             seed = 123,
             na.rm = TRUE
         ) +
@@ -1317,12 +1196,12 @@ create_gomwu_bubble <- function(bubble_data, organism_name, org_color) {
             breaks = c(10, 50, 100, 200, 500)
         ) +
         
-        # Axes with expansion matching our calculations
-        scale_x_continuous(expand = expansion(mult = c(x_expand, x_expand))) +
-        scale_y_continuous(expand = expansion(mult = c(0.02, 0.10))) +
+        # Axes - expanded with 8% extra at top
+        scale_x_continuous(expand = expansion(mult = c(0.40, 0.40))) +
+        scale_y_continuous(expand = expansion(mult = c(0.02, 0.08))) +
         
         # Facet
-        facet_grid(season_label ~ division, scales = "free") +
+        facet_grid(season_label ~ division, scales = "free_x") +
         
         # Labels
         labs(
@@ -1346,8 +1225,8 @@ create_gomwu_bubble <- function(bubble_data, organism_name, org_color) {
             legend.position = "right",
             legend.box = "vertical",
             panel.grid.minor = element_blank(),
-            panel.spacing = unit(1.2, "lines"),
-            plot.margin = margin(10, 15, 10, 15)
+            panel.spacing = unit(1.2, "lines"),  # Increased spacing
+            plot.margin = margin(10, 15, 10, 10)  # Extra right margin
         ) +
         
         guides(
@@ -1362,7 +1241,7 @@ create_gomwu_bubble <- function(bubble_data, organism_name, org_color) {
 # Generate Plots
 # -----------------------------------------------------------------------------
 
-cat("\nLoading Host GO_MWU results...\n")
+cat("Loading Host GO_MWU results...\n")
 host_gomwu <- load_gomwu_bubble_results("../10_GO_MWU", prefix = "", "Host")
 cat("  Loaded", nrow(host_gomwu), "GO terms\n")
 
@@ -1429,20 +1308,20 @@ fig4e_symbiont_bubble <- create_gomwu_bubble(
 )
 
 # -----------------------------------------------------------------------------
-# Save Plots
+# Save Plots - 15 x 11 inches
 # -----------------------------------------------------------------------------
 
 ggsave("figures/Fig4D_bubble_host_GOMWU.pdf", fig4d_host_bubble,
-       width = 16, height = 12, dpi = 300)
+       width = 15, height = 11, dpi = 300)
 ggsave("figures/Fig4D_bubble_host_GOMWU.png", fig4d_host_bubble,
-       width = 16, height = 12, dpi = 300)
-cat("✓ Saved: Fig4D_bubble_host_GOMWU.pdf/png (16x12 inches)\n")
+       width = 15, height = 11, dpi = 300)
+cat("✓ Saved: Fig4D_bubble_host_GOMWU.pdf/png (15x11 inches)\n")
 
 ggsave("figures/Fig4E_bubble_symbiont_GOMWU.pdf", fig4e_symbiont_bubble,
-       width = 16, height = 12, dpi = 300)
+       width = 15, height = 11, dpi = 300)
 ggsave("figures/Fig4E_bubble_symbiont_GOMWU.png", fig4e_symbiont_bubble,
-       width = 16, height = 12, dpi = 300)
-cat("✓ Saved: Fig4E_bubble_symbiont_GOMWU.pdf/png (16x12 inches)\n")
+       width = 15, height = 11, dpi = 300)
+cat("✓ Saved: Fig4E_bubble_symbiont_GOMWU.pdf/png (15x11 inches)\n")
 
 # -----------------------------------------------------------------------------
 # Save Summary
@@ -1451,13 +1330,15 @@ cat("✓ Saved: Fig4E_bubble_symbiont_GOMWU.pdf/png (16x12 inches)\n")
 annotated_summary <- bind_rows(
     host_bubble_data %>%
         filter(!is.na(annotate_label)) %>%
-        mutate(annotation_type = ifelse(matches_keyword, "Keyword (bold)", "Top significant")) %>%
-        select(organism, season, division, go_name, annotate_label, p.adj, delta.rank, 
+        mutate(organism = "Host",
+               annotation_type = ifelse(matches_keyword, "Keyword (bold)", "Top significant")) %>%
+        select(organism, season = season_label, division, go_name, annotate_label, p.adj, delta.rank, 
                nseqs, matches_keyword, is_top_significant, annotation_type, label_side),
     symbiont_bubble_data %>%
         filter(!is.na(annotate_label)) %>%
-        mutate(annotation_type = ifelse(matches_keyword, "Keyword (bold)", "Top significant")) %>%
-        select(organism, season, division, go_name, annotate_label, p.adj, delta.rank, 
+        mutate(organism = "Symbiont",
+               annotation_type = ifelse(matches_keyword, "Keyword (bold)", "Top significant")) %>%
+        select(organism, season = season_label, division, go_name, annotate_label, p.adj, delta.rank, 
                nseqs, matches_keyword, is_top_significant, annotation_type, label_side)
 ) %>%
     arrange(organism, season, division, label_side, p.adj)
@@ -1466,9 +1347,13 @@ write.csv(annotated_summary, "data/bubble_plot_annotated_terms.csv", row.names =
 cat("✓ Saved: bubble_plot_annotated_terms.csv\n")
 
 cat("\n=== Summary by Side ===\n")
-print(table(annotated_summary$organism, annotated_summary$label_side))
+cat("\nHost:\n")
+print(table(host_labels$label_side, host_labels$label_fontface))
+cat("\nSymbiont:\n")
+print(table(sym_labels$label_side, sym_labels$label_fontface))
 
 cat("\n✓ Figure 4D-E bubble plots complete!\n")
+
 # ==============================================================================
 # FIGURE 5: Volcano Plots
 # ==============================================================================
