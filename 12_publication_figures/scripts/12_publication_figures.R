@@ -749,7 +749,7 @@ ANNOTATION_KEYWORDS <- c(
 )
 
 BUBBLE_P_ADJ_CUTOFF <- 0.05
-TOP_N_ANNOTATE <- 10
+TOP_N_ANNOTATE <- 6
 
 division_colors <- c(
     "BP" = "#4DAF4A",
@@ -992,7 +992,7 @@ load_gomwu_bubble_results <- function(base_dir, prefix = "", organism_label) {
 # Process Data for Plotting
 # -----------------------------------------------------------------------------
 
-process_for_bubble <- function(gomwu_data, p_cutoff = 0.05, top_n = 10) {
+process_for_bubble <- function(gomwu_data, p_cutoff = 0.05, top_n = 6) {
     
     keyword_pattern <- paste(ANNOTATION_KEYWORDS, collapse = "|")
     
