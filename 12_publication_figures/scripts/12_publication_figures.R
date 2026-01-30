@@ -713,37 +713,36 @@ cat("      Symbiont Summer=#006341, Symbiont Winter=#8fe2b0\n")
 cat("      Excludes: Protein Phosphorylation, Na/K Transport, Phospholipid Transport\n")
 
 # ==============================================================================
-# FIGURE 4D-E: GO_MWU Bubble Plots - Host and Symbiont
+# FIGURE 4D-E: GO_MWU Bubble Plots - UPDATED VERSION
 # Y-axis: -log10(p.adj), X-axis: delta.rank (direction), Size: nseqs
 # Faceted by Division (BP/MF/CC) × Season (Summer/Winter)
-# Only annotate terms matching calcification/transport keywords
+# Annotations: Top 10 significant terms + keyword matches (bolded)
+# Labels positioned to sides with connecting lines
 # ==============================================================================
 
 cat("\n==============================================================================\n")
-cat("Figure 4D-E: GO_MWU Bubble Plots\n")
+cat("Figure 4D-E: GO_MWU Bubble Plots (Updated)\n")
 cat("==============================================================================\n\n")
 
 # -----------------------------------------------------------------------------
 # Configuration
 # -----------------------------------------------------------------------------
 
-# Keywords for annotation (case-insensitive)
-# Using word boundaries (\b) for short words that could match inside other words
-# e.g., "ion" should not match "translation", "region", "junction"
+# Keywords for annotation (case-insensitive) - these will be BOLDED
 ANNOTATION_KEYWORDS <- c(
-    "\\bion\\b",           # ion as standalone word only
-    "ion transport",       # compound terms are safe
+    "\\bion\\b",
+    "ion transport",
     "ion channel",
     "ion homeostasis",
-    "proton", 
-    "calcium", 
-    "carbonate",           # more specific than "carbon"
+    "proton",
+    "calcium",
+    "carbonate",
     "carbonic",
     "bicarbonate",
-    "calcium channel",    # more specific
-    "chemosensory", 
-    "plasmamembrane",      # membrane as word boundary to reduce noise
-    "ossification", 
+    "calcium channel",
+    "chemosensory",
+    "plasmamembrane",
+    "ossification",
     "biomineralization",
     "calcification",
     "endoplasmic reticulum"
@@ -752,15 +751,18 @@ ANNOTATION_KEYWORDS <- c(
 # Significance cutoff for plotting (orange line)
 BUBBLE_P_ADJ_CUTOFF <- 0.05
 
+# Number of top significant terms to annotate per facet
+TOP_N_ANNOTATE <- 10
+
 # Colors matching reference image (BP=green, CC=red, MF=blue)
 division_colors <- c(
     "BP" = "#4DAF4A",  # Green
-    "CC" = "#E41A1C",  # Red  
+    "CC" = "#E41A1C",  # Red
     "MF" = "#377EB8"   # Blue
 )
 
 # -----------------------------------------------------------------------------
-# Load GO_MWU Results
+# Load GO_MWU Results (same as before)
 # -----------------------------------------------------------------------------
 
 load_gomwu_bubble_results <- function(base_dir, prefix = "", organism_label) {
@@ -773,9 +775,8 @@ load_gomwu_bubble_results <- function(base_dir, prefix = "", organism_label) {
     for (season in seasons) {
         for (div in divisions) {
             
-            # Construct filename
             if (prefix == "") {
-                filename <- file.path(base_dir, "output", 
+                filename <- file.path(base_dir, "output",
                                      paste0(season, "_", div, "_MWU_results.csv"))
             } else {
                 filename <- file.path(base_dir, "output",
@@ -786,7 +787,6 @@ load_gomwu_bubble_results <- function(base_dir, prefix = "", organism_label) {
                 df <- read.table(filename, header = TRUE, stringsAsFactors = FALSE,
                                 sep = "", quote = "\"", comment.char = "")
                 
-                # Clean column names
                 names(df) <- gsub('^"', '', names(df))
                 names(df) <- gsub('"$', '', names(df))
                 names(df) <- trimws(names(df))
@@ -805,19 +805,13 @@ load_gomwu_bubble_results <- function(base_dir, prefix = "", organism_label) {
     return(bind_rows(all_results))
 }
 
-cat("Loading Host GO_MWU results...\n")
-host_gomwu <- load_gomwu_bubble_results("../10_GO_MWU", prefix = "", "Host")
-cat("  Loaded", nrow(host_gomwu), "GO terms\n")
-
-cat("Loading Symbiont GO_MWU results...\n")
-symbiont_gomwu <- load_gomwu_bubble_results("../11_symbiont_GO_MWU", prefix = "symbiont", "Symbiont")
-cat("  Loaded", nrow(symbiont_gomwu), "GO terms\n")
-
 # -----------------------------------------------------------------------------
-# Process Data for Plotting
+# Process Data for Plotting - UPDATED
 # -----------------------------------------------------------------------------
 
-process_for_bubble <- function(gomwu_data, p_cutoff = 0.05) {
+process_for_bubble <- function(gomwu_data, p_cutoff = 0.05, top_n = 10) {
+    
+    keyword_pattern <- paste(ANNOTATION_KEYWORDS, collapse = "|")
     
     df <- gomwu_data %>%
         filter(!is.na(p.adj)) %>%
@@ -825,11 +819,10 @@ process_for_bubble <- function(gomwu_data, p_cutoff = 0.05) {
             # Y-axis: -log10(p.adj), cap at reasonable value
             neg_log10_padj = pmin(-log10(p.adj), 30),
             
-            # X-axis: delta.rank (already signed for direction)
-            # Normalize to z-score-like scale for better visualization
-            x_value = delta.rank / 100,  # Scale down for readability
+            # X-axis: delta.rank scaled for readability
+            x_value = delta.rank / 100,
             
-            # Clean up GO term name
+            # Clean GO term name
             go_name = name,
             
             # Season labels
@@ -839,37 +832,46 @@ process_for_bubble <- function(gomwu_data, p_cutoff = 0.05) {
             ),
             
             # Division factor
-            division = factor(division, levels = c("BP", "CC", "MF"))
+            division = factor(division, levels = c("BP", "CC", "MF")),
+            
+            # Check if term matches keyword
+            matches_keyword = str_detect(tolower(go_name), regex(keyword_pattern, ignore_case = TRUE))
         )
     
-    # Check if term matches any annotation keyword
-    keyword_pattern <- paste(ANNOTATION_KEYWORDS, collapse = "|")
+    # Identify top N significant terms per facet (season × division)
+    top_significant <- df %>%
+        filter(p.adj < p_cutoff) %>%
+        group_by(season_label, division) %>%
+        slice_min(order_by = p.adj, n = top_n, with_ties = FALSE) %>%
+        ungroup() %>%
+        mutate(is_top_significant = TRUE) %>%
+        select(go_name, season_label, division, is_top_significant)
+    
+    # Join back and create annotation columns
     df <- df %>%
+        left_join(top_significant, by = c("go_name", "season_label", "division")) %>%
         mutate(
-            matches_keyword = str_detect(tolower(go_name), regex(keyword_pattern, ignore_case = TRUE)),
-            # Only annotate if significant AND matches keyword
-            annotate_label = ifelse(p.adj < p_cutoff & matches_keyword, 
-                                    str_trunc(go_name, 35), NA)
+            is_top_significant = replace_na(is_top_significant, FALSE),
+            
+            # Annotate if: significant keyword match OR top N significant
+            should_annotate = (p.adj < p_cutoff & matches_keyword) | is_top_significant,
+            
+            # Label text (truncated)
+            annotate_label = ifelse(should_annotate, str_trunc(go_name, 40), NA_character_),
+            
+            # Fontface: bold for keyword matches, plain for top significant only
+            label_fontface = case_when(
+                !should_annotate ~ NA_character_,
+                matches_keyword ~ "bold",
+                TRUE ~ "plain"
+            )
         )
     
     return(df)
 }
 
-host_bubble_data <- process_for_bubble(host_gomwu, BUBBLE_P_ADJ_CUTOFF)
-symbiont_bubble_data <- process_for_bubble(symbiont_gomwu, BUBBLE_P_ADJ_CUTOFF)
-
-cat("\nHost data for plotting:", nrow(host_bubble_data), "terms\n")
-cat("  Significant (p.adj <", BUBBLE_P_ADJ_CUTOFF, "):", 
-    sum(host_bubble_data$p.adj < BUBBLE_P_ADJ_CUTOFF, na.rm = TRUE), "\n")
-cat("  To be annotated:", sum(!is.na(host_bubble_data$annotate_label)), "\n")
-
-cat("\nSymbiont data for plotting:", nrow(symbiont_bubble_data), "terms\n")
-cat("  Significant (p.adj <", BUBBLE_P_ADJ_CUTOFF, "):", 
-    sum(symbiont_bubble_data$p.adj < BUBBLE_P_ADJ_CUTOFF, na.rm = TRUE), "\n")
-cat("  To be annotated:", sum(!is.na(symbiont_bubble_data$annotate_label)), "\n")
-
 # -----------------------------------------------------------------------------
-# Create Bubble Plot Function
+# Create Bubble Plot Function - UPDATED
 # -----------------------------------------------------------------------------
 
 create_gomwu_bubble <- function(bubble_data, organism_name, org_color) {
@@ -877,30 +879,75 @@ create_gomwu_bubble <- function(bubble_data, organism_name, org_color) {
     # Significance threshold line
     sig_line <- -log10(BUBBLE_P_ADJ_CUTOFF)
     
+    # Separate data for bold and plain labels
+    label_data <- bubble_data %>%
+        filter(!is.na(annotate_label))
+    
+    bold_labels <- label_data %>% filter(label_fontface == "bold")
+    plain_labels <- label_data %>% filter(label_fontface == "plain")
+    
+    # Determine nudge direction based on x_value (push to opposite side)
+    # Positive x_value -> nudge left, Negative x_value -> nudge right
+    bold_labels <- bold_labels %>%
+        mutate(nudge_direction = ifelse(x_value > 0, -1, 1))
+    plain_labels <- plain_labels %>%
+        mutate(nudge_direction = ifelse(x_value > 0, -1, 1))
+    
     p <- ggplot(bubble_data, aes(x = x_value, y = neg_log10_padj)) +
         
         # Points - all terms
-        geom_point(aes(size = nseqs, fill = division), 
+        geom_point(aes(size = nseqs, fill = division),
                    shape = 21, alpha = 0.6, color = "gray30", stroke = 0.3) +
         
         # Significance threshold line
-        geom_hline(yintercept = sig_line, color = "darkorange", 
+        geom_hline(yintercept = sig_line, color = "darkorange",
                    linetype = "solid", linewidth = 0.8) +
         
         # Vertical line at 0 (no change)
-        geom_vline(xintercept = 0, color = "gray50", 
+        geom_vline(xintercept = 0, color = "gray50",
                    linetype = "dashed", linewidth = 0.5) +
         
-        # Labels for keyword-matching significant terms
+        # BOLD labels (keyword matches) - pushed to sides
         geom_text_repel(
+            data = bold_labels,
             aes(label = annotate_label),
             size = 2.5,
-            max.overlaps = 20,
-            box.padding = 0.3,
-            point.padding = 0.2,
-            segment.color = "gray50",
+            fontface = "bold",
+            color = "black",
+            max.overlaps = 30,
+            box.padding = 0.4,
+            point.padding = 0.3,
+            segment.color = "gray40",
+            segment.size = 0.4,
+            segment.linetype = "solid",
+            min.segment.length = 0,
+            force = 2,
+            force_pull = 0.5,
+            direction = "y",
+            nudge_x = bold_labels$nudge_direction * 15,
+            hjust = ifelse(bold_labels$nudge_direction > 0, 0, 1),
+            na.rm = TRUE
+        ) +
+        
+        # PLAIN labels (top significant, not keyword) - pushed to sides
+        geom_text_repel(
+            data = plain_labels,
+            aes(label = annotate_label),
+            size = 2.3,
+            fontface = "plain",
+            color = "gray20",
+            max.overlaps = 30,
+            box.padding = 0.4,
+            point.padding = 0.3,
+            segment.color = "gray60",
             segment.size = 0.3,
-            min.segment.length = 0.2,
+            segment.linetype = "dashed",
+            min.segment.length = 0,
+            force = 2,
+            force_pull = 0.5,
+            direction = "y",
+            nudge_x = plain_labels$nudge_direction * 15,
+            hjust = ifelse(plain_labels$nudge_direction > 0, 0, 1),
             na.rm = TRUE
         ) +
         
@@ -908,8 +955,8 @@ create_gomwu_bubble <- function(bubble_data, organism_name, org_color) {
         scale_fill_manual(
             values = division_colors,
             name = "GO Division",
-            labels = c("BP" = "Biological Process", 
-                      "CC" = "Cellular Component", 
+            labels = c("BP" = "Biological Process",
+                      "CC" = "Cellular Component",
                       "MF" = "Molecular Function")
         ) +
         
@@ -920,6 +967,9 @@ create_gomwu_bubble <- function(bubble_data, organism_name, org_color) {
             breaks = c(10, 50, 100, 200, 500)
         ) +
         
+        # Expand x-axis to make room for labels on sides
+        scale_x_continuous(expand = expansion(mult = c(0.3, 0.3))) +
+        
         # Facet: columns = division, rows = season
         facet_grid(season_label ~ division, scales = "free_x") +
         
@@ -927,14 +977,16 @@ create_gomwu_bubble <- function(bubble_data, organism_name, org_color) {
         labs(
             x = "Delta Rank (Direction Score)",
             y = expression(-log[10]~italic(p)[adj]),
-            title = paste0("GO Enrichment: ", organism_name)
+            title = paste0("GO Enrichment: ", organism_name),
+            caption = "Bold = calcification/transport keywords; Plain = top 10 significant"
         ) +
         
         # Theme
         theme_bw(base_size = 11) +
         theme(
-            plot.title = element_text(size = 14, face = "bold.italic", 
+            plot.title = element_text(size = 14, face = "bold.italic",
                                       hjust = 0.5, color = org_color),
+            plot.caption = element_text(size = 9, face = "italic", hjust = 0.5),
             axis.title = element_text(size = 11, face = "bold"),
             axis.text = element_text(size = 9),
             strip.text = element_text(size = 10, face = "bold"),
@@ -958,48 +1010,79 @@ create_gomwu_bubble <- function(bubble_data, organism_name, org_color) {
 # Generate Plots
 # -----------------------------------------------------------------------------
 
+cat("Loading Host GO_MWU results...\n")
+host_gomwu <- load_gomwu_bubble_results("../10_GO_MWU", prefix = "", "Host")
+cat("  Loaded", nrow(host_gomwu), "GO terms\n")
+
+cat("Loading Symbiont GO_MWU results...\n")
+symbiont_gomwu <- load_gomwu_bubble_results("../11_symbiont_GO_MWU", prefix = "symbiont", "Symbiont")
+cat("  Loaded", nrow(symbiont_gomwu), "GO terms\n")
+
+# Process with updated function
+host_bubble_data <- process_for_bubble(host_gomwu, BUBBLE_P_ADJ_CUTOFF, TOP_N_ANNOTATE)
+symbiont_bubble_data <- process_for_bubble(symbiont_gomwu, BUBBLE_P_ADJ_CUTOFF, TOP_N_ANNOTATE)
+
+cat("\nHost data for plotting:", nrow(host_bubble_data), "terms\n")
+cat("  Significant (p.adj <", BUBBLE_P_ADJ_CUTOFF, "):",
+    sum(host_bubble_data$p.adj < BUBBLE_P_ADJ_CUTOFF, na.rm = TRUE), "\n")
+cat("  Keyword matches to annotate:", sum(host_bubble_data$matches_keyword & 
+                                           host_bubble_data$p.adj < BUBBLE_P_ADJ_CUTOFF, na.rm = TRUE), "\n")
+cat("  Top significant to annotate:", sum(host_bubble_data$is_top_significant, na.rm = TRUE), "\n")
+cat("  Total annotations:", sum(!is.na(host_bubble_data$annotate_label)), "\n")
+
+cat("\nSymbiont data for plotting:", nrow(symbiont_bubble_data), "terms\n")
+cat("  Significant (p.adj <", BUBBLE_P_ADJ_CUTOFF, "):",
+    sum(symbiont_bubble_data$p.adj < BUBBLE_P_ADJ_CUTOFF, na.rm = TRUE), "\n")
+cat("  Keyword matches to annotate:", sum(symbiont_bubble_data$matches_keyword & 
+                                           symbiont_bubble_data$p.adj < BUBBLE_P_ADJ_CUTOFF, na.rm = TRUE), "\n")
+cat("  Top significant to annotate:", sum(symbiont_bubble_data$is_top_significant, na.rm = TRUE), "\n")
+cat("  Total annotations:", sum(!is.na(symbiont_bubble_data$annotate_label)), "\n")
+
 cat("\nGenerating Host bubble plot...\n")
 fig4d_host_bubble <- create_gomwu_bubble(
-    host_bubble_data, 
-    "M. capitata (Host)", 
-    host_color
+    host_bubble_data,
+    "M. capitata (Host)",
+    "#E69F00"  # host_color
 )
 
 cat("Generating Symbiont bubble plot...\n")
 fig4e_symbiont_bubble <- create_gomwu_bubble(
-    symbiont_bubble_data, 
-    "D. trenchii (Symbiont)", 
-    symbiont_color
+    symbiont_bubble_data,
+    "D. trenchii (Symbiont)",
+    "#56B4E9"  # symbiont_color
 )
 
 # -----------------------------------------------------------------------------
 # Save Plots
 # -----------------------------------------------------------------------------
 
-ggsave("figures/Fig4D_bubble_host_GOMWU.pdf", fig4d_host_bubble, 
-       width = 14, height = 8, dpi = 300)
-ggsave("figures/Fig4D_bubble_host_GOMWU.png", fig4d_host_bubble, 
-       width = 14, height = 8, dpi = 300)
+ggsave("figures/Fig4D_bubble_host_GOMWU.pdf", fig4d_host_bubble,
+       width = 16, height = 9, dpi = 300)
+ggsave("figures/Fig4D_bubble_host_GOMWU.png", fig4d_host_bubble,
+       width = 16, height = 9, dpi = 300)
 cat("✓ Saved: Fig4D_bubble_host_GOMWU.pdf/png\n")
 
-ggsave("figures/Fig4E_bubble_symbiont_GOMWU.pdf", fig4e_symbiont_bubble, 
-       width = 14, height = 8, dpi = 300)
-ggsave("figures/Fig4E_bubble_symbiont_GOMWU.png", fig4e_symbiont_bubble, 
-       width = 14, height = 8, dpi = 300)
+ggsave("figures/Fig4E_bubble_symbiont_GOMWU.pdf", fig4e_symbiont_bubble,
+       width = 16, height = 9, dpi = 300)
+ggsave("figures/Fig4E_bubble_symbiont_GOMWU.png", fig4e_symbiont_bubble,
+       width = 16, height = 9, dpi = 300)
 cat("✓ Saved: Fig4E_bubble_symbiont_GOMWU.pdf/png\n")
 
 # -----------------------------------------------------------------------------
 # Save Summary Statistics
 # -----------------------------------------------------------------------------
 
-# Summary of annotated terms
 annotated_summary <- bind_rows(
-    host_bubble_data %>% 
+    host_bubble_data %>%
         filter(!is.na(annotate_label)) %>%
-        select(organism, season, division, go_name, p.adj, delta.rank, nseqs),
+        mutate(annotation_type = ifelse(matches_keyword, "Keyword (bold)", "Top significant")) %>%
+        select(organism, season, division, go_name, p.adj, delta.rank, nseqs, 
+               matches_keyword, is_top_significant, annotation_type),
     symbiont_bubble_data %>%
         filter(!is.na(annotate_label)) %>%
-        select(organism, season, division, go_name, p.adj, delta.rank, nseqs)
+        mutate(annotation_type = ifelse(matches_keyword, "Keyword (bold)", "Top significant")) %>%
+        select(organism, season, division, go_name, p.adj, delta.rank, nseqs,
+               matches_keyword, is_top_significant, annotation_type)
 ) %>%
     arrange(organism, season, division, p.adj)
 
@@ -1008,7 +1091,11 @@ cat("✓ Saved: bubble_plot_annotated_terms.csv\n")
 
 # Print summary
 cat("\n=== Annotated Terms Summary ===\n")
+cat("\nBy organism and season:\n")
 print(table(annotated_summary$organism, annotated_summary$season))
+
+cat("\nBy annotation type:\n")
+print(table(annotated_summary$organism, annotated_summary$annotation_type))
 
 cat("\n✓ Figure 4D-E bubble plots complete!\n")
 
