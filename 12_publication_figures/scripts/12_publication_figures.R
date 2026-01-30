@@ -713,17 +713,18 @@ cat("      Symbiont Summer=#006341, Symbiont Winter=#8fe2b0\n")
 cat("      Excludes: Protein Phosphorylation, Na/K Transport, Phospholipid Transport\n")
 
 # ==============================================================================
-# FIGURE 4D-E: GO_MWU Bubble Plots - VERSION 5
-# Comprehensive abbreviations based on actual plot terms
+# FIGURE 4D-E: GO_MWU Bubble Plots - VERSION 6
+# With MANUAL position overrides for specific labels
 # ==============================================================================
 
 cat("\n==============================================================================\n")
-cat("Figure 4D-E: GO_MWU Bubble Plots (Updated v5 - Comprehensive Abbreviations)\n")
+cat("Figure 4D-E: GO_MWU Bubble Plots (v6 - Manual Position Overrides)\n")
 cat("==============================================================================\n\n")
 
 # -----------------------------------------------------------------------------
 # Configuration
 # -----------------------------------------------------------------------------
+
 
 ANNOTATION_KEYWORDS <- c(
     "\\bion\\b",
@@ -754,14 +755,11 @@ division_colors <- c(
 )
 
 # -----------------------------------------------------------------------------
-# GO Term Simplification Function - COMPREHENSIVE VERSION
+# GO Term Simplification Function (same as v5)
 # -----------------------------------------------------------------------------
 
 simplify_go_term <- function(term) {
     
-    # =========================================================================
-    # STEP 1: Remove uninformative words completely
-    # =========================================================================
     remove_words <- c(
         "\\bobsolete\\s*",
         "\\bmonoatomic\\s*",
@@ -773,9 +771,6 @@ simplify_go_term <- function(term) {
         term <- str_replace_all(term, regex(pattern, ignore_case = TRUE), "")
     }
     
-    # =========================================================================
-    # STEP 2: Ion symbols (plain text)
-    # =========================================================================
     ion_replacements <- c(
         "\\bcalcium\\b" = "Ca2+",
         "\\bsodium\\b" = "Na+",
@@ -789,35 +784,25 @@ simplify_go_term <- function(term) {
         "\\bproton\\b" = "H+",
         "\\bhydrogen\\b" = "H+"
     )
+    
     for (pattern in names(ion_replacements)) {
         term <- str_replace_all(term, regex(pattern, ignore_case = TRUE), 
                                 ion_replacements[pattern])
     }
     
-    # =========================================================================
-    # STEP 3: Multi-word phrases (replace BEFORE single words)
-    # Order matters - longer phrases first!
-    # =========================================================================
     phrase_abbrevs <- c(
-        # Cellular structures - multi-word
         "endoplasmic reticulum" = "ER",
         "plasma membrane" = "PM",
         "cell membrane" = "membrane",
         "rough ER" = "rough ER",
         "ER-Golgi intermediate compartment" = "ER-Golgi",
-        
-        # Regulation phrases
         "positive regulation of" = "+reg.",
         "negative regulation of" = "-reg.",
         "regulation of" = "reg.",
-        
-        # Remove these phrases entirely (low information)
         "response to " = "",
         "involved in " = "",
         "establishment of " = "",
         " involved in.*$" = "",
-        
-        # Simplify compound descriptors
         "-containing complex" = "",
         "-transporting " = " ",
         "-driven active" = "-driven",
@@ -826,23 +811,17 @@ simplify_go_term <- function(term) {
         "-directed " = "-dir. ",
         "-transcribed " = "-txd ",
         "-type " = " ",
-        
-        # Common multi-word terms
         "transmembrane transporter" = "TM transporter",
         "transmembrane transport" = "TM transport",
         "ion transmembrane" = "ion TM",
         "active transmembrane" = "active TM",
-        
         "ATP synthase" = "ATP synth.",
         "two-sector ATPase" = "ATPase",
-        
         "nervous system" = "NS",
         "central nervous system" = "CNS",
-        
         "nucleic acid" = "nucl. acid",
         "amino acid" = "AA",
         "fatty acid" = "FA",
-        
         "cell-cell" = "cell-cell",
         "protein-RNA" = "prot.-RNA"
     )
@@ -852,18 +831,12 @@ simplify_go_term <- function(term) {
                                 phrase_abbrevs[pattern])
     }
     
-    # =========================================================================
-    # STEP 4: Single word abbreviations
-    # =========================================================================
     word_abbrevs <- c(
-        # Requested abbreviations
         "\\bchemosensory\\b" = "chemosen.",
         "\\bprotein\\b" = "prot.",
         "\\bcomplex\\b" = "cplx",
         "\\bligand\\b" = "lig.",
         "\\borganic\\b" = "org.",
-        
-        # Cellular/molecular terms
         "\\bmitochondrial\\b" = "mito.",
         "\\bmitochondrion\\b" = "mito.",
         "\\bcytoplasmic\\b" = "cyto.",
@@ -877,16 +850,12 @@ simplify_go_term <- function(term) {
         "\\bpreribosome\\b" = "preribo.",
         "\\bribonucleoprotein\\b" = "RNP",
         "\\bspliceosomal\\b" = "spliceo.",
-        
-        # Channel/transport terms
         "\\btransmembrane\\b" = "TM",
         "\\btransporter\\b" = "transporter",
         "\\btransport\\b" = "transport",
         "\\bchannel\\b" = "ch.",
         "\\bvoltage-gated\\b" = "V-gated",
         "\\btransmitter-gated\\b" = "transmit.-gated",
-        
-        # Structure terms
         "\\borganelle\\b" = "organelle",
         "\\benvelope\\b" = "env.",
         "\\bmembrane\\b" = "memb.",
@@ -901,8 +870,6 @@ simplify_go_term <- function(term) {
         "\\bjunction\\b" = "junct.",
         "\\banchoring\\b" = "anchor.",
         "\\bsynaptic\\b" = "synap.",
-        
-        # Process terms
         "\\blocalization\\b" = "local.",
         "\\borganization\\b" = "org.",
         "\\bbiosynthetic\\b" = "biosynth.",
@@ -920,8 +887,6 @@ simplify_go_term <- function(term) {
         "\\bbiogenesis\\b" = "biogen.",
         "\\bdevelopment\\b" = "dev.",
         "\\bsignaling\\b" = "signal.",
-        
-        # Descriptor terms
         "\\bstructural\\b" = "struct.",
         "\\bconstituent\\b" = "const.",
         "\\bmolecule\\b" = "mol.",
@@ -932,16 +897,12 @@ simplify_go_term <- function(term) {
         "\\bintracellular\\b" = "IC",
         "\\binorganic\\b" = "inorg.",
         "\\bmonovalent\\b" = "monoval.",
-        
-        # Movement/motor terms
         "\\bmicrotubule\\b" = "MT",
         "\\bcytoskeletal\\b" = "cytoskel.",
         "\\blocomotory\\b" = "locomo.",
         "\\bmovement\\b" = "movmt",
         "\\bmotor\\b" = "motor",
         "\\bdynein\\b" = "dynein",
-        
-        # Other common terms
         "\\bpolypeptide\\b" = "polypep.",
         "\\bconformation\\b" = "conform.",
         "\\bdehydrogenase\\b" = "DH",
@@ -961,27 +922,19 @@ simplify_go_term <- function(term) {
                                 word_abbrevs[pattern])
     }
     
-    # =========================================================================
-    # STEP 5: Final cleanup
-    # =========================================================================
+    term <- str_replace_all(term, "\\s+", " ")
+    term <- str_replace_all(term, "^\\s+|\\s+$", "")
+    term <- str_replace_all(term, "\\s*-\\s*", "-")
+    term <- str_replace_all(term, "\\s+,", ",")
+    term <- str_replace_all(term, ",\\s*$", "")
+    term <- str_replace_all(term, "\\s*\\.$", "")
+    term <- str_replace_all(term, "^\\s*of\\s+", "")
+    term <- str_replace_all(term, "\\s+of$", "")
+    term <- str_replace_all(term, "\\s+to$", "")
+    term <- str_replace_all(term, "\\s+or$", "")
     
-    # Clean up spacing and punctuation
-    term <- str_replace_all(term, "\\s+", " ")           # collapse spaces
-    term <- str_replace_all(term, "^\\s+|\\s+$", "")     # trim
-    term <- str_replace_all(term, "\\s*-\\s*", "-")      # clean hyphens
-    term <- str_replace_all(term, "\\s+,", ",")          # comma spacing
-    term <- str_replace_all(term, ",\\s*$", "")          # trailing comma
-    term <- str_replace_all(term, "\\s*\\.$", "")        # trailing period
-    term <- str_replace_all(term, "^\\s*of\\s+", "")     # leading "of"
-    term <- str_replace_all(term, "\\s+of$", "")         # trailing "of"
-    term <- str_replace_all(term, "\\s+to$", "")         # trailing "to"
-    term <- str_replace_all(term, "\\s+or$", "")         # trailing "or"
-    
-    # =========================================================================
-    # STEP 6: Limit to 4 words max (more readable than 3)
-    # =========================================================================
     words <- str_split(term, "\\s+")[[1]]
-    words <- words[words != ""]  # remove empty strings
+    words <- words[words != ""]
     
     if (length(words) > 4) {
         term <- paste(words[1:4], collapse = " ")
@@ -991,56 +944,6 @@ simplify_go_term <- function(term) {
     
     return(term)
 }
-
-# -----------------------------------------------------------------------------
-# Test the function with actual terms from the plots
-# -----------------------------------------------------------------------------
-
-cat("Testing simplification function with actual plot terms:\n")
-cat(strrep("=", 80), "\n")
-
-test_terms <- c(
-    # From Host plot
-    "chemosensory behavior",
-    "protein localization to mitochondrion",
-    "ligand-gated ion channel activity",
-    "ligand-gated cation channel activity",
-    "transmitter-gated ion channel activity",
-    "excitatory extracellular ligand-gated monoatomic ion channel activity",
-    "regulation of cytosolic calcium ion concentration",
-    "oxidoreductase activity, acting on NAD(P)H",
-    "polypeptide conformation or assembly isomerase activity",
-    "dynein light intermediate chain binding",
-    "mitochondrial protein-containing complex",
-    "rough endoplasmic reticulum membrane",
-    "endoplasmic reticulum chaperone complex",
-    "structural constituent of ribosome",
-    "oxidoreduction-driven active transmembrane transporter activity",
-    
-    # From Symbiont plot
-    "nuclear-transcribed mRNA catabolic process",
-    "organic cyclic compound biosynthetic process",
-    "protein-RNA complex organization",
-    "localization within membrane",
-    "calcium ion-mediated signaling",
-    "monovalent inorganic anion transport",
-    "ER-Golgi intermediate compartment membrane",
-    "lumenal side of endoplasmic reticulum membrane",
-    "sno(s)RNA-containing ribonucleoprotein complex",
-    "phosphatidylinositol bisphosphate binding",
-    "calcium ion-dependent cysteine-type endopeptidase activity",
-    "calcium ion-dependent phospholipid binding",
-    "voltage-gated calcium ion channel activity",
-    "plus-end-directed microtubule motor activity",
-    "alkali metal ion binding"
-)
-
-for (t in test_terms) {
-    simplified <- simplify_go_term(t)
-    cat(sprintf("%-60s -> %s\n", substr(t, 1, 60), simplified))
-}
-
-cat(strrep("=", 80), "\n\n")
 
 # -----------------------------------------------------------------------------
 # Load GO_MWU Results
@@ -1097,7 +1000,7 @@ process_for_bubble <- function(gomwu_data, p_cutoff = 0.05, top_n = 10) {
     df <- gomwu_data %>%
         filter(!is.na(p.adj)) %>%
         mutate(
-            neg_log10_padj = pmin(-log10(p.adj), 30),
+            neg_log10_padj = pmin(-log10(p.adj), 35),
             x_value = delta.rank / 100,
             go_name = name,
             season_label = factor(
@@ -1108,7 +1011,6 @@ process_for_bubble <- function(gomwu_data, p_cutoff = 0.05, top_n = 10) {
             matches_keyword = str_detect(tolower(go_name), regex(keyword_pattern, ignore_case = TRUE))
         )
     
-    # Identify top N significant terms per facet
     top_significant <- df %>%
         filter(p.adj < p_cutoff) %>%
         group_by(season_label, division) %>%
@@ -1117,20 +1019,16 @@ process_for_bubble <- function(gomwu_data, p_cutoff = 0.05, top_n = 10) {
         mutate(is_top_significant = TRUE) %>%
         select(go_name, season_label, division, is_top_significant)
     
-    # Join and create annotation columns
     df <- df %>%
         left_join(top_significant, by = c("go_name", "season_label", "division")) %>%
         mutate(
             is_top_significant = replace_na(is_top_significant, FALSE),
             should_annotate = (p.adj < p_cutoff & matches_keyword) | is_top_significant,
-            
-            # Apply simplification function
             annotate_label = ifelse(
                 should_annotate, 
                 sapply(go_name, simplify_go_term),
                 NA_character_
             ),
-            
             label_fontface = case_when(
                 !should_annotate ~ NA_character_,
                 matches_keyword ~ "bold",
@@ -1147,42 +1045,205 @@ process_for_bubble <- function(gomwu_data, p_cutoff = 0.05, top_n = 10) {
 }
 
 # -----------------------------------------------------------------------------
-# Create Bubble Plot Function
+# MANUAL POSITION ADJUSTMENTS
 # -----------------------------------------------------------------------------
 
-create_gomwu_bubble <- function(bubble_data, organism_name, org_color) {
+# Define manual position overrides for HOST
+# Format: season, division, label_pattern (partial match), manual_x, manual_y
+host_manual_positions <- tribble(
+    ~season_label, ~division, ~label_pattern, ~manual_x, ~manual_y, ~fontface_filter,
+    # Host Summer MF: H+ TM transporter to x = -60
+    "Summer", "MF", "H\\+ TM transporter", -60, NA, "bold",
+    
+    # Host Winter MF: bold negative terms start at x = -50
+    "Winter", "MF", "cation ch", -50, NA, "bold",
+    "Winter", "MF", "lig.-gated ion ch", -50, NA, "bold",
+    "Winter", "MF", "lig.-gated cation ch", -50, NA, "bold",
+    "Winter", "MF", "lig.-gated anion ch", -50, NA, "bold",
+    "Winter", "MF", "H\\+ TM transporter", -50, NA, "bold",
+    "Winter", "MF", "active ion TM transporter", -50, NA, "bold",
+    "Winter", "MF", "transmit.-gated ion ch", -50, NA, "bold",
+    "Winter", "MF", "metal ion TM transporter", -50, NA, "bold",
+    
+    # Host Winter MF: "ch" on negative side to y = 9.0
+    "Winter", "MF", "^ch$", NA, 9.0, "plain",
+    
+    # Host Winter MF: positive bold terms start at x = 30
+    "Winter", "MF", "polypep. conform", 30, NA, "bold",
+    "Winter", "MF", "MT motor", 30, NA, "bold",
+    
+    # Host Winter MF: non-bold positive terms scatter y = 5-7
+    "Winter", "MF", "dynein light", 30, 7, "plain",
+    "Winter", "MF", "gated ch", 30, 6, "plain",
+    "Winter", "MF", "RNA bind", 30, 5, "plain",
+    "Winter", "MF", "redox-driven TM", 30, 5.5, "plain",
+    "Winter", "MF", "ATPase reg", 30, 6.5, "plain",
+    
+    # Host Winter MF: H+ TM transporter (positive side) at y = 4
+    # Note: need to distinguish from negative H+ TM transporter - use x_value > 0
+    "Winter", "MF", "H\\+ TM transporter_POS", 30, 4, "bold"
+)
+
+# Define manual position overrides for SYMBIONT
+symbiont_manual_positions <- tribble(
+    ~season_label, ~division, ~label_pattern, ~manual_x, ~manual_y, ~fontface_filter,
+    # Symbiont Summer CC: rough ER to y = 2.5
+    "Summer", "CC", "^rough ER$", NA, 2.5, "bold",
+    
+    # Symbiont Summer MF: Ca2+ ion TM transporter to y = 5
+    "Summer", "MF", "Ca2\\+ ion TM transporter", NA, 5, "bold",
+    
+    # Symbiont Winter BP: bold annotations below y = 2 moved up
+    # These will be handled dynamically below
+    
+    # Symbiont Winter CC: negative bold start at x = -60, positive at x = 30
+    "Winter", "CC", "ion ch. cplx", -60, NA, "bold",
+    "Winter", "CC", "Ca2\\+ ch. cplx", -60, NA, "bold",
+    "Winter", "CC", "spliceo. cplx", -60, NA, "bold",
+    "Winter", "CC", "sno\\(s\\)RNA", -60, NA, "bold",
+    "Winter", "CC", "ER prot", 30, NA, "bold",
+    "Winter", "CC", "H\\+ ATPase cplx", 30, NA, "bold",
+    "Winter", "CC", "rough ER", 30, NA, "bold",
+    "Winter", "CC", "ER-Golgi", 30, NA, "bold",
+    "Winter", "CC", "lumen. side", 30, NA, "bold"
+    
+    # Symbiont Winter MF: positive bold below y = 5 moved up - handled dynamically
+)
+
+# -----------------------------------------------------------------------------
+# Apply Manual Adjustments Function
+# -----------------------------------------------------------------------------
+
+apply_manual_adjustments <- function(bubble_data, manual_df, organism_type) {
+    
+    label_data <- bubble_data %>%
+        filter(!is.na(annotate_label)) %>%
+        mutate(
+            manual_x = NA_real_,
+            manual_y = NA_real_,
+            has_manual = FALSE
+        )
+    
+    # Apply specific manual positions
+    for (i in 1:nrow(manual_df)) {
+        row <- manual_df[i, ]
+        
+        # Handle the special _POS suffix for distinguishing same labels by side
+        pattern <- row$label_pattern
+        check_positive <- FALSE
+        if (str_detect(pattern, "_POS$")) {
+            pattern <- str_replace(pattern, "_POS$", "")
+            check_positive <- TRUE
+        }
+        
+        # Find matching labels
+        match_idx <- which(
+            label_data$season_label == row$season_label &
+            label_data$division == row$division &
+            str_detect(label_data$annotate_label, regex(pattern, ignore_case = TRUE)) &
+            label_data$label_fontface == row$fontface_filter
+        )
+        
+        # Additional filter for positive side if needed
+        if (check_positive && length(match_idx) > 0) {
+            match_idx <- match_idx[label_data$x_value[match_idx] > 0]
+        }
+        
+        if (length(match_idx) > 0) {
+            if (!is.na(row$manual_x)) {
+                label_data$manual_x[match_idx] <- row$manual_x
+            }
+            if (!is.na(row$manual_y)) {
+                label_data$manual_y[match_idx] <- row$manual_y
+            }
+            label_data$has_manual[match_idx] <- TRUE
+        }
+    }
+    
+    # DYNAMIC ADJUSTMENTS for Symbiont
+    if (organism_type == "symbiont") {
+        # Symbiont Winter BP: bold annotations below y = 2 moved to y = 20, 21, 22...
+        winter_bp_low <- which(
+            label_data$season_label == "Winter" &
+            label_data$division == "BP" &
+            label_data$label_fontface == "bold" &
+            label_data$neg_log10_padj < 2
+        )
+        if (length(winter_bp_low) > 0) {
+            # Assign sequential y positions starting at 20
+            for (j in seq_along(winter_bp_low)) {
+                idx <- winter_bp_low[j]
+                label_data$manual_y[idx] <- 20 + (j - 1)
+                label_data$has_manual[idx] <- TRUE
+            }
+        }
+        
+        # Symbiont Winter MF: positive bold below y = 5 moved to y = 17, 18, 19, 20...
+        winter_mf_low <- which(
+            label_data$season_label == "Winter" &
+            label_data$division == "MF" &
+            label_data$label_fontface == "bold" &
+            label_data$x_value > 0 &
+            label_data$neg_log10_padj < 5
+        )
+        if (length(winter_mf_low) > 0) {
+            for (j in seq_along(winter_mf_low)) {
+                idx <- winter_mf_low[j]
+                label_data$manual_y[idx] <- 17 + (j - 1)
+                label_data$has_manual[idx] <- TRUE
+            }
+        }
+    }
+    
+    # For manual positions, set label coordinates
+    label_data <- label_data %>%
+        mutate(
+            # Label x position: use manual_x if set, otherwise calculate from side
+            label_x = case_when(
+                has_manual & !is.na(manual_x) ~ manual_x / 100,  # Convert back to x_value scale
+                label_side == "left" ~ x_value - 0.2,
+                label_side == "right" ~ x_value + 0.2,
+                TRUE ~ x_value
+            ),
+            # Label y position: use manual_y if set, otherwise use data y
+            label_y = case_when(
+                has_manual & !is.na(manual_y) ~ manual_y,
+                TRUE ~ neg_log10_padj
+            )
+        )
+    
+    return(label_data)
+}
+
+# -----------------------------------------------------------------------------
+# Create Bubble Plot Function with Manual Overrides
+# -----------------------------------------------------------------------------
+
+create_gomwu_bubble_manual <- function(bubble_data, label_data, organism_name, org_color) {
     
     sig_line <- -log10(BUBBLE_P_ADJ_CUTOFF)
     
-    # Separate data by side AND fontface
-    label_data <- bubble_data %>%
-        filter(!is.na(annotate_label))
+    # Separate manual vs auto labels
+    manual_labels <- label_data %>% filter(has_manual)
+    auto_labels <- label_data %>% filter(!has_manual)
     
-    bold_left <- label_data %>% filter(label_fontface == "bold", label_side == "left")
-    bold_right <- label_data %>% filter(label_fontface == "bold", label_side == "right")
-    plain_left <- label_data %>% filter(label_fontface == "plain", label_side == "left")
-    plain_right <- label_data %>% filter(label_fontface == "plain", label_side == "right")
+    # Further split auto labels by side and fontface
+    bold_left <- auto_labels %>% filter(label_fontface == "bold", label_side == "left")
+    bold_right <- auto_labels %>% filter(label_fontface == "bold", label_side == "right")
+    plain_left <- auto_labels %>% filter(label_fontface == "plain", label_side == "left")
+    plain_right <- auto_labels %>% filter(label_fontface == "plain", label_side == "right")
     
-    # Calculate x-axis range and boundaries
+    # Manual labels by fontface
+    manual_bold <- manual_labels %>% filter(label_fontface == "bold")
+    manual_plain <- manual_labels %>% filter(label_fontface == "plain")
+    
+    # X-axis parameters
     x_range <- range(bubble_data$x_value, na.rm = TRUE)
     x_span <- diff(x_range)
+    x_expand <- 0.50
     
-    # Expansion factor (must match scale_x_continuous expand)
-    x_expand <- 0.45
-    x_min_plot <- x_range[1] - (x_span * x_expand)
-    x_max_plot <- x_range[2] + (x_span * x_expand)
-    
-    # Nudge distances - staggered lanes
-    nudge_bold <- x_span * 0.18
-    nudge_plain <- x_span * 0.35
-    
-    # Label boundaries - keep labels INSIDE the plot with margin
-    x_left_limit <- x_min_plot + (x_span * 0.02)   # Small margin from edge
-    x_right_limit <- x_max_plot - (x_span * 0.02)
-    
-    # Y-axis boundaries
-    y_range <- range(bubble_data$neg_log10_padj, na.rm = TRUE)
-    y_max <- y_range[2] * 1.08  # 8% headroom
+    nudge_bold <- x_span * 0.15
+    nudge_plain <- x_span * 0.32
     
     p <- ggplot(bubble_data, aes(x = x_value, y = neg_log10_padj)) +
         
@@ -1198,15 +1259,45 @@ create_gomwu_bubble <- function(bubble_data, organism_name, org_color) {
         geom_vline(xintercept = 0, color = "gray50",
                    linetype = "dashed", linewidth = 0.5) +
         
-        # BOLD LEFT labels (inner lane)
+        # ----- MANUAL LABELS -----
+        # Segments for manual bold labels
+        geom_segment(
+            data = manual_bold,
+            aes(x = x_value, y = neg_log10_padj, xend = label_x, yend = label_y),
+            color = "gray40", linewidth = 0.3, linetype = "solid"
+        ) +
+        # Manual bold labels
+        geom_text(
+            data = manual_bold,
+            aes(x = label_x, y = label_y, label = annotate_label,
+                hjust = ifelse(label_side == "left", 1, 0)),
+            size = 2.3, fontface = "bold", color = "black"
+        ) +
+        
+        # Segments for manual plain labels
+        geom_segment(
+            data = manual_plain,
+            aes(x = x_value, y = neg_log10_padj, xend = label_x, yend = label_y),
+            color = "gray55", linewidth = 0.25, linetype = "dashed"
+        ) +
+        # Manual plain labels
+        geom_text(
+            data = manual_plain,
+            aes(x = label_x, y = label_y, label = annotate_label,
+                hjust = ifelse(label_side == "left", 1, 0)),
+            size = 2.1, fontface = "plain", color = "gray30"
+        ) +
+        
+        # ----- AUTO LABELS with ggrepel -----
+        # Bold left
         geom_text_repel(
             data = bold_left,
             aes(label = annotate_label),
             size = 2.3,
             fontface = "bold",
             color = "black",
-            xlim = c(x_left_limit, 0),  # Constrain to left half
-            ylim = c(0, y_max),
+            xlim = c(-Inf, NA),
+            ylim = c(0, NA),
             hjust = 1,
             direction = "y",
             nudge_x = -nudge_bold,
@@ -1224,15 +1315,15 @@ create_gomwu_bubble <- function(bubble_data, organism_name, org_color) {
             na.rm = TRUE
         ) +
         
-        # BOLD RIGHT labels (inner lane)
+        # Bold right
         geom_text_repel(
             data = bold_right,
             aes(label = annotate_label),
             size = 2.3,
             fontface = "bold",
             color = "black",
-            xlim = c(0, x_right_limit),  # Constrain to right half
-            ylim = c(0, y_max),
+            xlim = c(NA, Inf),
+            ylim = c(0, NA),
             hjust = 0,
             direction = "y",
             nudge_x = nudge_bold,
@@ -1250,15 +1341,15 @@ create_gomwu_bubble <- function(bubble_data, organism_name, org_color) {
             na.rm = TRUE
         ) +
         
-        # PLAIN LEFT labels (outer lane)
+        # Plain left
         geom_text_repel(
             data = plain_left,
             aes(label = annotate_label),
             size = 2.1,
             fontface = "plain",
             color = "gray30",
-            xlim = c(x_left_limit, -nudge_bold),  # Outer lane only
-            ylim = c(0, y_max),
+            xlim = c(-Inf, NA),
+            ylim = c(0, NA),
             hjust = 1,
             direction = "y",
             nudge_x = -nudge_plain,
@@ -1276,15 +1367,15 @@ create_gomwu_bubble <- function(bubble_data, organism_name, org_color) {
             na.rm = TRUE
         ) +
         
-        # PLAIN RIGHT labels (outer lane)
+        # Plain right
         geom_text_repel(
             data = plain_right,
             aes(label = annotate_label),
             size = 2.1,
             fontface = "plain",
             color = "gray30",
-            xlim = c(nudge_bold, x_right_limit),  # Outer lane only
-            ylim = c(0, y_max),
+            xlim = c(NA, Inf),
+            ylim = c(0, NA),
             hjust = 0,
             direction = "y",
             nudge_x = nudge_plain,
@@ -1317,14 +1408,11 @@ create_gomwu_bubble <- function(bubble_data, organism_name, org_color) {
             breaks = c(10, 50, 100, 200, 500)
         ) +
         
-        # Axes with expansion matching our calculations
         scale_x_continuous(expand = expansion(mult = c(x_expand, x_expand))) +
-        scale_y_continuous(expand = expansion(mult = c(0.02, 0.10))) +
+        scale_y_continuous(expand = expansion(mult = c(0.02, 0.12))) +
         
-        # Facet
         facet_grid(season_label ~ division, scales = "free") +
         
-        # Labels
         labs(
             x = "Delta Rank (Direction Score)",
             y = expression(-log[10]~italic(p)[adj]),
@@ -1332,7 +1420,6 @@ create_gomwu_bubble <- function(bubble_data, organism_name, org_color) {
             caption = "Bold = calcification/ion keywords | Plain = top 10 significant | Left = down | Right = up"
         ) +
         
-        # Theme
         theme_bw(base_size = 11) +
         theme(
             plot.title = element_text(size = 14, face = "bold.italic",
@@ -1362,7 +1449,7 @@ create_gomwu_bubble <- function(bubble_data, organism_name, org_color) {
 # Generate Plots
 # -----------------------------------------------------------------------------
 
-cat("\nLoading Host GO_MWU results...\n")
+cat("Loading Host GO_MWU results...\n")
 host_gomwu <- load_gomwu_bubble_results("../10_GO_MWU", prefix = "", "Host")
 cat("  Loaded", nrow(host_gomwu), "GO terms\n")
 
@@ -1374,56 +1461,40 @@ cat("  Loaded", nrow(symbiont_gomwu), "GO terms\n")
 host_bubble_data <- process_for_bubble(host_gomwu, BUBBLE_P_ADJ_CUTOFF, TOP_N_ANNOTATE)
 symbiont_bubble_data <- process_for_bubble(symbiont_gomwu, BUBBLE_P_ADJ_CUTOFF, TOP_N_ANNOTATE)
 
-# Show simplified terms
-cat("\n=== Simplified Labels (Host Sample) ===\n")
-host_sample <- host_bubble_data %>%
-    filter(!is.na(annotate_label)) %>%
-    select(go_name, annotate_label, label_fontface) %>%
-    head(20)
-for (i in 1:nrow(host_sample)) {
-    cat(sprintf("  %-50s -> %s\n", 
-                substr(host_sample$go_name[i], 1, 50),
-                host_sample$annotate_label[i]))
-}
+# Apply manual adjustments
+cat("\nApplying manual position adjustments for Host...\n")
+host_label_data <- apply_manual_adjustments(host_bubble_data, host_manual_positions, "host")
+cat("  Manual positions applied:", sum(host_label_data$has_manual), "labels\n")
 
-cat("\n=== Simplified Labels (Symbiont Sample) ===\n")
-sym_sample <- symbiont_bubble_data %>%
-    filter(!is.na(annotate_label)) %>%
-    select(go_name, annotate_label, label_fontface) %>%
-    head(20)
-for (i in 1:nrow(sym_sample)) {
-    cat(sprintf("  %-50s -> %s\n", 
-                substr(sym_sample$go_name[i], 1, 50),
-                sym_sample$annotate_label[i]))
-}
+cat("Applying manual position adjustments for Symbiont...\n")
+symbiont_label_data <- apply_manual_adjustments(symbiont_bubble_data, symbiont_manual_positions, "symbiont")
+cat("  Manual positions applied:", sum(symbiont_label_data$has_manual), "labels\n")
 
-# Summary stats
-cat("\nHost annotation breakdown:\n")
-host_labels <- host_bubble_data %>% filter(!is.na(annotate_label))
-cat("  Bold-Left:", sum(host_labels$label_fontface == "bold" & host_labels$label_side == "left"), "\n")
-cat("  Bold-Right:", sum(host_labels$label_fontface == "bold" & host_labels$label_side == "right"), "\n")
-cat("  Plain-Left:", sum(host_labels$label_fontface == "plain" & host_labels$label_side == "left"), "\n")
-cat("  Plain-Right:", sum(host_labels$label_fontface == "plain" & host_labels$label_side == "right"), "\n")
-cat("  Total:", nrow(host_labels), "\n")
+# Show manual adjustments
+#cat("\n=== Host Manual Adjustments ===\n")
+#host_label_data %>%
+#    filter(has_manual) %>%
+#    select(season_label, division, annotate_label, manual_x, manual_y) %>%
+#    print(n = 30)
 
-cat("\nSymbiont annotation breakdown:\n")
-sym_labels <- symbiont_bubble_data %>% filter(!is.na(annotate_label))
-cat("  Bold-Left:", sum(sym_labels$label_fontface == "bold" & sym_labels$label_side == "left"), "\n")
-cat("  Bold-Right:", sum(sym_labels$label_fontface == "bold" & sym_labels$label_side == "right"), "\n")
-cat("  Plain-Left:", sum(sym_labels$label_fontface == "plain" & sym_labels$label_side == "left"), "\n")
-cat("  Plain-Right:", sum(sym_labels$label_fontface == "plain" & sym_labels$label_side == "right"), "\n")
-cat("  Total:", nrow(sym_labels), "\n")
+#cat("\n=== Symbiont Manual Adjustments ===\n")
+#symbiont_label_data %>%
+#    filter(has_manual) %>%
+#    select(season_label, division, annotate_label, manual_x, manual_y) %>%
+#    print(n = 30)
 
 cat("\nGenerating Host bubble plot...\n")
-fig4d_host_bubble <- create_gomwu_bubble(
+fig4d_host_bubble <- create_gomwu_bubble_manual(
     host_bubble_data,
+    host_label_data,
     "M. capitata (Host)",
     "#E69F00"
 )
 
 cat("Generating Symbiont bubble plot...\n")
-fig4e_symbiont_bubble <- create_gomwu_bubble(
+fig4e_symbiont_bubble <- create_gomwu_bubble_manual(
     symbiont_bubble_data,
+    symbiont_label_data,
     "D. trenchii (Symbiont)",
     "#56B4E9"
 )
@@ -1449,24 +1520,21 @@ cat("✓ Saved: Fig4E_bubble_symbiont_GOMWU.pdf/png (16x12 inches)\n")
 # -----------------------------------------------------------------------------
 
 annotated_summary <- bind_rows(
-    host_bubble_data %>%
-        filter(!is.na(annotate_label)) %>%
-        mutate(annotation_type = ifelse(matches_keyword, "Keyword (bold)", "Top significant")) %>%
-        select(organism, season, division, go_name, annotate_label, p.adj, delta.rank, 
-               nseqs, matches_keyword, is_top_significant, annotation_type, label_side),
-    symbiont_bubble_data %>%
-        filter(!is.na(annotate_label)) %>%
-        mutate(annotation_type = ifelse(matches_keyword, "Keyword (bold)", "Top significant")) %>%
-        select(organism, season, division, go_name, annotate_label, p.adj, delta.rank, 
-               nseqs, matches_keyword, is_top_significant, annotation_type, label_side)
+    host_label_data %>%
+        mutate(organism = "Host", 
+               annotation_type = ifelse(matches_keyword, "Keyword (bold)", "Top significant")) %>%
+        select(organism, season = season_label, division, go_name, annotate_label, 
+               p.adj, delta.rank, nseqs, annotation_type, label_side, has_manual),
+    symbiont_label_data %>%
+        mutate(organism = "Symbiont",
+               annotation_type = ifelse(matches_keyword, "Keyword (bold)", "Top significant")) %>%
+        select(organism, season = season_label, division, go_name, annotate_label, 
+               p.adj, delta.rank, nseqs, annotation_type, label_side, has_manual)
 ) %>%
     arrange(organism, season, division, label_side, p.adj)
 
 write.csv(annotated_summary, "data/bubble_plot_annotated_terms.csv", row.names = FALSE)
 cat("✓ Saved: bubble_plot_annotated_terms.csv\n")
-
-cat("\n=== Summary by Side ===\n")
-print(table(annotated_summary$organism, annotated_summary$label_side))
 
 cat("\n✓ Figure 4D-E bubble plots complete!\n")
 
