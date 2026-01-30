@@ -1163,9 +1163,14 @@ create_gomwu_bubble <- function(bubble_data, organism_name, org_color) {
     plain_left <- label_data %>% filter(label_fontface == "plain", label_side == "left")
     plain_right <- label_data %>% filter(label_fontface == "plain", label_side == "right")
     
-    # Calculate nudge distance
+    # Calculate nudge distances - STAGGERED for bold vs plain
+    # Bold labels closer to points, plain labels further out
     x_range <- range(bubble_data$x_value, na.rm = TRUE)
-    nudge_distance <- diff(x_range) * 0.25
+    nudge_bold <- diff(x_range) * 0.20   # Inner lane (closer)
+    nudge_plain <- diff(x_range) * 0.38  # Outer lane (further)
+    
+    # Y-axis range for constraining labels
+    y_max <- max(bubble_data$neg_log10_padj, na.rm = TRUE)
     
     p <- ggplot(bubble_data, aes(x = x_value, y = neg_log10_padj)) +
         
@@ -1181,7 +1186,7 @@ create_gomwu_bubble <- function(bubble_data, organism_name, org_color) {
         geom_vline(xintercept = 0, color = "gray50",
                    linetype = "dashed", linewidth = 0.5) +
         
-        # BOLD LEFT labels
+        # BOLD LEFT labels (inner lane)
         geom_text_repel(
             data = bold_left,
             aes(label = annotate_label),
@@ -1189,23 +1194,24 @@ create_gomwu_bubble <- function(bubble_data, organism_name, org_color) {
             fontface = "bold",
             color = "black",
             xlim = c(-Inf, NA),
+            ylim = c(0, NA),  # Keep labels within plot
             hjust = 1,
             direction = "y",
-            nudge_x = -nudge_distance,
+            nudge_x = -nudge_bold,
             segment.color = "gray40",
             segment.size = 0.4,
             segment.linetype = "solid",
             min.segment.length = 0,
-            box.padding = 0.15,
-            point.padding = 0.1,
-            force = 2,
+            box.padding = 0.2,
+            point.padding = 0.15,
+            force = 4,
             force_pull = 0,
             max.overlaps = 50,
             seed = 42,
             na.rm = TRUE
         ) +
         
-        # BOLD RIGHT labels
+        # BOLD RIGHT labels (inner lane)
         geom_text_repel(
             data = bold_right,
             aes(label = annotate_label),
@@ -1213,23 +1219,24 @@ create_gomwu_bubble <- function(bubble_data, organism_name, org_color) {
             fontface = "bold",
             color = "black",
             xlim = c(NA, Inf),
+            ylim = c(0, NA),
             hjust = 0,
             direction = "y",
-            nudge_x = nudge_distance,
+            nudge_x = nudge_bold,
             segment.color = "gray40",
             segment.size = 0.4,
             segment.linetype = "solid",
             min.segment.length = 0,
-            box.padding = 0.15,
-            point.padding = 0.1,
-            force = 2,
+            box.padding = 0.2,
+            point.padding = 0.15,
+            force = 4,
             force_pull = 0,
             max.overlaps = 50,
             seed = 42,
             na.rm = TRUE
         ) +
         
-        # PLAIN LEFT labels
+        # PLAIN LEFT labels (outer lane)
         geom_text_repel(
             data = plain_left,
             aes(label = annotate_label),
@@ -1237,23 +1244,24 @@ create_gomwu_bubble <- function(bubble_data, organism_name, org_color) {
             fontface = "plain",
             color = "gray30",
             xlim = c(-Inf, NA),
+            ylim = c(0, NA),
             hjust = 1,
             direction = "y",
-            nudge_x = -nudge_distance,
+            nudge_x = -nudge_plain,
             segment.color = "gray60",
             segment.size = 0.3,
             segment.linetype = "dashed",
             min.segment.length = 0,
-            box.padding = 0.15,
-            point.padding = 0.1,
-            force = 2,
+            box.padding = 0.2,
+            point.padding = 0.15,
+            force = 4,
             force_pull = 0,
             max.overlaps = 50,
-            seed = 42,
+            seed = 123,  # Different seed to avoid same positions
             na.rm = TRUE
         ) +
         
-        # PLAIN RIGHT labels
+        # PLAIN RIGHT labels (outer lane)
         geom_text_repel(
             data = plain_right,
             aes(label = annotate_label),
@@ -1261,19 +1269,20 @@ create_gomwu_bubble <- function(bubble_data, organism_name, org_color) {
             fontface = "plain",
             color = "gray30",
             xlim = c(NA, Inf),
+            ylim = c(0, NA),
             hjust = 0,
             direction = "y",
-            nudge_x = nudge_distance,
+            nudge_x = nudge_plain,
             segment.color = "gray60",
             segment.size = 0.3,
             segment.linetype = "dashed",
             min.segment.length = 0,
-            box.padding = 0.15,
-            point.padding = 0.1,
-            force = 2,
+            box.padding = 0.2,
+            point.padding = 0.15,
+            force = 4,
             force_pull = 0,
             max.overlaps = 50,
-            seed = 42,
+            seed = 123,
             na.rm = TRUE
         ) +
         
@@ -1292,7 +1301,9 @@ create_gomwu_bubble <- function(bubble_data, organism_name, org_color) {
             breaks = c(10, 50, 100, 200, 500)
         ) +
         
-        scale_x_continuous(expand = expansion(mult = c(0.35, 0.35))) +
+        # Expanded axes to prevent clipping
+        scale_x_continuous(expand = expansion(mult = c(0.40, 0.40))) +
+        scale_y_continuous(expand = expansion(mult = c(0.02, 0.08))) +  # Extra room at top
         
         # Facet
         facet_grid(season_label ~ division, scales = "free_x") +
@@ -1319,8 +1330,8 @@ create_gomwu_bubble <- function(bubble_data, organism_name, org_color) {
             legend.position = "right",
             legend.box = "vertical",
             panel.grid.minor = element_blank(),
-            panel.spacing = unit(1, "lines"),
-            plot.margin = margin(10, 10, 10, 10)
+            panel.spacing = unit(1.2, "lines"),  # Slightly more spacing between panels
+            plot.margin = margin(10, 15, 10, 10)  # Extra right margin
         ) +
         
         guides(
@@ -1406,16 +1417,16 @@ fig4e_symbiont_bubble <- create_gomwu_bubble(
 # -----------------------------------------------------------------------------
 
 ggsave("figures/Fig4D_bubble_host_GOMWU.pdf", fig4d_host_bubble,
-       width = 14, height = 9, dpi = 300)
+       width = 15, height = 11, dpi = 300)
 ggsave("figures/Fig4D_bubble_host_GOMWU.png", fig4d_host_bubble,
-       width = 14, height = 9, dpi = 300)
-cat("✓ Saved: Fig4D_bubble_host_GOMWU.pdf/png (14x9 inches)\n")
+       width = 15, height = 11, dpi = 300)
+cat("✓ Saved: Fig4D_bubble_host_GOMWU.pdf/png (15x11 inches)\n")
 
 ggsave("figures/Fig4E_bubble_symbiont_GOMWU.pdf", fig4e_symbiont_bubble,
-       width = 14, height = 9, dpi = 300)
+       width = 15, height = 11, dpi = 300)
 ggsave("figures/Fig4E_bubble_symbiont_GOMWU.png", fig4e_symbiont_bubble,
-       width = 14, height = 9, dpi = 300)
-cat("✓ Saved: Fig4E_bubble_symbiont_GOMWU.pdf/png (14x9 inches)\n")
+       width = 15, height = 11, dpi = 300)
+cat("✓ Saved: Fig4E_bubble_symbiont_GOMWU.pdf/png (15x11 inches)\n")
 
 # -----------------------------------------------------------------------------
 # Save Summary
