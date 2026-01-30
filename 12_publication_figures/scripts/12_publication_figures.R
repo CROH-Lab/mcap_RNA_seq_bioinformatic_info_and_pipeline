@@ -740,15 +740,13 @@ ANNOTATION_KEYWORDS <- c(
     "carbonate",           # more specific than "carbon"
     "carbonic",
     "bicarbonate",
-    "channel activity",    # more specific
-    "\\bacid\\b",          # acid as word, not "acidic" substring issues
+    "calcium channel",    # more specific
     "chemosensory", 
     "plasmamembrane",      # membrane as word boundary to reduce noise
     "ossification", 
     "biomineralization",
     "calcification",
-    "endoplasmic reticulum",
-    "mitochondri"          # catches mitochondria, mitochondrial, mitochondrion
+    "endoplasmic reticulum"
 )
 
 # Significance cutoff for plotting (orange line)

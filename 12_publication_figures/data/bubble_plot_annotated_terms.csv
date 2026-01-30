@@ -1,79 +1,48 @@
 "organism","season","division","go_name","p.adj","delta.rank","nseqs"
 "Host","summer","BP","response to endoplasmic reticulum stress",1.47882711492969e-05,-796,249
-"Host","summer","BP","protein localization to mitochondrion",0.00022977313271818,-1141,94
 "Host","summer","BP","chemosensory behavior",0.000244867927441304,953,133
 "Host","summer","BP","regulation of monoatomic ion transport",0.000574368009215899,423,649
-"Host","summer","BP","response to acid chemical",0.000617851205990762,622,282
-"Host","summer","BP","mitochondrion organization",0.0143151678481103,-323,664
-"Host","summer","BP","response to fatty acid",0.0204447833336567,849,83
 "Host","summer","BP","inorganic anion transport",0.0227993896489522,518,217
-"Host","summer","BP","inner mitochondrial membrane organization",0.0230084347018233,-1254,36
 "Host","summer","BP","regulation of cytosolic calcium ion concentration",0.0355683347656201,404,328
-"Host","summer","BP","mitochondrial transport",0.0399484404538055,-562,158
 "Host","summer","BP","ossification",0.0451165863230957,538,165
-"Host","summer","BP","mitochondrial gene expression",0.0499730156478459,-620,118
-"Host","summer","CC","mitochondrial protein-containing complex",2.27012771524673e-06,-697,226
 "Host","summer","CC","endoplasmic reticulum protein-containing complex",2.41082604247001e-05,-964,95
 "Host","summer","CC","rough endoplasmic reticulum membrane",0.000708485998887435,-1339,34
 "Host","summer","CC","endoplasmic reticulum chaperone complex",0.00761453592689457,-1821,12
 "Host","summer","CC","proton-transporting two-sector ATPase complex",0.017598478659272,-919,39
 "Host","summer","CC","rough endoplasmic reticulum",0.0181501325756362,-667,73
 "Host","summer","CC","proton-transporting ATP synthase complex",0.0242874839842683,-1400,15
-"Host","summer","CC","mitochondrial matrix",0.0242874839842683,-301,342
 "Host","summer","CC","obsolete endoplasmic reticulum part",0.0242874839842683,-210,767
 "Host","summer","MF","proton transmembrane transporter activity",7.00119531847492e-05,-1108,83
 "Host","summer","MF","active monoatomic ion transmembrane transporter activity",0.00192077100476197,-944,78
-"Host","summer","MF","gated channel activity",0.00274882139006119,663,152
-"Host","summer","MF","channel activity",0.00474263858155469,509,235
 "Host","summer","MF","monoatomic cation channel activity",0.0133510650404387,557,163
 "Host","summer","MF","ligand-gated monoatomic ion channel activity",0.0159190409096359,689,102
 "Host","summer","MF","ligand-gated monoatomic cation channel activity",0.0237512633791609,796,70
-"Host","summer","MF","voltage-gated channel activity",0.02886207090412,747,74
-"Host","winter","BP","mitochondrion organization",8.09024109979525e-05,455,668
-"Host","winter","BP","inner mitochondrial membrane organization",0.000444844544416162,1719,36
 "Host","winter","BP","chemosensory behavior",0.000556477967471867,-911,124
-"Host","winter","BP","mitochondrial electron transport, ubiquinol to cytochrome c",0.00186463980774118,2148,19
-"Host","winter","BP","mitochondrial gene expression",0.0023565353533226,845,118
 "Host","winter","BP","inorganic anion transport",0.00793817203470542,-631,171
-"Host","winter","BP","mitochondrial transport",0.0112544841416774,628,163
 "Host","winter","BP","sodium ion transport",0.0301215102672729,-605,136
 "Host","winter","BP","regulation of monoatomic ion transport",0.0497353526701818,-269,635
-"Host","winter","CC","mitochondrial protein-containing complex",6.09270878161228e-09,823,228
-"Host","winter","CC","mitochondrial matrix",4.34539801108161e-05,490,343
-"Host","winter","MF","gated channel activity",3.82091176050046e-06,-987,140
-"Host","winter","MF","channel activity",6.24424538660489e-06,-740,222
 "Host","winter","MF","proton transmembrane transporter activity",1.12025430865353e-05,1156,83
 "Host","winter","MF","ligand-gated monoatomic ion channel activity",0.000148096737235434,-980,94
 "Host","winter","MF","extracellular ligand-gated monoatomic ion channel activity",0.00257156094334511,-1468,29
-"Host","winter","MF","outward rectifier potassium channel activity",0.00403958960339568,-1794,18
-"Host","winter","MF","voltage-gated channel activity",0.00484077689477816,-906,69
 "Host","winter","MF","monoatomic cation channel activity",0.00507600226573861,-603,155
-"Host","winter","MF","catalytic activity, acting on a nucleic acid",0.00719202894694606,340,483
 "Host","winter","MF","ligand-gated monoatomic anion channel activity",0.00790408216878428,-1241,33
 "Host","winter","MF","ligand-gated monoatomic cation channel activity",0.0130243995454279,-843,66
-"Host","winter","MF","sodium channel activity",0.0184470775891448,-1243,27
 "Host","winter","MF","transmitter-gated monoatomic ion channel activity",0.0184470775891448,-1528,18
 "Host","winter","MF","metal ion transmembrane transporter activity",0.0187864327104469,-441,219
 "Host","winter","MF","active monoatomic ion transmembrane transporter activity",0.0203910215959604,739,75
 "Host","winter","MF","excitatory extracellular ligand-gated monoatomic ion channel activity",0.0450104605392683,-1356,18
-"Symbiont","summer","BP","nucleic acid catabolic process",3.80628435878813e-07,-657,375
 "Symbiont","summer","BP","response to cadmium ion",0.000819321965777178,629,232
-"Symbiont","summer","BP","sulfur amino acid metabolic process",0.00465723536000399,1037,66
-"Symbiont","summer","BP","obsolete aspartate family amino acid metabolic process",0.0233479244247497,887,71
 "Symbiont","summer","BP","metal ion transport",0.0489153352315799,394,326
 "Symbiont","summer","CC","rough endoplasmic reticulum membrane",3.93786802915305e-06,-1131,60
 "Symbiont","summer","CC","rough endoplasmic reticulum",4.31589959416512e-05,-862,86
 "Symbiont","summer","MF","calcium ion transmembrane transporter activity",0.0324354907951206,601,108
-"Symbiont","winter","BP","nucleic acid catabolic process",6.69262323057458e-15,-919,374
 "Symbiont","winter","BP","monoatomic cation transport",8.2054113840383e-10,664,485
 "Symbiont","winter","BP","monoatomic ion transmembrane transport",2.37683958141821e-08,568,580
 "Symbiont","winter","BP","metal ion transport",5.19742674189159e-07,680,328
 "Symbiont","winter","BP","obsolete inorganic ion transmembrane transport",2.21410455969598e-05,557,381
 "Symbiont","winter","BP","monoatomic anion transport",4.46001724898485e-05,574,334
 "Symbiont","winter","BP","potassium ion transport",0.000186048229405333,886,120
-"Symbiont","winter","BP","regulation of retinoic acid receptor signaling pathway",0.000453550597890073,-2356,15
 "Symbiont","winter","BP","sodium ion transport",0.000522354335740698,877,108
-"Symbiont","winter","BP","acid secretion",0.00131214296515775,1594,29
 "Symbiont","winter","BP","intracellular monoatomic anion homeostasis",0.00142133088770419,2201,15
 "Symbiont","winter","BP","monoatomic anion homeostasis",0.00250883828225496,1174,49
 "Symbiont","winter","BP","organic cation transport",0.00321284766928087,774,109
@@ -87,49 +56,31 @@
 "Symbiont","winter","BP","regulation of monoatomic ion transport",0.0198207659648682,442,234
 "Symbiont","winter","BP","response to lithium ion",0.0198796668955327,-1612,17
 "Symbiont","winter","BP","potassium ion export across plasma membrane",0.021019788506902,1706,15
-"Symbiont","winter","BP","mitochondrial protein catabolic process",0.024271122989818,1865,12
 "Symbiont","winter","BP","monoatomic ion homeostasis",0.0262819830114147,321,420
-"Symbiont","winter","BP","mitochondrial respiratory chain complex assembly",0.0265538885140157,-1545,17
 "Symbiont","winter","BP","obsolete monovalent inorganic anion homeostasis",0.0276378144375382,1348,22
 "Symbiont","winter","BP","negative regulation of calcium ion transmembrane transport",0.0343112854479001,-1695,13
-"Symbiont","winter","BP","dicarboxylic acid transport",0.0378364666131619,830,53
-"Symbiont","winter","BP","organic acid transport",0.0457454857980072,478,153
 "Symbiont","winter","BP","positive regulation of monoatomic ion transport",0.0461893490655794,510,134
-"Symbiont","winter","BP","non-proteinogenic amino acid biosynthetic process",0.0489753062665171,-1493,15
-"Symbiont","winter","BP","regulation of organic acid transport",0.0490196776623215,1092,28
 "Symbiont","winter","CC","rough endoplasmic reticulum membrane",0.000155460173888133,-957,60
-"Symbiont","winter","CC","mitochondrial protein-containing complex",0.000253721667457742,-641,126
 "Symbiont","winter","CC","rough endoplasmic reticulum",0.000563466493421048,-733,86
 "Symbiont","winter","CC","calcium channel complex",0.00201088168608599,1116,30
 "Symbiont","winter","CC","endoplasmic reticulum lumen",0.00406911909892821,-591,96
-"Symbiont","winter","CC","inner mitochondrial membrane protein complex",0.00753845630903075,-748,52
 "Symbiont","winter","CC","endoplasmic reticulum-Golgi intermediate compartment membrane",0.00909065893921184,-1050,25
 "Symbiont","winter","CC","monoatomic ion channel complex",0.00991300736141196,510,105
 "Symbiont","winter","CC","endoplasmic reticulum protein-containing complex",0.0101332955401771,-467,125
-"Symbiont","winter","CC","obsolete mitochondrial part",0.0235254000198139,-196,620
 "Symbiont","winter","CC","proton-transporting two-sector ATPase complex",0.0394000045316952,-758,32
-"Symbiont","winter","CC","obsolete mitochondrial membrane part",0.0394000045316952,-370,137
 "Symbiont","winter","CC","lumenal side of endoplasmic reticulum membrane",0.0394000045316952,-1072,16
 "Symbiont","winter","MF","monoatomic ion transmembrane transporter activity",1.22939735168858e-11,609,540
 "Symbiont","winter","MF","metal ion transmembrane transporter activity",6.77384521199822e-10,820,241
-"Symbiont","winter","MF","gated channel activity",1.94397682945124e-09,1019,146
-"Symbiont","winter","MF","channel activity",3.08373975119376e-09,831,216
-"Symbiont","winter","MF","voltage-gated channel activity",3.70188143942702e-08,1083,110
 "Symbiont","winter","MF","monoatomic ion channel activity",7.33175978449126e-07,770,184
 "Symbiont","winter","MF","potassium ion transmembrane transporter activity",2.07882441700821e-05,892,106
 "Symbiont","winter","MF","calcium ion transmembrane transporter activity",9.01646208170219e-05,827,108
 "Symbiont","winter","MF","calcium ion binding",0.000103091231056308,546,248
 "Symbiont","winter","MF","sodium ion transmembrane transporter activity",0.000170912797134625,878,89
-"Symbiont","winter","MF","potassium channel activity",0.000285848680963393,1054,58
-"Symbiont","winter","MF","nucleic acid conformation isomerase activity",0.00115844137899076,493,230
 "Symbiont","winter","MF","calcium channel activity",0.00387998327497806,957,49
 "Symbiont","winter","MF","ligand-gated monoatomic ion channel activity",0.00451908924110734,925,51
-"Symbiont","winter","MF","ammonium channel activity",0.00547106392481402,1223,28
 "Symbiont","winter","MF","voltage-gated calcium channel activity",0.0119429462962718,1071,31
-"Symbiont","winter","MF","delayed rectifier potassium channel activity",0.0119429462962718,1331,20
 "Symbiont","winter","MF","P-type calcium transporter activity",0.0142636038329728,1191,24
 "Symbiont","winter","MF","alkali metal ion binding",0.0146995798457901,1043,31
 "Symbiont","winter","MF","iron ion binding",0.0258718905265196,-607,79
 "Symbiont","winter","MF","calcium-dependent cysteine-type endopeptidase activity",0.0309086758811097,784,44
 "Symbiont","winter","MF","calcium-dependent phospholipid binding",0.0327559226143422,1121,21
-"Symbiont","winter","MF","dicarboxylic acid transmembrane transporter activity",0.0457031536187609,838,34
