@@ -713,16 +713,16 @@ cat("      Symbiont Summer=#006341, Symbiont Winter=#8fe2b0\n")
 cat("      Excludes: Protein Phosphorylation, Na/K Transport, Phospholipid Transport\n")
 
 # ==============================================================================
-# FIGURE 4D-E: GO_MWU Bubble Plots - VERSION 3
+# FIGURE 4D-E: GO_MWU Bubble Plots - VERSION 4
 # Y-axis: -log10(p.adj), X-axis: delta.rank (direction), Size: nseqs
 # Faceted by Division (BP/MF/CC) × Season (Summer/Winter)
 # Annotations: Top 10 significant terms + keyword matches (bolded)
 # Labels positioned by delta rank sign: positive=RIGHT, negative=LEFT
-# NEW: Abbreviated GO terms for compact display
+# NEW: Smarter GO term simplification (standard abbrevs, 3-word max)
 # ==============================================================================
 
 cat("\n==============================================================================\n")
-cat("Figure 4D-E: GO_MWU Bubble Plots (Updated v3 - Abbreviated Terms)\n")
+cat("Figure 4D-E: GO_MWU Bubble Plots (Updated v4 - Smart Simplification)\n")
 cat("==============================================================================\n\n")
 
 # -----------------------------------------------------------------------------
@@ -758,30 +758,28 @@ division_colors <- c(
 )
 
 # -----------------------------------------------------------------------------
-# GO Term Abbreviation Function
+# GO Term Simplification Function
 # -----------------------------------------------------------------------------
 
-abbreviate_go_term <- function(term) {
+simplify_go_term <- function(term) {
     
-    # Step 1: Remove "monoatomic" (and clean up extra spaces)
+    # Step 1: Remove uninformative words
+    term <- str_replace_all(term, "\\bobsolete\\s*", "")
     term <- str_replace_all(term, "\\bmonoatomic\\s*", "")
-    term <- str_replace_all(term, "\\s+", " ")  # collapse multiple spaces
-    term <- str_trim(term)
     
-    # Step 2: Replace ion names with chemical symbols
-    # Using correct ionic charges
+    # Step 2: Ion symbols (plain text)
     ion_replacements <- c(
-        "\\bcalcium\\b" = "Ca²⁺",
-        "\\bsodium\\b" = "Na⁺",
-        "\\bpotassium\\b" = "K⁺",
-        "\\bcadmium\\b" = "Cd²⁺",
-        "\\blithium\\b" = "Li⁺",
+        "\\bcalcium\\b" = "Ca2+",
+        "\\bsodium\\b" = "Na+",
+        "\\bpotassium\\b" = "K+",
+        "\\bcadmium\\b" = "Cd2+",
+        "\\blithium\\b" = "Li+",
         "\\biron\\b" = "Fe",
-        "\\bmagnesium\\b" = "Mg²⁺",
-        "\\bzinc\\b" = "Zn²⁺",
-        "\\bcopper\\b" = "Cu²⁺",
-        "\\bproton\\b" = "H⁺",
-        "\\bhydrogen\\b" = "H⁺"
+        "\\bmagnesium\\b" = "Mg2+",
+        "\\bzinc\\b" = "Zn2+",
+        "\\bcopper\\b" = "Cu2+",
+        "\\bproton\\b" = "H+",
+        "\\bhydrogen\\b" = "H+"
     )
     
     for (pattern in names(ion_replacements)) {
@@ -789,37 +787,87 @@ abbreviate_go_term <- function(term) {
                                 ion_replacements[pattern])
     }
     
-    # Step 3: Abbreviate words > 6 characters to 5 chars + period
-    # Split into words, process each, rejoin
+    # Step 3: Standard biological abbreviations
+    bio_abbrevs <- c(
+        "endoplasmic reticulum" = "ER",
+        "transmembrane" = "TM",
+        "transporter" = "transporter",
+        "ATPase" = "ATPase",
+        "ATP synthase" = "ATP synth.",
+        "mitochondrial" = "mito.",
+        "mitochondrion" = "mito.",
+        "cytoplasmic" = "cyto.",
+        "cytosolic" = "cyto.",
+        "ribonucleoprotein" = "RNP",
+        "oxidoreductase" = "oxidored.",
+        "oxidoreduction" = "redox",
+        "phosphorylation" = "phosph.",
+        "dephosphorylation" = "dephosph.",
+        "transcription" = "txn",
+        "translation" = "translation",
+        "translational" = "transl.",
+        "ribosomal" = "ribo.",
+        "ribosome" = "ribosome",
+        "plasma membrane" = "PM",
+        "cell membrane" = "membrane",
+        "extracellular" = "EC",
+        "intracellular" = "IC"
+    )
+    
+    for (pattern in names(bio_abbrevs)) {
+        term <- str_replace_all(term, regex(pattern, ignore_case = TRUE), 
+                                bio_abbrevs[pattern])
+    }
+    
+    # Step 4: Simplify common GO phrase patterns
+    phrase_simplifications <- c(
+        "^regulation of " = "reg. ",
+        "^positive regulation of " = "+reg. ",
+        "^negative regulation of " = "-reg. ",
+        "^response to " = "",
+        "^involved in " = "",
+        "^establishment of " = "",
+        " involved in.*$" = "",
+        "-containing complex" = " complex",
+        "-transporting " = " "
+    )
+    
+    for (pattern in names(phrase_simplifications)) {
+        term <- str_replace_all(term, regex(pattern, ignore_case = TRUE), 
+                                phrase_simplifications[pattern])
+    }
+    
+    # Step 5: Remove low-information suffixes (but keep important ones)
+    # These words at the END of terms often don't add meaning
+    term <- str_replace_all(term, "\\s+activity$", "")
+    term <- str_replace_all(term, "\\s+process$", "")
+    term <- str_replace_all(term, "\\s+part$", "")
+    term <- str_replace_all(term, "\\s+region$", "")
+    
+    # Step 6: Clean up
+    term <- str_replace_all(term, "\\s+", " ")  # collapse multiple spaces
+    term <- str_replace_all(term, "^\\s+|\\s+$", "")  # trim
+    term <- str_replace_all(term, "\\s*-\\s*", "-")  # clean hyphens
+    
+    # Step 7: Keep maximum 3 words (but preserve hyphenated terms as one unit)
+    # Split carefully - hyphenated words count as one
     words <- str_split(term, "\\s+")[[1]]
     
-    abbreviated_words <- sapply(words, function(word) {
-        # Don't abbreviate ion symbols (contain superscript or are short)
-        if (str_detect(word, "[⁺²]") || nchar(word) <= 6) {
-            return(word)
-        }
-        # Don't abbreviate hyphenated compound terms - process each part
-        if (str_detect(word, "-")) {
-            parts <- str_split(word, "-")[[1]]
-            abbreviated_parts <- sapply(parts, function(p) {
-                if (nchar(p) > 6) {
-                    paste0(substr(p, 1, 5), ".")
-                } else {
-                    p
-                }
-            })
-            return(paste(abbreviated_parts, collapse = "-"))
-        }
-        # Regular word > 6 chars
-        paste0(substr(word, 1, 5), ".")
-    })
+    if (length(words) > 3) {
+        # Keep first 3 words
+        term <- paste(words[1:3], collapse = " ")
+    }
     
-    result <- paste(abbreviated_words, collapse = " ")
-    return(result)
+    return(term)
 }
 
+# -----------------------------------------------------------------------------
 # Test the function
-cat("Testing abbreviation function:\n")
+# -----------------------------------------------------------------------------
+
+cat("Testing simplification function:\n")
+cat(strrep("-", 70), "\n")
+
 test_terms <- c(
     "monoatomic cation channel activity",
     "calcium ion transmembrane transport",
@@ -828,12 +876,25 @@ test_terms <- c(
     "proton-transporting ATP synthase complex",
     "ligand-gated monoatomic ion channel activity",
     "sodium ion transport",
-    "oxidative phosphorylation"
+    "oxidative phosphorylation",
+    "obsolete endoplasmic reticulum part",
+    "response to endoplasmic reticulum stress",
+    "rough endoplasmic reticulum membrane",
+    "active monoatomic ion transmembrane transporter activity",
+    "positive regulation of cytosolic calcium ion concentration",
+    "transmitter-gated monoatomic ion channel activity",
+    "metal ion transmembrane transporter activity",
+    "oxidoreduction-driven active transmembrane transporter activity",
+    "mitochondrial protein-containing complex",
+    "structural constituent of ribosome"
 )
 
 for (t in test_terms) {
-    cat("  ", t, "\n    -> ", abbreviate_go_term(t), "\n")
+    simplified <- simplify_go_term(t)
+    cat(sprintf("%-55s -> %s\n", t, simplified))
 }
+
+cat(strrep("-", 70), "\n\n")
 
 # -----------------------------------------------------------------------------
 # Load GO_MWU Results
@@ -917,10 +978,10 @@ process_for_bubble <- function(gomwu_data, p_cutoff = 0.05, top_n = 10) {
             is_top_significant = replace_na(is_top_significant, FALSE),
             should_annotate = (p.adj < p_cutoff & matches_keyword) | is_top_significant,
             
-            # Apply abbreviation function to create label
+            # Apply simplification function
             annotate_label = ifelse(
                 should_annotate, 
-                sapply(go_name, abbreviate_go_term),
+                sapply(go_name, simplify_go_term),
                 NA_character_
             ),
             
@@ -958,7 +1019,7 @@ create_gomwu_bubble <- function(bubble_data, organism_name, org_color) {
     
     # Calculate nudge distance
     x_range <- range(bubble_data$x_value, na.rm = TRUE)
-    nudge_distance <- diff(x_range) * 0.35
+    nudge_distance <- diff(x_range) * 0.3
     
     p <- ggplot(bubble_data, aes(x = x_value, y = neg_log10_padj)) +
         
@@ -1085,7 +1146,7 @@ create_gomwu_bubble <- function(bubble_data, organism_name, org_color) {
             breaks = c(10, 50, 100, 200, 500)
         ) +
         
-        scale_x_continuous(expand = expansion(mult = c(0.45, 0.45))) +
+        scale_x_continuous(expand = expansion(mult = c(0.4, 0.4))) +
         
         # Facet
         facet_grid(season_label ~ division, scales = "free_x") +
@@ -1095,7 +1156,7 @@ create_gomwu_bubble <- function(bubble_data, organism_name, org_color) {
             x = "Delta Rank (Direction Score)",
             y = expression(-log[10]~italic(p)[adj]),
             title = paste0("GO Enrichment: ", organism_name),
-            caption = "Bold = calcification/ion keywords | Plain = top 10 significant | Left = downreg. | Right = upreg."
+            caption = "Bold = calcification/ion keywords | Plain = top 10 significant | Left = down | Right = up"
         ) +
         
         # Theme
@@ -1140,13 +1201,13 @@ cat("  Loaded", nrow(symbiont_gomwu), "GO terms\n")
 host_bubble_data <- process_for_bubble(host_gomwu, BUBBLE_P_ADJ_CUTOFF, TOP_N_ANNOTATE)
 symbiont_bubble_data <- process_for_bubble(symbiont_gomwu, BUBBLE_P_ADJ_CUTOFF, TOP_N_ANNOTATE)
 
-# Show some example abbreviated terms
-cat("\nExample abbreviated labels (Host):\n")
+# Show simplified terms
+cat("\n=== Simplified Labels (Host Sample) ===\n")
 host_bubble_data %>%
     filter(!is.na(annotate_label)) %>%
-    select(go_name, annotate_label) %>%
-    head(10) %>%
-    print()
+    select(go_name, annotate_label, label_fontface) %>%
+    head(15) %>%
+    print(width = 120)
 
 # Summary stats
 cat("\nHost annotation breakdown:\n")
@@ -1184,19 +1245,19 @@ fig4e_symbiont_bubble <- create_gomwu_bubble(
 # -----------------------------------------------------------------------------
 
 ggsave("figures/Fig4D_bubble_host_GOMWU.pdf", fig4d_host_bubble,
-       width = 16, height = 10, dpi = 300)
+       width = 14, height = 9, dpi = 300)
 ggsave("figures/Fig4D_bubble_host_GOMWU.png", fig4d_host_bubble,
-       width = 16, height = 10, dpi = 300)
-cat("✓ Saved: Fig4D_bubble_host_GOMWU.pdf/png (16x10 inches)\n")
+       width = 14, height = 9, dpi = 300)
+cat("✓ Saved: Fig4D_bubble_host_GOMWU.pdf/png (14x9 inches)\n")
 
 ggsave("figures/Fig4E_bubble_symbiont_GOMWU.pdf", fig4e_symbiont_bubble,
-       width = 16, height = 10, dpi = 300)
+       width = 14, height = 9, dpi = 300)
 ggsave("figures/Fig4E_bubble_symbiont_GOMWU.png", fig4e_symbiont_bubble,
-       width = 16, height = 10, dpi = 300)
-cat("✓ Saved: Fig4E_bubble_symbiont_GOMWU.pdf/png (16x10 inches)\n")
+       width = 14, height = 9, dpi = 300)
+cat("✓ Saved: Fig4E_bubble_symbiont_GOMWU.pdf/png (14x9 inches)\n")
 
 # -----------------------------------------------------------------------------
-# Save Summary with both original and abbreviated terms
+# Save Summary with both original and simplified terms
 # -----------------------------------------------------------------------------
 
 annotated_summary <- bind_rows(
@@ -1220,6 +1281,7 @@ cat("\n=== Summary by Side ===\n")
 print(table(annotated_summary$organism, annotated_summary$label_side))
 
 cat("\n✓ Figure 4D-E bubble plots complete!\n")
+
 # ==============================================================================
 # FIGURE 5: Volcano Plots
 # ==============================================================================
