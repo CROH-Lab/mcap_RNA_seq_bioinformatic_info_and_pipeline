@@ -1349,16 +1349,26 @@ symbiont_bubble_data <- process_for_bubble(symbiont_gomwu, BUBBLE_P_ADJ_CUTOFF, 
 
 # Show simplified terms
 cat("\n=== Simplified Labels (Host Sample) ===\n")
-host_bubble_data %>%
+host_sample <- host_bubble_data %>%
     filter(!is.na(annotate_label)) %>%
     select(go_name, annotate_label, label_fontface) %>%
-    print(n = 20, width = 120)
+    head(20)
+for (i in 1:nrow(host_sample)) {
+    cat(sprintf("  %-50s -> %s\n", 
+                substr(host_sample$go_name[i], 1, 50),
+                host_sample$annotate_label[i]))
+}
 
 cat("\n=== Simplified Labels (Symbiont Sample) ===\n")
-symbiont_bubble_data %>%
+sym_sample <- symbiont_bubble_data %>%
     filter(!is.na(annotate_label)) %>%
     select(go_name, annotate_label, label_fontface) %>%
-    print(n = 20, width = 120)
+    head(20)
+for (i in 1:nrow(sym_sample)) {
+    cat(sprintf("  %-50s -> %s\n", 
+                substr(sym_sample$go_name[i], 1, 50),
+                sym_sample$annotate_label[i]))
+}
 
 # Summary stats
 cat("\nHost annotation breakdown:\n")
