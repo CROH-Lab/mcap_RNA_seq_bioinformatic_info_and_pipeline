@@ -713,15 +713,15 @@ cat("      Symbiont Summer=#006341, Symbiont Winter=#8fe2b0\n")
 cat("      Excludes: Protein Phosphorylation, Na/K Transport, Phospholipid Transport\n")
 
 # ==============================================================================
-# FIGURE 4D-E: GO_MWU Bubble Plots - UPDATED VERSION
+# FIGURE 4D-E: GO_MWU Bubble Plots - VERSION 2
 # Y-axis: -log10(p.adj), X-axis: delta.rank (direction), Size: nseqs
 # Faceted by Division (BP/MF/CC) × Season (Summer/Winter)
 # Annotations: Top 10 significant terms + keyword matches (bolded)
-# Labels positioned to sides with connecting lines
+# Labels positioned by delta rank sign: positive=RIGHT, negative=LEFT
 # ==============================================================================
 
 cat("\n==============================================================================\n")
-cat("Figure 4D-E: GO_MWU Bubble Plots (Updated)\n")
+cat("Figure 4D-E: GO_MWU Bubble Plots (Updated v2)\n")
 cat("==============================================================================\n\n")
 
 # -----------------------------------------------------------------------------
@@ -756,13 +756,13 @@ TOP_N_ANNOTATE <- 10
 
 # Colors matching reference image (BP=green, CC=red, MF=blue)
 division_colors <- c(
-    "BP" = "#4DAF4A",  # Green
-    "CC" = "#E41A1C",  # Red
-    "MF" = "#377EB8"   # Blue
+    "BP" = "#4DAF4A",
+    "CC" = "#E41A1C",
+    "MF" = "#377EB8"
 )
 
 # -----------------------------------------------------------------------------
-# Load GO_MWU Results (same as before)
+# Load GO_MWU Results
 # -----------------------------------------------------------------------------
 
 load_gomwu_bubble_results <- function(base_dir, prefix = "", organism_label) {
@@ -806,7 +806,7 @@ load_gomwu_bubble_results <- function(base_dir, prefix = "", organism_label) {
 }
 
 # -----------------------------------------------------------------------------
-# Process Data for Plotting - UPDATED
+# Process Data for Plotting
 # -----------------------------------------------------------------------------
 
 process_for_bubble <- function(gomwu_data, p_cutoff = 0.05, top_n = 10) {
@@ -816,29 +816,18 @@ process_for_bubble <- function(gomwu_data, p_cutoff = 0.05, top_n = 10) {
     df <- gomwu_data %>%
         filter(!is.na(p.adj)) %>%
         mutate(
-            # Y-axis: -log10(p.adj), cap at reasonable value
             neg_log10_padj = pmin(-log10(p.adj), 30),
-            
-            # X-axis: delta.rank scaled for readability
             x_value = delta.rank / 100,
-            
-            # Clean GO term name
             go_name = name,
-            
-            # Season labels
             season_label = factor(
                 ifelse(season == "summer", "Summer", "Winter"),
                 levels = c("Summer", "Winter")
             ),
-            
-            # Division factor
             division = factor(division, levels = c("BP", "CC", "MF")),
-            
-            # Check if term matches keyword
             matches_keyword = str_detect(tolower(go_name), regex(keyword_pattern, ignore_case = TRUE))
         )
     
-    # Identify top N significant terms per facet (season × division)
+    # Identify top N significant terms per facet
     top_significant <- df %>%
         filter(p.adj < p_cutoff) %>%
         group_by(season_label, division) %>%
@@ -847,23 +836,24 @@ process_for_bubble <- function(gomwu_data, p_cutoff = 0.05, top_n = 10) {
         mutate(is_top_significant = TRUE) %>%
         select(go_name, season_label, division, is_top_significant)
     
-    # Join back and create annotation columns
+    # Join and create annotation columns
     df <- df %>%
         left_join(top_significant, by = c("go_name", "season_label", "division")) %>%
         mutate(
             is_top_significant = replace_na(is_top_significant, FALSE),
-            
-            # Annotate if: significant keyword match OR top N significant
             should_annotate = (p.adj < p_cutoff & matches_keyword) | is_top_significant,
-            
-            # Label text (truncated)
-            annotate_label = ifelse(should_annotate, str_trunc(go_name, 40), NA_character_),
-            
-            # Fontface: bold for keyword matches, plain for top significant only
+            annotate_label = ifelse(should_annotate, str_trunc(go_name, 45), NA_character_),
             label_fontface = case_when(
                 !should_annotate ~ NA_character_,
                 matches_keyword ~ "bold",
                 TRUE ~ "plain"
+            ),
+            # Key: position based on delta rank sign
+            # Positive delta.rank = RIGHT side, Negative delta.rank = LEFT side
+            label_side = case_when(
+                !should_annotate ~ NA_character_,
+                delta.rank >= 0 ~ "right",
+                TRUE ~ "left"
             )
         )
     
@@ -871,27 +861,26 @@ process_for_bubble <- function(gomwu_data, p_cutoff = 0.05, top_n = 10) {
 }
 
 # -----------------------------------------------------------------------------
-# Create Bubble Plot Function - UPDATED
+# Create Bubble Plot Function
 # -----------------------------------------------------------------------------
 
 create_gomwu_bubble <- function(bubble_data, organism_name, org_color) {
     
-    # Significance threshold line
     sig_line <- -log10(BUBBLE_P_ADJ_CUTOFF)
     
-    # Separate data for bold and plain labels
+    # Separate data by side AND fontface
     label_data <- bubble_data %>%
         filter(!is.na(annotate_label))
     
-    bold_labels <- label_data %>% filter(label_fontface == "bold")
-    plain_labels <- label_data %>% filter(label_fontface == "plain")
+    # Split into 4 groups: bold-left, bold-right, plain-left, plain-right
+    bold_left <- label_data %>% filter(label_fontface == "bold", label_side == "left")
+    bold_right <- label_data %>% filter(label_fontface == "bold", label_side == "right")
+    plain_left <- label_data %>% filter(label_fontface == "plain", label_side == "left")
+    plain_right <- label_data %>% filter(label_fontface == "plain", label_side == "right")
     
-    # Determine nudge direction based on x_value (push to opposite side)
-    # Positive x_value -> nudge left, Negative x_value -> nudge right
-    bold_labels <- bold_labels %>%
-        mutate(nudge_direction = ifelse(x_value > 0, -1, 1))
-    plain_labels <- plain_labels %>%
-        mutate(nudge_direction = ifelse(x_value > 0, -1, 1))
+    # Calculate x-axis range for nudge distances
+    x_range <- range(bubble_data$x_value, na.rm = TRUE)
+    nudge_distance <- diff(x_range) * 0.4  # 40% of range
     
     p <- ggplot(bubble_data, aes(x = x_value, y = neg_log10_padj)) +
         
@@ -903,51 +892,103 @@ create_gomwu_bubble <- function(bubble_data, organism_name, org_color) {
         geom_hline(yintercept = sig_line, color = "darkorange",
                    linetype = "solid", linewidth = 0.8) +
         
-        # Vertical line at 0 (no change)
+        # Vertical line at 0
         geom_vline(xintercept = 0, color = "gray50",
                    linetype = "dashed", linewidth = 0.5) +
         
-        # BOLD labels (keyword matches) - pushed to sides
+        # BOLD LEFT labels (keyword matches, negative delta rank)
         geom_text_repel(
-            data = bold_labels,
+            data = bold_left,
             aes(label = annotate_label),
-            size = 2.5,
+            size = 2.4,
             fontface = "bold",
             color = "black",
-            max.overlaps = 30,
-            box.padding = 0.4,
-            point.padding = 0.3,
+            xlim = c(-Inf, NA),  # Constrain labels to left side
+            hjust = 1,          # Right-align text (pointing toward bubble)
+            direction = "y",    # Only repel vertically
+            nudge_x = -nudge_distance,
             segment.color = "gray40",
             segment.size = 0.4,
             segment.linetype = "solid",
             min.segment.length = 0,
-            force = 2,
-            force_pull = 0.5,
-            direction = "y",
-            nudge_x = bold_labels$nudge_direction * 15,
-            hjust = ifelse(bold_labels$nudge_direction > 0, 0, 1),
+            box.padding = 0.25,
+            point.padding = 0.2,
+            force = 1,
+            force_pull = 0,
+            max.overlaps = 50,
+            seed = 42,
             na.rm = TRUE
         ) +
         
-        # PLAIN labels (top significant, not keyword) - pushed to sides
+        # BOLD RIGHT labels (keyword matches, positive delta rank)
         geom_text_repel(
-            data = plain_labels,
+            data = bold_right,
             aes(label = annotate_label),
-            size = 2.3,
+            size = 2.4,
+            fontface = "bold",
+            color = "black",
+            xlim = c(NA, Inf),  # Constrain labels to right side
+            hjust = 0,          # Left-align text (pointing toward bubble)
+            direction = "y",
+            nudge_x = nudge_distance,
+            segment.color = "gray40",
+            segment.size = 0.4,
+            segment.linetype = "solid",
+            min.segment.length = 0,
+            box.padding = 0.25,
+            point.padding = 0.2,
+            force = 1,
+            force_pull = 0,
+            max.overlaps = 50,
+            seed = 42,
+            na.rm = TRUE
+        ) +
+        
+        # PLAIN LEFT labels (top significant, negative delta rank)
+        geom_text_repel(
+            data = plain_left,
+            aes(label = annotate_label),
+            size = 2.2,
             fontface = "plain",
-            color = "gray20",
-            max.overlaps = 30,
-            box.padding = 0.4,
-            point.padding = 0.3,
+            color = "gray30",
+            xlim = c(-Inf, NA),
+            hjust = 1,
+            direction = "y",
+            nudge_x = -nudge_distance,
             segment.color = "gray60",
             segment.size = 0.3,
             segment.linetype = "dashed",
             min.segment.length = 0,
-            force = 2,
-            force_pull = 0.5,
+            box.padding = 0.25,
+            point.padding = 0.2,
+            force = 1,
+            force_pull = 0,
+            max.overlaps = 50,
+            seed = 42,
+            na.rm = TRUE
+        ) +
+        
+        # PLAIN RIGHT labels (top significant, positive delta rank)
+        geom_text_repel(
+            data = plain_right,
+            aes(label = annotate_label),
+            size = 2.2,
+            fontface = "plain",
+            color = "gray30",
+            xlim = c(NA, Inf),
+            hjust = 0,
             direction = "y",
-            nudge_x = plain_labels$nudge_direction * 15,
-            hjust = ifelse(plain_labels$nudge_direction > 0, 0, 1),
+            nudge_x = nudge_distance,
+            segment.color = "gray60",
+            segment.size = 0.3,
+            segment.linetype = "dashed",
+            min.segment.length = 0,
+            box.padding = 0.25,
+            point.padding = 0.2,
+            force = 1,
+            force_pull = 0,
+            max.overlaps = 50,
+            seed = 42,
             na.rm = TRUE
         ) +
         
@@ -967,10 +1008,10 @@ create_gomwu_bubble <- function(bubble_data, organism_name, org_color) {
             breaks = c(10, 50, 100, 200, 500)
         ) +
         
-        # Expand x-axis to make room for labels on sides
-        scale_x_continuous(expand = expansion(mult = c(0.3, 0.3))) +
+        # Expand x-axis for label room
+        scale_x_continuous(expand = expansion(mult = c(0.5, 0.5))) +
         
-        # Facet: columns = division, rows = season
+        # Facet
         facet_grid(season_label ~ division, scales = "free_x") +
         
         # Labels
@@ -978,7 +1019,7 @@ create_gomwu_bubble <- function(bubble_data, organism_name, org_color) {
             x = "Delta Rank (Direction Score)",
             y = expression(-log[10]~italic(p)[adj]),
             title = paste0("GO Enrichment: ", organism_name),
-            caption = "Bold = calcification/transport keywords; Plain = top 10 significant"
+            caption = "Bold = calcification/transport keywords | Plain = top 10 significant\nLabels positioned by direction: negative (left) ← 0 → positive (right)"
         ) +
         
         # Theme
@@ -986,7 +1027,8 @@ create_gomwu_bubble <- function(bubble_data, organism_name, org_color) {
         theme(
             plot.title = element_text(size = 14, face = "bold.italic",
                                       hjust = 0.5, color = org_color),
-            plot.caption = element_text(size = 9, face = "italic", hjust = 0.5),
+            plot.caption = element_text(size = 8, face = "italic", hjust = 0.5,
+                                        color = "gray40"),
             axis.title = element_text(size = 11, face = "bold"),
             axis.text = element_text(size = 9),
             strip.text = element_text(size = 10, face = "bold"),
@@ -994,7 +1036,8 @@ create_gomwu_bubble <- function(bubble_data, organism_name, org_color) {
             legend.position = "right",
             legend.box = "vertical",
             panel.grid.minor = element_blank(),
-            panel.spacing = unit(0.8, "lines")
+            panel.spacing = unit(1, "lines"),
+            plot.margin = margin(10, 10, 10, 10)
         ) +
         
         # Guides
@@ -1018,58 +1061,59 @@ cat("Loading Symbiont GO_MWU results...\n")
 symbiont_gomwu <- load_gomwu_bubble_results("../11_symbiont_GO_MWU", prefix = "symbiont", "Symbiont")
 cat("  Loaded", nrow(symbiont_gomwu), "GO terms\n")
 
-# Process with updated function
+# Process data
 host_bubble_data <- process_for_bubble(host_gomwu, BUBBLE_P_ADJ_CUTOFF, TOP_N_ANNOTATE)
 symbiont_bubble_data <- process_for_bubble(symbiont_gomwu, BUBBLE_P_ADJ_CUTOFF, TOP_N_ANNOTATE)
 
-cat("\nHost data for plotting:", nrow(host_bubble_data), "terms\n")
-cat("  Significant (p.adj <", BUBBLE_P_ADJ_CUTOFF, "):",
-    sum(host_bubble_data$p.adj < BUBBLE_P_ADJ_CUTOFF, na.rm = TRUE), "\n")
-cat("  Keyword matches to annotate:", sum(host_bubble_data$matches_keyword & 
-                                           host_bubble_data$p.adj < BUBBLE_P_ADJ_CUTOFF, na.rm = TRUE), "\n")
-cat("  Top significant to annotate:", sum(host_bubble_data$is_top_significant, na.rm = TRUE), "\n")
-cat("  Total annotations:", sum(!is.na(host_bubble_data$annotate_label)), "\n")
+# Summary stats
+cat("\nHost annotation breakdown:\n")
+host_labels <- host_bubble_data %>% filter(!is.na(annotate_label))
+cat("  Bold-Left:", sum(host_labels$label_fontface == "bold" & host_labels$label_side == "left"), "\n")
+cat("  Bold-Right:", sum(host_labels$label_fontface == "bold" & host_labels$label_side == "right"), "\n")
+cat("  Plain-Left:", sum(host_labels$label_fontface == "plain" & host_labels$label_side == "left"), "\n")
+cat("  Plain-Right:", sum(host_labels$label_fontface == "plain" & host_labels$label_side == "right"), "\n")
+cat("  Total:", nrow(host_labels), "\n")
 
-cat("\nSymbiont data for plotting:", nrow(symbiont_bubble_data), "terms\n")
-cat("  Significant (p.adj <", BUBBLE_P_ADJ_CUTOFF, "):",
-    sum(symbiont_bubble_data$p.adj < BUBBLE_P_ADJ_CUTOFF, na.rm = TRUE), "\n")
-cat("  Keyword matches to annotate:", sum(symbiont_bubble_data$matches_keyword & 
-                                           symbiont_bubble_data$p.adj < BUBBLE_P_ADJ_CUTOFF, na.rm = TRUE), "\n")
-cat("  Top significant to annotate:", sum(symbiont_bubble_data$is_top_significant, na.rm = TRUE), "\n")
-cat("  Total annotations:", sum(!is.na(symbiont_bubble_data$annotate_label)), "\n")
+cat("\nSymbiont annotation breakdown:\n")
+sym_labels <- symbiont_bubble_data %>% filter(!is.na(annotate_label))
+cat("  Bold-Left:", sum(sym_labels$label_fontface == "bold" & sym_labels$label_side == "left"), "\n")
+cat("  Bold-Right:", sum(sym_labels$label_fontface == "bold" & sym_labels$label_side == "right"), "\n")
+cat("  Plain-Left:", sum(sym_labels$label_fontface == "plain" & sym_labels$label_side == "left"), "\n")
+cat("  Plain-Right:", sum(sym_labels$label_fontface == "plain" & sym_labels$label_side == "right"), "\n")
+cat("  Total:", nrow(sym_labels), "\n")
 
 cat("\nGenerating Host bubble plot...\n")
 fig4d_host_bubble <- create_gomwu_bubble(
     host_bubble_data,
     "M. capitata (Host)",
-    "#E69F00"  # host_color
+    "#E69F00"
 )
 
 cat("Generating Symbiont bubble plot...\n")
 fig4e_symbiont_bubble <- create_gomwu_bubble(
     symbiont_bubble_data,
     "D. trenchii (Symbiont)",
-    "#56B4E9"  # symbiont_color
+    "#56B4E9"
 )
 
 # -----------------------------------------------------------------------------
-# Save Plots
+# Save Plots - wider to accommodate side labels
 # -----------------------------------------------------------------------------
 
 ggsave("figures/Fig4D_bubble_host_GOMWU.pdf", fig4d_host_bubble,
-       width = 16, height = 9, dpi = 300)
+       width = 18, height = 10, dpi = 300)
 ggsave("figures/Fig4D_bubble_host_GOMWU.png", fig4d_host_bubble,
-       width = 16, height = 9, dpi = 300)
-cat("✓ Saved: Fig4D_bubble_host_GOMWU.pdf/png\n")
+       width = 18, height = 10, dpi = 300)
+cat("✓ Saved: Fig4D_bubble_host_GOMWU.pdf/png (18x10 inches)\n")
 
 ggsave("figures/Fig4E_bubble_symbiont_GOMWU.pdf", fig4e_symbiont_bubble,
-       width = 16, height = 9, dpi = 300)
+       width = 18, height = 10, dpi = 300)
 ggsave("figures/Fig4E_bubble_symbiont_GOMWU.png", fig4e_symbiont_bubble,
-       width = 16, height = 9, dpi = 300)
-cat("✓ Saved: Fig4E_bubble_symbiont_GOMWU.pdf/png\n")
+       width = 18, height = 10, dpi = 300)
+cat("✓ Saved: Fig4E_bubble_symbiont_GOMWU.pdf/png (18x10 inches)\n")
 
 # -----------------------------------------------------------------------------
-# Save Summary Statistics
+# Save Summary
 # -----------------------------------------------------------------------------
 
 annotated_summary <- bind_rows(
@@ -1077,25 +1121,20 @@ annotated_summary <- bind_rows(
         filter(!is.na(annotate_label)) %>%
         mutate(annotation_type = ifelse(matches_keyword, "Keyword (bold)", "Top significant")) %>%
         select(organism, season, division, go_name, p.adj, delta.rank, nseqs, 
-               matches_keyword, is_top_significant, annotation_type),
+               matches_keyword, is_top_significant, annotation_type, label_side),
     symbiont_bubble_data %>%
         filter(!is.na(annotate_label)) %>%
         mutate(annotation_type = ifelse(matches_keyword, "Keyword (bold)", "Top significant")) %>%
         select(organism, season, division, go_name, p.adj, delta.rank, nseqs,
-               matches_keyword, is_top_significant, annotation_type)
+               matches_keyword, is_top_significant, annotation_type, label_side)
 ) %>%
-    arrange(organism, season, division, p.adj)
+    arrange(organism, season, division, label_side, p.adj)
 
 write.csv(annotated_summary, "data/bubble_plot_annotated_terms.csv", row.names = FALSE)
 cat("✓ Saved: bubble_plot_annotated_terms.csv\n")
 
-# Print summary
-cat("\n=== Annotated Terms Summary ===\n")
-cat("\nBy organism and season:\n")
-print(table(annotated_summary$organism, annotated_summary$season))
-
-cat("\nBy annotation type:\n")
-print(table(annotated_summary$organism, annotated_summary$annotation_type))
+cat("\n=== Summary by Side ===\n")
+print(table(annotated_summary$organism, annotated_summary$label_side))
 
 cat("\n✓ Figure 4D-E bubble plots complete!\n")
 
