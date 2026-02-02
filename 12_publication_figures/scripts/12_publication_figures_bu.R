@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 # ==============================================================================
 # Publication-Ready Figures: M. capitata and D. trenchii OA Response
-# Version 4 - Fixed chord diagram gap.after
+# Version 5 - Updated dot plots for calcification pathways
 # ==============================================================================
 
 setwd("/home/darmstrong4/mc_rework/12_publication_figures")
@@ -69,7 +69,7 @@ host_winter$gene_id <- rownames(host_winter)
 sym_summer$gene_id <- rownames(sym_summer)
 sym_winter$gene_id <- rownames(sym_winter)
 
-host_annot <- read.delim("/home/darmstrong4/mc_rework/08_host_deg_annotation/results/all_annotations_full.tsv", 
+host_annot <- read.delim("/home/darmstrong4/mc_rework/08_host_deg_annotation/results/all_annotations_full.tsv",
                           stringsAsFactors = FALSE)
 sym_annot <- read.delim("/home/darmstrong4/mc_rework/09_symbiont_deg_annotation/results/all_annotations_full.tsv",
                          stringsAsFactors = FALSE)
@@ -99,19 +99,19 @@ cat("Figure 1: Density Ridgeline Plot\n")
 cat("==============================================================================\n\n")
 
 ridgeline_data <- bind_rows(
-    host_summer %>% 
+    host_summer %>%
         filter(!is.na(log2FoldChange)) %>%
         mutate(Organism = "M. cap", Season = "S", Group_Label = "M. cap - S") %>%
         select(log2FoldChange, Organism, Season, Group_Label),
-    host_winter %>% 
+    host_winter %>%
         filter(!is.na(log2FoldChange)) %>%
         mutate(Organism = "M. cap", Season = "W", Group_Label = "M. cap - W") %>%
         select(log2FoldChange, Organism, Season, Group_Label),
-    sym_summer %>% 
+    sym_summer %>%
         filter(!is.na(log2FoldChange)) %>%
         mutate(Organism = "D. tre", Season = "S", Group_Label = "D. tre - S") %>%
         select(log2FoldChange, Organism, Season, Group_Label),
-    sym_winter %>% 
+    sym_winter %>%
         filter(!is.na(log2FoldChange)) %>%
         mutate(Organism = "D. tre", Season = "W", Group_Label = "D. tre - W") %>%
         select(log2FoldChange, Organism, Season, Group_Label)
@@ -122,7 +122,7 @@ ridgeline_data <- ridgeline_data %>%
         "D. tre - W", "D. tre - S", "M. cap - W", "M. cap - S"
     )))
 
-fig1_ridgeline <- ggplot(ridgeline_data, aes(x = log2FoldChange, y = Group_Label, 
+fig1_ridgeline <- ggplot(ridgeline_data, aes(x = log2FoldChange, y = Group_Label,
                                               fill = interaction(Organism, Season))) +
     geom_density_ridges(alpha = 0.8, scale = 1.5, rel_min_height = 0.01) +
     geom_vline(xintercept = 0, linetype = "dashed", color = "gray40", linewidth = 0.8) +
@@ -179,7 +179,7 @@ draw.pairwise.venn(
 )
 dev.off()
 
-legend_plot <- ggplot(data.frame(Season = c("Summer", "Winter")), 
+legend_plot <- ggplot(data.frame(Season = c("Summer", "Winter")),
                       aes(x = 1, y = Season, fill = Season)) +
     geom_tile(width = 0.3, height = 0.8) +
     scale_fill_manual(values = c("Summer" = summer_color, "Winter" = winter_color)) +
@@ -205,30 +205,30 @@ create_deg_heatmap_all <- function(vsd_mat, deseq_results, filename, max_genes =
     all_degs <- deseq_results %>%
         filter(!is.na(padj) & padj < 0.05) %>%
         arrange(desc(abs(log2FoldChange)))
-    
+
     if (nrow(all_degs) < 5) {
         cat("  Warning: Fewer than 5 DEGs, skipping\n")
         return(NULL)
     }
-    
+
     if (nrow(all_degs) > max_genes) {
         cat("  Note: Limiting to top", max_genes, "DEGs\n")
         all_degs <- head(all_degs, max_genes)
     }
-    
+
     common_genes <- intersect(all_degs$gene_id, rownames(vsd_mat))
     if (length(common_genes) < 5) return(NULL)
-    
+
     heatmap_mat <- vsd_mat[common_genes, , drop = FALSE]
     heatmap_mat_scaled <- t(scale(t(heatmap_mat)))
-    
+
     sample_names <- colnames(heatmap_mat)
     treatments <- ifelse(grepl("B", sample_names), "OA", "Ambient")
     anno_col <- data.frame(Treatment = treatments, row.names = sample_names)
     anno_colors <- list(Treatment = c("OA" = "#E69F00", "Ambient" = "#56B4E9"))
-    
+
     plot_height <- max(8, min(20, nrow(heatmap_mat_scaled) / 20))
-    
+
     pdf(filename, width = 8, height = plot_height)
     pheatmap::pheatmap(heatmap_mat_scaled,
              color = colorRampPalette(c(down_color, "white", up_color))(100),
@@ -237,7 +237,7 @@ create_deg_heatmap_all <- function(vsd_mat, deseq_results, filename, max_genes =
              annotation_col = anno_col, annotation_colors = anno_colors,
              fontsize = 10, border_color = NA, main = "")
     dev.off()
-    
+
     cat("  Saved:", filename, "with", length(common_genes), "DEGs\n")
     return(length(common_genes))
 }
@@ -264,9 +264,9 @@ suppressPackageStartupMessages({
 
 # Configuration
 CALC_KEYWORDS <- c(
-    "calcium", "carbonate", "carbonic", 
+    "calcium", "carbonate", "carbonic",
     "ion transport", "ion homeostasis", "metal ion",
-    "proton", "ATPase", "pH", 
+    "proton", "ATPase", "pH",
     "solute", "biomineralization", "ossification",
     "cation", "anion", "sodium", "potassium",
     "phosphorylation", "phospholipid", "oxidative"
@@ -284,24 +284,24 @@ SEASON_CONFIG <- list(
 load_gomwu_results <- function(dir, organism, season, divisions = c("BP", "MF", "CC")) {
     results <- list()
     for (div in divisions) {
-        file_prefix <- ifelse(organism == "host", 
+        file_prefix <- ifelse(organism == "host",
                              paste0(season, "_", div),
                              paste0("symbiont_", season, "_", div))
         file_path <- file.path(dir, paste0(file_prefix, "_MWU_results.csv"))
-        
+
         if (file.exists(file_path)) {
-            df <- read.table(file_path, header = TRUE, stringsAsFactors = FALSE, 
+            df <- read.table(file_path, header = TRUE, stringsAsFactors = FALSE,
                            sep = "", quote = "\"", comment.char = "")
             names(df) <- gsub('^"', '', names(df))
             names(df) <- gsub('"$', '', names(df))
             names(df) <- trimws(names(df))
-            
+
             if (!"p.adj" %in% names(df)) {
                 if ("padj" %in% names(df)) {
                     names(df)[names(df) == "padj"] <- "p.adj"
                 }
             }
-            
+
             df$organism <- organism
             df$division <- div
             df$season <- season
@@ -314,89 +314,89 @@ load_gomwu_results <- function(dir, organism, season, divisions = c("BP", "MF", 
 # Function to create Sankey for a given season
 create_season_sankey <- function(season_name) {
     cat("\n--- Processing", toupper(season_name), "---\n")
-    
+
     config <- SEASON_CONFIG[[season_name]]
-    
+
     host_gomwu <- load_gomwu_results("../10_GO_MWU/output", "host", season_name)
     symbiont_gomwu <- load_gomwu_results("../11_symbiont_GO_MWU/output", "symbiont", season_name)
     all_gomwu <- bind_rows(host_gomwu, symbiont_gomwu)
-    
+
     cat("  Loaded GO terms - Host:", nrow(host_gomwu), "| Symbiont:", nrow(symbiont_gomwu), "\n")
-    
+
     # Filter for calcification terms
     calc_data <- all_gomwu %>%
         filter(p.adj < P_ADJ_CUTOFF) %>%
         filter(str_detect(name, regex(paste(CALC_KEYWORDS, collapse = "|"), ignore_case = TRUE)))
-    
+
     cat("  Calcification terms at p.adj < 0.05:", nrow(calc_data), "\n")
-    
+
     if (nrow(calc_data) == 0) {
         cat("  Warning: No calcification terms found\n")
         return(NULL)
     }
-    
+
     # Assign parent categories - EXPANDED with priority categories
     assign_parent_category <- function(go_name) {
         go_name_lower <- tolower(go_name)
         case_when(
             # Priority 3: Oxidative Phosphorylation (check first - most specific)
             str_detect(go_name_lower, "oxidative phosphorylation") ~ "Oxidative Phosphorylation",
-            
+
             # Priority 1: Specific Ion Transport (before general ion transport)
             str_detect(go_name_lower, "sodium.*transport|potassium.*transport") ~ "Na/K Transport",
-            
+
             # Priority 4: Phospholipid/Membrane Transport
             str_detect(go_name_lower, "phospholipid.*transport|organophosphate.*transport") ~ "Phospholipid Transport",
-            
+
             # Priority 2: Protein Phosphorylation (broad kinase activity)
             str_detect(go_name_lower, "protein phosphorylation|phosphotransferase.*alcohol|autophosphorylation") ~ "Protein Phosphorylation",
-            
+
             # Original categories (more specific matches first)
             str_detect(go_name_lower, "calcium") ~ "Calcium Homeostasis",
             str_detect(go_name_lower, "carbonate|carbonic") ~ "Carbon/Carbonate",
             str_detect(go_name_lower, "proton.*transport|h\\+.*transport") ~ "Proton Transport",
             str_detect(go_name_lower, "metal ion") ~ "Metal Ion Homeostasis",
             str_detect(go_name_lower, "atpase") ~ "ATPase Activity",
-            
+
             # Ion homeostasis & regulation (catch regulation terms)
             str_detect(go_name_lower, "ion homeostasis|regulation.*ion transport") ~ "Ion Homeostasis/Regulation",
-            
+
             # General ion transport (last, catches remaining)
             str_detect(go_name_lower, "cation|anion|ion transport") ~ "Ion Transport",
-            
+
             TRUE ~ NA_character_
         )
     }
-    
+
     calc_data <- calc_data %>%
         mutate(
             parent_category = assign_parent_category(name),
             source_node = paste(organism, division, sep = "-")
         )
-    
+
     # Diagnostic output
     cat("\n  === PARENT CATEGORY BREAKDOWN ===\n")
-    
+
     parent_breakdown <- calc_data %>%
         filter(!is.na(parent_category)) %>%
         group_by(organism, parent_category) %>%
         summarise(n_terms = n(), .groups = "drop") %>%
         arrange(organism, desc(n_terms))
-    
+
     cat("\n  HOST:\n")
     host_breakdown <- parent_breakdown %>% filter(organism == "host")
     if (nrow(host_breakdown) > 0) print(host_breakdown) else cat("    No host terms\n")
-    
+
     cat("\n  SYMBIONT:\n")
     symbiont_breakdown <- parent_breakdown %>% filter(organism == "symbiont")
     if (nrow(symbiont_breakdown) > 0) print(symbiont_breakdown) else cat("    No symbiont terms\n")
-    
+
     # Show excluded terms
     excluded_terms <- calc_data %>%
         filter(is.na(parent_category)) %>%
         select(organism, division, name, p.adj) %>%
         arrange(organism, p.adj)
-    
+
     if (nrow(excluded_terms) > 0) {
         cat("\n  === EXCLUDED TERMS ===\n")
         cat("  Total excluded:", nrow(excluded_terms), "\n")
@@ -404,46 +404,46 @@ create_season_sankey <- function(season_name) {
         write.csv(excluded_terms, excluded_file, row.names = FALSE)
         cat("  ✓ Saved to:", excluded_file, "\n")
     }
-    
+
     n_before <- nrow(calc_data)
     calc_data <- calc_data %>% filter(!is.na(parent_category))
     n_after <- nrow(calc_data)
     cat("\n  Terms: ", n_before, " → ", n_after, " (excluded ", n_before - n_after, ")\n", sep = "")
-    
+
     # Hierarchical filtering
     parent_ranking <- calc_data %>%
         group_by(parent_category) %>%
         summarise(total_significance = sum(-log10(p.adj + 1e-10)), n_terms = n(), .groups = "drop") %>%
         arrange(desc(total_significance))
-    
+
     cat("\n  Parent category ranking:\n")
     print(parent_ranking)
-    
+
     top_parents <- head(parent_ranking, config$max_parent_categories)$parent_category
     cat("\n  Selected top", config$max_parent_categories, "parents\n")
-    
+
     calc_data <- calc_data %>%
         filter(parent_category %in% top_parents) %>%
         mutate(go_term_display = str_trunc(name, 60))
-    
+
     cat("  Final GO terms:", nrow(calc_data), "\n")
-    
+
     # Build nodes
     source_nodes <- calc_data %>%
         distinct(source_node, organism) %>%
         mutate(group = organism)
-    
+
     parent_nodes <- calc_data %>%
         distinct(parent_category) %>%
         mutate(group = "parent", organism = "parent")
     names(parent_nodes)[1] <- "source_node"
-    
+
     go_nodes <- calc_data %>%
         distinct(go_term_display, parent_category, organism) %>%
         mutate(group = organism)
     names(go_nodes)[1] <- "source_node"
     go_nodes <- go_nodes %>% select(source_node, group, organism)
-    
+
     nodes <- bind_rows(
         source_nodes %>% select(source_node, group, organism),
         parent_nodes,
@@ -451,40 +451,40 @@ create_season_sankey <- function(season_name) {
     ) %>%
         distinct(source_node, .keep_all = TRUE) %>%
         mutate(node_id = row_number() - 1)
-    
+
     # Build links WITH organism tracking for coloring
     link1 <- calc_data %>%
         group_by(source_node, parent_category, organism) %>%
         summarise(value = sum(-log10(p.adj + 1e-10)), .groups = "drop") %>%
         left_join(nodes %>% select(source_node, source_id = node_id), by = "source_node") %>%
         left_join(nodes %>% select(source_node, target_id = node_id), by = c("parent_category" = "source_node"))
-    
+
     link2 <- calc_data %>%
         mutate(value = -log10(p.adj + 1e-10)) %>%
         left_join(nodes %>% select(source_node, source_id = node_id), by = c("parent_category" = "source_node")) %>%
         left_join(nodes %>% select(source_node, target_id = node_id), by = c("go_term_display" = "source_node"))
-    
+
     links <- bind_rows(
         link1 %>% select(source = source_id, target = target_id, value, organism),
         link2 %>% select(source = source_id, target = target_id, value, organism)
     )
-    
+
     cat("  Sankey: Nodes =", nrow(nodes), "| Links =", nrow(links), "\n")
-    
+
     # Prepare for Sankey
     nodes_renamed <- nodes
     colnames(nodes_renamed)[colnames(nodes_renamed) == "source_node"] <- "name"
     nodes_for_sankey <- as.data.frame(nodes_renamed)
     links_for_sankey <- as.data.frame(links)
-    
+
     # CRITICAL: Add link group for coloring flows by source organism
     links_for_sankey$group <- links_for_sankey$organism
-    
+
     # Colors: Orange (host), Green (symbiont), Gray (parent)
     color_scale <- 'd3.scaleOrdinal()
         .domain(["host", "symbiont", "parent"])
         .range(["#E69F00", "#2ECC71", "#95A5A6"])'
-    
+
     sankey <- sankeyNetwork(
         Links = links_for_sankey,
         Nodes = nodes_for_sankey,
@@ -502,19 +502,19 @@ create_season_sankey <- function(season_name) {
         colourScale = color_scale,
         fontFamily = "Arial"
     )
-    
+
     html_file <- paste0("figures/Fig4_calcification_sankey_", season_name, ".html")
     saveWidget(sankey, html_file, selfcontained = TRUE)
     cat("  ✓ Saved:", html_file, "\n")
-    
+
     summary_calcs <- calc_data %>%
         group_by(organism, division, parent_category) %>%
         summarise(n_terms = n(), mean_padj = mean(p.adj), .groups = "drop") %>%
         arrange(organism, parent_category)
-    
-    write.csv(summary_calcs, paste0("data/calcification_summary_", season_name, ".csv"), 
+
+    write.csv(summary_calcs, paste0("data/calcification_summary_", season_name, ".csv"),
               row.names = FALSE)
-    
+
     return(list(summary = summary_calcs, parent_ranking = parent_ranking))
 }
 
@@ -532,12 +532,12 @@ cat("NOTE: Excludes Protein Phosphorylation, Na/K Transport, Phospholipid Transp
 cat("==============================================================================\n\n")
 
 # Load both seasons together
-host_summer <- load_gomwu_results("../10_GO_MWU/output", "host", "summer")
-host_winter <- load_gomwu_results("../10_GO_MWU/output", "host", "winter")
-symbiont_summer <- load_gomwu_results("../11_symbiont_GO_MWU/output", "symbiont", "summer")
-symbiont_winter <- load_gomwu_results("../11_symbiont_GO_MWU/output", "symbiont", "winter")
+host_summer_go <- load_gomwu_results("../10_GO_MWU/output", "host", "summer")
+host_winter_go <- load_gomwu_results("../10_GO_MWU/output", "host", "winter")
+symbiont_summer_go <- load_gomwu_results("../11_symbiont_GO_MWU/output", "symbiont", "summer")
+symbiont_winter_go <- load_gomwu_results("../11_symbiont_GO_MWU/output", "symbiont", "winter")
 
-all_combined <- bind_rows(host_summer, host_winter, symbiont_summer, symbiont_winter)
+all_combined <- bind_rows(host_summer_go, host_winter_go, symbiont_summer_go, symbiont_winter_go)
 
 cat("Loaded combined data - Total GO terms:", nrow(all_combined), "\n")
 
@@ -649,7 +649,7 @@ nodes_combined_for_sankey <- as.data.frame(nodes_combined_renamed)
 links_combined_for_sankey <- as.data.frame(links_combined)
 links_combined_for_sankey$group <- links_combined_for_sankey$organism_season
 
-# 4-color scheme: 
+# 4-color scheme:
 # #ff671f = Host Summer, #ffb81c = Host Winter
 # #006341 = Symbiont Summer, #8fe2b0 = Symbiont Winter
 color_scale_combined <- 'd3.scaleOrdinal()
@@ -713,6 +713,648 @@ cat("      Symbiont Summer=#006341, Symbiont Winter=#8fe2b0\n")
 cat("      Excludes: Protein Phosphorylation, Na/K Transport, Phospholipid Transport\n")
 
 # ==============================================================================
+# FIGURE 4D-E: GO_MWU Bubble Plots - VERSION 5 (Staggered Lanes)
+# Y-axis: -log10(p.adj), X-axis: delta.rank (direction), Size: nseqs
+# Faceted by Division (BP/MF/CC) × Season (Summer/Winter)
+# Annotations: Top 10 significant terms + keyword matches (bolded)
+# Labels positioned by delta rank sign: positive=RIGHT, negative=LEFT
+# Staggered lanes: Bold=inner, Plain=outer
+# ==============================================================================
+
+cat("\n==============================================================================\n")
+cat("Figure 4D-E: GO_MWU Bubble Plots (v5 - Staggered Lanes)\n")
+cat("==============================================================================\n\n")
+
+# -----------------------------------------------------------------------------
+# Configuration
+# -----------------------------------------------------------------------------
+
+ANNOTATION_KEYWORDS <- c(
+    "\\bion\\b",
+    "ion transport",
+    "ion channel",
+    "ion homeostasis",
+    "proton",
+    "calcium",
+    "carbonate",
+    "carbonic",
+    "bicarbonate",
+    "calcium channel",
+    "chemosensory",
+    "plasmamembrane",
+    "ossification",
+    "biomineralization",
+    "calcification",
+    "endoplasmic reticulum"
+)
+
+BUBBLE_P_ADJ_CUTOFF <- 0.05
+TOP_N_ANNOTATE <- 6
+
+division_colors <- c(
+    "BP" = "#4DAF4A",
+    "CC" = "#E41A1C",
+    "MF" = "#377EB8"
+)
+
+# -----------------------------------------------------------------------------
+# GO Term Simplification Function
+# -----------------------------------------------------------------------------
+
+simplify_go_term <- function(term) {
+    
+    # Remove uninformative words
+    remove_words <- c(
+        "\\bobsolete\\s*",
+        "\\bmonoatomic\\s*",
+        "\\bprocess\\b",
+        "\\bactivity\\b",
+        "\\bpart\\b"
+    )
+    for (pattern in remove_words) {
+        term <- str_replace_all(term, regex(pattern, ignore_case = TRUE), "")
+    }
+    
+    # Ion symbols
+    ion_replacements <- c(
+        "\\bcalcium\\b" = "Ca2+",
+        "\\bsodium\\b" = "Na+",
+        "\\bpotassium\\b" = "K+",
+        "\\bcadmium\\b" = "Cd2+",
+        "\\blithium\\b" = "Li+",
+        "\\biron\\b" = "Fe",
+        "\\bmagnesium\\b" = "Mg2+",
+        "\\bzinc\\b" = "Zn2+",
+        "\\bcopper\\b" = "Cu2+",
+        "\\bproton\\b" = "H+",
+        "\\bhydrogen\\b" = "H+"
+    )
+    for (pattern in names(ion_replacements)) {
+        term <- str_replace_all(term, regex(pattern, ignore_case = TRUE), 
+                                ion_replacements[pattern])
+    }
+    
+    # Multi-word phrase abbreviations
+    phrase_abbrevs <- c(
+        "endoplasmic reticulum" = "ER",
+        "plasma membrane" = "PM",
+        "cell membrane" = "membrane",
+        "rough ER" = "rough ER",
+        "ER-Golgi intermediate compartment" = "ER-Golgi",
+        "positive regulation of" = "+reg.",
+        "negative regulation of" = "-reg.",
+        "regulation of" = "reg.",
+        "response to " = "",
+        "involved in " = "",
+        "establishment of " = "",
+        " involved in.*$" = "",
+        "-containing complex" = "",
+        "-transporting " = " ",
+        "-driven active" = "-driven",
+        "-dependent " = "-dep. ",
+        "-mediated " = "-med. ",
+        "-directed " = "-dir. ",
+        "-transcribed " = "-txd ",
+        "-type " = " ",
+        "transmembrane transporter" = "TM transporter",
+        "transmembrane transport" = "TM transport",
+        "ion transmembrane" = "ion TM",
+        "active transmembrane" = "active TM",
+        "ATP synthase" = "ATP synth.",
+        "two-sector ATPase" = "ATPase",
+        "nervous system" = "NS",
+        "central nervous system" = "CNS",
+        "nucleic acid" = "nucl. acid",
+        "amino acid" = "AA",
+        "fatty acid" = "FA",
+        "cell-cell" = "cell-cell",
+        "protein-RNA" = "prot.-RNA"
+    )
+    for (pattern in names(phrase_abbrevs)) {
+        term <- str_replace_all(term, regex(pattern, ignore_case = TRUE), 
+                                phrase_abbrevs[pattern])
+    }
+    
+    # Single word abbreviations
+    word_abbrevs <- c(
+        "\\bchemosensory\\b" = "chemosen.",
+        "\\bprotein\\b" = "prot.",
+        "\\bcomplex\\b" = "cplx",
+        "\\bligand\\b" = "lig.",
+        "\\borganic\\b" = "org.",
+        "\\bmitochondrial\\b" = "mito.",
+        "\\bmitochondrion\\b" = "mito.",
+        "\\bcytoplasmic\\b" = "cyto.",
+        "\\bcytosolic\\b" = "cyto.",
+        "\\bcytoplasm\\b" = "cyto.",
+        "\\bnuclear\\b" = "nucl.",
+        "\\bribosomal\\b" = "ribo.",
+        "\\bribosome\\b" = "ribo.",
+        "\\bpolysomal\\b" = "polysomal",
+        "\\bpolysome\\b" = "polysome",
+        "\\bpreribosome\\b" = "preribo.",
+        "\\bribonucleoprotein\\b" = "RNP",
+        "\\bspliceosomal\\b" = "spliceo.",
+        "\\btransmembrane\\b" = "TM",
+        "\\btransporter\\b" = "transporter",
+        "\\btransport\\b" = "transport",
+        "\\bchannel\\b" = "ch.",
+        "\\bvoltage-gated\\b" = "V-gated",
+        "\\btransmitter-gated\\b" = "transmit.-gated",
+        "\\borganelle\\b" = "organelle",
+        "\\benvelope\\b" = "env.",
+        "\\bmembrane\\b" = "memb.",
+        "\\blumenal\\b" = "lumen.",
+        "\\blumen\\b" = "lumen",
+        "\\bcomponent\\b" = "comp.",
+        "\\bcompartment\\b" = "compart.",
+        "\\bintermediate\\b" = "interm.",
+        "\\bintrinsic\\b" = "intrins.",
+        "\\bbounded\\b" = "bound.",
+        "\\bprojection\\b" = "proj.",
+        "\\bjunction\\b" = "junct.",
+        "\\banchoring\\b" = "anchor.",
+        "\\bsynaptic\\b" = "synap.",
+        "\\blocalization\\b" = "local.",
+        "\\borganization\\b" = "org.",
+        "\\bbiosynthetic\\b" = "biosynth.",
+        "\\bcatabolic\\b" = "catabol.",
+        "\\bmetabolic\\b" = "metab.",
+        "\\bphosphorylation\\b" = "phosph.",
+        "\\boxidative\\b" = "oxid.",
+        "\\boxidoreductase\\b" = "oxidored.",
+        "\\boxidoreduction\\b" = "redox",
+        "\\btranslational\\b" = "transl.",
+        "\\btranslation\\b" = "transl.",
+        "\\btranscription\\b" = "txn",
+        "\\binitiation\\b" = "init.",
+        "\\bassembly\\b" = "assemb.",
+        "\\bbiogenesis\\b" = "biogen.",
+        "\\bdevelopment\\b" = "dev.",
+        "\\bsignaling\\b" = "signal.",
+        "\\bstructural\\b" = "struct.",
+        "\\bconstituent\\b" = "const.",
+        "\\bmolecule\\b" = "mol.",
+        "\\bbinding\\b" = "bind.",
+        "\\bregulator\\b" = "reg.",
+        "\\bexcitatory\\b" = "excit.",
+        "\\bextracellular\\b" = "EC",
+        "\\bintracellular\\b" = "IC",
+        "\\binorganic\\b" = "inorg.",
+        "\\bmonovalent\\b" = "monoval.",
+        "\\bmicrotubule\\b" = "MT",
+        "\\bcytoskeletal\\b" = "cytoskel.",
+        "\\blocomotory\\b" = "locomo.",
+        "\\bmovement\\b" = "movmt",
+        "\\bmotor\\b" = "motor",
+        "\\bdynein\\b" = "dynein",
+        "\\bpolypeptide\\b" = "polypep.",
+        "\\bconformation\\b" = "conform.",
+        "\\bdehydrogenase\\b" = "DH",
+        "\\bendopeptidase\\b" = "endopep.",
+        "\\bphospholipid\\b" = "phospholip.",
+        "\\bphosphatidylinositol\\b" = "PI",
+        "\\bbisphosphate\\b" = "bisP",
+        "\\bcysteine\\b" = "Cys",
+        "\\bhomeostasis\\b" = "homeo.",
+        "\\bbehavior\\b" = "behav.",
+        "\\bsensory\\b" = "sens.",
+        "\\borgan\\b" = "organ"
+    )
+    for (pattern in names(word_abbrevs)) {
+        term <- str_replace_all(term, regex(pattern, ignore_case = TRUE), 
+                                word_abbrevs[pattern])
+    }
+    
+    # Cleanup
+    term <- str_replace_all(term, "\\s+", " ")
+    term <- str_replace_all(term, "^\\s+|\\s+$", "")
+    term <- str_replace_all(term, "\\s*-\\s*", "-")
+    term <- str_replace_all(term, "\\s+,", ",")
+    term <- str_replace_all(term, ",\\s*$", "")
+    term <- str_replace_all(term, "\\s*\\.$", "")
+    term <- str_replace_all(term, "^\\s*of\\s+", "")
+    term <- str_replace_all(term, "\\s+of$", "")
+    term <- str_replace_all(term, "\\s+to$", "")
+    term <- str_replace_all(term, "\\s+or$", "")
+    
+    # Limit to 4 words
+    words <- str_split(term, "\\s+")[[1]]
+    words <- words[words != ""]
+    if (length(words) > 4) {
+        term <- paste(words[1:4], collapse = " ")
+    } else {
+        term <- paste(words, collapse = " ")
+    }
+    
+    return(term)
+}
+
+# -----------------------------------------------------------------------------
+# Load GO_MWU Results
+# -----------------------------------------------------------------------------
+
+load_gomwu_bubble_results <- function(base_dir, prefix = "", organism_label) {
+    
+    seasons <- c("summer", "winter")
+    divisions <- c("BP", "MF", "CC")
+    all_results <- list()
+    
+    for (season in seasons) {
+        for (div in divisions) {
+            if (prefix == "") {
+                filename <- file.path(base_dir, "output",
+                                     paste0(season, "_", div, "_MWU_results.csv"))
+            } else {
+                filename <- file.path(base_dir, "output",
+                                     paste0(prefix, "_", season, "_", div, "_MWU_results.csv"))
+            }
+            
+            if (file.exists(filename)) {
+                df <- read.table(filename, header = TRUE, stringsAsFactors = FALSE,
+                                sep = "", quote = "\"", comment.char = "")
+                names(df) <- gsub('^"', '', names(df))
+                names(df) <- gsub('"$', '', names(df))
+                names(df) <- trimws(names(df))
+                df$season <- season
+                df$division <- div
+                df$organism <- organism_label
+                all_results[[paste(organism_label, season, div, sep = "_")]] <- df
+            } else {
+                cat("  Warning: File not found -", filename, "\n")
+            }
+        }
+    }
+    return(bind_rows(all_results))
+}
+
+# -----------------------------------------------------------------------------
+# Process Data for Plotting
+# -----------------------------------------------------------------------------
+
+process_for_bubble <- function(gomwu_data, p_cutoff = 0.05, top_n = 6) {
+    
+    keyword_pattern <- paste(ANNOTATION_KEYWORDS, collapse = "|")
+    
+    df <- gomwu_data %>%
+        filter(!is.na(p.adj)) %>%
+        mutate(
+            neg_log10_padj = pmin(-log10(p.adj), 30),
+            x_value = delta.rank / 100,
+            go_name = name,
+            season_label = factor(
+                ifelse(season == "summer", "Summer", "Winter"),
+                levels = c("Summer", "Winter")
+            ),
+            division = factor(division, levels = c("BP", "CC", "MF")),
+            matches_keyword = str_detect(tolower(go_name), regex(keyword_pattern, ignore_case = TRUE))
+        )
+    
+    top_significant <- df %>%
+        filter(p.adj < p_cutoff) %>%
+        group_by(season_label, division) %>%
+        slice_min(order_by = p.adj, n = top_n, with_ties = FALSE) %>%
+        ungroup() %>%
+        mutate(is_top_significant = TRUE) %>%
+        select(go_name, season_label, division, is_top_significant)
+    
+    df <- df %>%
+        left_join(top_significant, by = c("go_name", "season_label", "division")) %>%
+        mutate(
+            is_top_significant = replace_na(is_top_significant, FALSE),
+            should_annotate = (p.adj < p_cutoff & matches_keyword) | is_top_significant,
+            annotate_label = ifelse(
+                should_annotate, 
+                sapply(go_name, simplify_go_term),
+                NA_character_
+            ),
+            label_fontface = case_when(
+                !should_annotate ~ NA_character_,
+                matches_keyword ~ "bold",
+                TRUE ~ "plain"
+            ),
+            label_side = case_when(
+                !should_annotate ~ NA_character_,
+                delta.rank >= 0 ~ "right",
+                TRUE ~ "left"
+            )
+        )
+    
+    return(df)
+}
+
+# -----------------------------------------------------------------------------
+# Create Bubble Plot Function - STAGGERED LANES
+# -----------------------------------------------------------------------------
+
+create_gomwu_bubble <- function(bubble_data, organism_name, org_color) {
+    
+    sig_line <- -log10(BUBBLE_P_ADJ_CUTOFF)
+    
+    # Separate data by side AND fontface
+    label_data <- bubble_data %>%
+        filter(!is.na(annotate_label))
+    
+    bold_left <- label_data %>% filter(label_fontface == "bold", label_side == "left")
+    bold_right <- label_data %>% filter(label_fontface == "bold", label_side == "right")
+    plain_left <- label_data %>% filter(label_fontface == "plain", label_side == "left")
+    plain_right <- label_data %>% filter(label_fontface == "plain", label_side == "right")
+    
+    # STAGGERED nudge distances
+    # Bold = 20% (inner lane, closer to points)
+    # Plain = 38% (outer lane, further out)
+    x_range <- range(bubble_data$x_value, na.rm = TRUE)
+    nudge_bold <- diff(x_range) * 0.20   # Inner lane
+    nudge_plain <- diff(x_range) * 0.38  # Outer lane
+    
+    p <- ggplot(bubble_data, aes(x = x_value, y = neg_log10_padj)) +
+        
+        # Points
+        geom_point(aes(size = nseqs, fill = division),
+                   shape = 21, alpha = 0.6, color = "gray30", stroke = 0.3) +
+        
+        # Significance threshold line
+        geom_hline(yintercept = sig_line, color = "darkorange",
+                   linetype = "solid", linewidth = 0.8) +
+        
+        # Vertical line at 0
+        geom_vline(xintercept = 0, color = "gray50",
+                   linetype = "dashed", linewidth = 0.5) +
+        
+        # BOLD LEFT labels (inner lane)
+        geom_text_repel(
+            data = bold_left,
+            aes(label = annotate_label),
+            size = 2.4,
+            fontface = "bold",
+            color = "black",
+            xlim = c(-Inf, NA),
+            ylim = c(0, NA),  # Keep labels within plot
+            hjust = 1,
+            direction = "y",
+            nudge_x = -nudge_bold,
+            segment.color = "gray40",
+            segment.size = 0.4,
+            segment.linetype = "solid",
+            min.segment.length = 0,
+            box.padding = 0.2,
+            point.padding = 0.15,
+            force = 4,
+            force_pull = 0,
+            max.overlaps = 50,
+            seed = 42,
+            na.rm = TRUE
+        ) +
+        
+        # BOLD RIGHT labels (inner lane)
+        geom_text_repel(
+            data = bold_right,
+            aes(label = annotate_label),
+            size = 2.4,
+            fontface = "bold",
+            color = "black",
+            xlim = c(NA, Inf),
+            ylim = c(0, NA),
+            hjust = 0,
+            direction = "y",
+            nudge_x = nudge_bold,
+            segment.color = "gray40",
+            segment.size = 0.4,
+            segment.linetype = "solid",
+            min.segment.length = 0,
+            box.padding = 0.2,
+            point.padding = 0.15,
+            force = 4,
+            force_pull = 0,
+            max.overlaps = 50,
+            seed = 42,
+            na.rm = TRUE
+        ) +
+        
+        # PLAIN LEFT labels (outer lane)
+        geom_text_repel(
+            data = plain_left,
+            aes(label = annotate_label),
+            size = 2.2,
+            fontface = "plain",
+            color = "gray30",
+            xlim = c(-Inf, NA),
+            ylim = c(0, NA),
+            hjust = 1,
+            direction = "y",
+            nudge_x = -nudge_plain,
+            segment.color = "gray60",
+            segment.size = 0.3,
+            segment.linetype = "dashed",
+            min.segment.length = 0,
+            box.padding = 0.2,
+            point.padding = 0.15,
+            force = 4,
+            force_pull = 0,
+            max.overlaps = 50,
+            seed = 123,  # Different seed for plain labels
+            na.rm = TRUE
+        ) +
+        
+        # PLAIN RIGHT labels (outer lane)
+        geom_text_repel(
+            data = plain_right,
+            aes(label = annotate_label),
+            size = 2.2,
+            fontface = "plain",
+            color = "gray30",
+            xlim = c(NA, Inf),
+            ylim = c(0, NA),
+            hjust = 0,
+            direction = "y",
+            nudge_x = nudge_plain,
+            segment.color = "gray60",
+            segment.size = 0.3,
+            segment.linetype = "dashed",
+            min.segment.length = 0,
+            box.padding = 0.2,
+            point.padding = 0.15,
+            force = 4,
+            force_pull = 0,
+            max.overlaps = 50,
+            seed = 123,
+            na.rm = TRUE
+        ) +
+        
+        # Scales
+        scale_fill_manual(
+            values = division_colors,
+            name = "GO Division",
+            labels = c("BP" = "Biological Process",
+                      "CC" = "Cellular Component",
+                      "MF" = "Molecular Function")
+        ) +
+        
+        scale_size_continuous(
+            name = "# Genes",
+            range = c(1, 12),
+            breaks = c(10, 50, 100, 200, 500)
+        ) +
+        
+        # Axes - expanded with 8% extra at top
+        scale_x_continuous(expand = expansion(mult = c(0.40, 0.40))) +
+        scale_y_continuous(expand = expansion(mult = c(0.02, 0.08))) +
+        
+        # Facet
+        facet_grid(season_label ~ division, scales = "free_x") +
+        
+        # Labels
+        labs(
+            x = "Delta Rank (Direction Score)",
+            y = expression(-log[10]~italic(p)[adj]),
+            title = paste0("GO Enrichment: ", organism_name),
+            caption = "Bold = calcification/ion keywords | Plain = top 10 significant | Left = down | Right = up"
+        ) +
+        
+        # Theme
+        theme_bw(base_size = 11) +
+        theme(
+            plot.title = element_text(size = 14, face = "bold.italic",
+                                      hjust = 0.5, color = org_color),
+            plot.caption = element_text(size = 8, face = "italic", hjust = 0.5,
+                                        color = "gray40"),
+            axis.title = element_text(size = 11, face = "bold"),
+            axis.text = element_text(size = 9),
+            strip.text = element_text(size = 10, face = "bold"),
+            strip.background = element_rect(fill = "gray95"),
+            legend.position = "right",
+            legend.box = "vertical",
+            panel.grid.minor = element_blank(),
+            panel.spacing = unit(1.2, "lines"),  # Increased spacing
+            plot.margin = margin(10, 15, 10, 10)  # Extra right margin
+        ) +
+        
+        guides(
+            fill = guide_legend(override.aes = list(size = 5), order = 1),
+            size = guide_legend(order = 2)
+        )
+    
+    return(p)
+}
+
+# -----------------------------------------------------------------------------
+# Generate Plots
+# -----------------------------------------------------------------------------
+
+cat("Loading Host GO_MWU results...\n")
+host_gomwu <- load_gomwu_bubble_results("../10_GO_MWU", prefix = "", "Host")
+cat("  Loaded", nrow(host_gomwu), "GO terms\n")
+
+cat("Loading Symbiont GO_MWU results...\n")
+symbiont_gomwu <- load_gomwu_bubble_results("../11_symbiont_GO_MWU", prefix = "symbiont", "Symbiont")
+cat("  Loaded", nrow(symbiont_gomwu), "GO terms\n")
+
+# Process data
+host_bubble_data <- process_for_bubble(host_gomwu, BUBBLE_P_ADJ_CUTOFF, TOP_N_ANNOTATE)
+symbiont_bubble_data <- process_for_bubble(symbiont_gomwu, BUBBLE_P_ADJ_CUTOFF, TOP_N_ANNOTATE)
+
+# Show simplified terms
+cat("\n=== Simplified Labels (Host Sample) ===\n")
+host_sample <- host_bubble_data %>%
+    filter(!is.na(annotate_label)) %>%
+    select(go_name, annotate_label, label_fontface) %>%
+    head(20)
+for (i in 1:nrow(host_sample)) {
+    cat(sprintf("  %-50s -> %s\n", 
+                substr(host_sample$go_name[i], 1, 50),
+                host_sample$annotate_label[i]))
+}
+
+cat("\n=== Simplified Labels (Symbiont Sample) ===\n")
+sym_sample <- symbiont_bubble_data %>%
+    filter(!is.na(annotate_label)) %>%
+    select(go_name, annotate_label, label_fontface) %>%
+    head(20)
+for (i in 1:nrow(sym_sample)) {
+    cat(sprintf("  %-50s -> %s\n", 
+                substr(sym_sample$go_name[i], 1, 50),
+                sym_sample$annotate_label[i]))
+}
+
+# Summary stats
+cat("\nHost annotation breakdown:\n")
+host_labels <- host_bubble_data %>% filter(!is.na(annotate_label))
+cat("  Bold-Left:", sum(host_labels$label_fontface == "bold" & host_labels$label_side == "left"), "\n")
+cat("  Bold-Right:", sum(host_labels$label_fontface == "bold" & host_labels$label_side == "right"), "\n")
+cat("  Plain-Left:", sum(host_labels$label_fontface == "plain" & host_labels$label_side == "left"), "\n")
+cat("  Plain-Right:", sum(host_labels$label_fontface == "plain" & host_labels$label_side == "right"), "\n")
+cat("  Total:", nrow(host_labels), "\n")
+
+cat("\nSymbiont annotation breakdown:\n")
+sym_labels <- symbiont_bubble_data %>% filter(!is.na(annotate_label))
+cat("  Bold-Left:", sum(sym_labels$label_fontface == "bold" & sym_labels$label_side == "left"), "\n")
+cat("  Bold-Right:", sum(sym_labels$label_fontface == "bold" & sym_labels$label_side == "right"), "\n")
+cat("  Plain-Left:", sum(sym_labels$label_fontface == "plain" & sym_labels$label_side == "left"), "\n")
+cat("  Plain-Right:", sum(sym_labels$label_fontface == "plain" & sym_labels$label_side == "right"), "\n")
+cat("  Total:", nrow(sym_labels), "\n")
+
+cat("\nGenerating Host bubble plot...\n")
+fig4d_host_bubble <- create_gomwu_bubble(
+    host_bubble_data,
+    "M. capitata (Host)",
+    "#E69F00"
+)
+
+cat("Generating Symbiont bubble plot...\n")
+fig4e_symbiont_bubble <- create_gomwu_bubble(
+    symbiont_bubble_data,
+    "D. trenchii (Symbiont)",
+    "#56B4E9"
+)
+
+# -----------------------------------------------------------------------------
+# Save Plots - 15 x 11 inches
+# -----------------------------------------------------------------------------
+
+ggsave("figures/Fig4D_bubble_host_GOMWU.pdf", fig4d_host_bubble,
+       width = 15, height = 11, dpi = 300)
+ggsave("figures/Fig4D_bubble_host_GOMWU.png", fig4d_host_bubble,
+       width = 15, height = 11, dpi = 300)
+cat("✓ Saved: Fig4D_bubble_host_GOMWU.pdf/png (15x11 inches)\n")
+
+ggsave("figures/Fig4E_bubble_symbiont_GOMWU.pdf", fig4e_symbiont_bubble,
+       width = 15, height = 11, dpi = 300)
+ggsave("figures/Fig4E_bubble_symbiont_GOMWU.png", fig4e_symbiont_bubble,
+       width = 15, height = 11, dpi = 300)
+cat("✓ Saved: Fig4E_bubble_symbiont_GOMWU.pdf/png (15x11 inches)\n")
+
+# -----------------------------------------------------------------------------
+# Save Summary
+# -----------------------------------------------------------------------------
+
+annotated_summary <- bind_rows(
+    host_bubble_data %>%
+        filter(!is.na(annotate_label)) %>%
+        mutate(organism = "Host",
+               annotation_type = ifelse(matches_keyword, "Keyword (bold)", "Top significant")) %>%
+        select(organism, season = season_label, division, go_name, annotate_label, p.adj, delta.rank, 
+               nseqs, matches_keyword, is_top_significant, annotation_type, label_side),
+    symbiont_bubble_data %>%
+        filter(!is.na(annotate_label)) %>%
+        mutate(organism = "Symbiont",
+               annotation_type = ifelse(matches_keyword, "Keyword (bold)", "Top significant")) %>%
+        select(organism, season = season_label, division, go_name, annotate_label, p.adj, delta.rank, 
+               nseqs, matches_keyword, is_top_significant, annotation_type, label_side)
+) %>%
+    arrange(organism, season, division, label_side, p.adj)
+
+write.csv(annotated_summary, "data/bubble_plot_annotated_terms.csv", row.names = FALSE)
+cat("✓ Saved: bubble_plot_annotated_terms.csv\n")
+
+cat("\n=== Summary by Side ===\n")
+cat("\nHost:\n")
+print(table(host_labels$label_side, host_labels$label_fontface))
+cat("\nSymbiont:\n")
+print(table(sym_labels$label_side, sym_labels$label_fontface))
+
+cat("\n✓ Figure 4D-E bubble plots complete!\n")
+
+# ==============================================================================
 # FIGURE 5: Volcano Plots
 # ==============================================================================
 
@@ -734,15 +1376,15 @@ create_volcano <- function(deseq_df, title_text, padj_cutoff = 0.05, lfc_cutoff 
             ),
             significance = factor(significance, levels = c("Up", "Down", "Sig (|LFC|<1)", "NS"))
         )
-    
+
     n_up <- sum(df$significance == "Up", na.rm = TRUE)
     n_down <- sum(df$significance == "Down", na.rm = TRUE)
-    
+
     ggplot(df, aes(x = log2FoldChange, y = neg_log10_pval, color = significance)) +
         geom_point(alpha = 0.5, size = 1) +
         geom_vline(xintercept = c(-lfc_cutoff, lfc_cutoff), linetype = "dashed", color = "gray50") +
         geom_hline(yintercept = -log10(0.05), linetype = "dashed", color = "gray50") +
-        scale_color_manual(values = c("Up" = up_color, "Down" = down_color, 
+        scale_color_manual(values = c("Up" = up_color, "Down" = down_color,
                                       "Sig (|LFC|<1)" = "gray50", "NS" = "gray80"),
                            name = "Expression") +
         labs(x = expression(Log[2]~Fold~Change), y = expression(-Log[10]~P-value),
@@ -785,13 +1427,13 @@ cat("===========================================================================
 create_pca_from_matrix <- function(vsd_mat, title_text) {
     pca_result <- prcomp(t(vsd_mat), scale. = FALSE)
     percent_var <- round(100 * (pca_result$sdev^2 / sum(pca_result$sdev^2)), 1)
-    
+
     pca_data <- data.frame(
         PC1 = pca_result$x[, 1], PC2 = pca_result$x[, 2],
         sample = rownames(pca_result$x),
         Treatment = ifelse(grepl("B", rownames(pca_result$x)), "OA", "Ambient")
     )
-    
+
     ggplot(pca_data, aes(x = PC1, y = PC2, color = Treatment, shape = Treatment)) +
         geom_point(size = 4, alpha = 0.8) +
         stat_ellipse(level = 0.95, linetype = "dashed") +
@@ -839,7 +1481,7 @@ summary_stats <- data.frame(
     Organism = c("Host", "Host", "Symbiont", "Symbiont"),
     Season = c("Summer", "Winter", "Summer", "Winter"),
     Total_Genes = c(nrow(host_summer), nrow(host_winter), nrow(sym_summer), nrow(sym_winter)),
-    DEGs_total = c(nrow(host_summer_degs), nrow(host_winter_degs), 
+    DEGs_total = c(nrow(host_summer_degs), nrow(host_winter_degs),
                    nrow(sym_summer_degs), nrow(sym_winter_degs)),
     DEGs_up = c(sum(host_summer_degs$log2FoldChange > 0),
                 sum(host_winter_degs$log2FoldChange > 0),

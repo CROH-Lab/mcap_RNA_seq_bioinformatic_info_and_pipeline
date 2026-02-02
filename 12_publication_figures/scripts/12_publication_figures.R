@@ -91,28 +91,39 @@ cat("  Symbiont Summer:", nrow(sym_summer_degs), "\n")
 cat("  Symbiont Winter:", nrow(sym_winter_degs), "\n")
 
 # ==============================================================================
-# FIGURE 1: Density Ridgeline Plot
+# UPDATED FIGURE SECTIONS - Figures 1, 2, 3
+# Replace the corresponding sections in 12_publication_figures.R
+# ==============================================================================
+# Key fixes:
+# - Figure 1: DEGs only (padj < 0.05)
+# - Figure 2: Fixed popViewport() -> upViewport() to avoid grid/graphics mixing
+# - Figure 3: Top 250 DEGs, custom colors, combined panel, same viewport fix
+# ==============================================================================
+
+# ==============================================================================
+# FIGURE 1: Density Ridgeline Plot - DEGs ONLY
 # ==============================================================================
 
 cat("\n==============================================================================\n")
-cat("Figure 1: Density Ridgeline Plot\n")
+cat("Figure 1: Density Ridgeline Plot (DEGs Only)\n")
 cat("==============================================================================\n\n")
 
+# Filter to DEGs only (padj < 0.05)
 ridgeline_data <- bind_rows(
     host_summer %>%
-        filter(!is.na(log2FoldChange)) %>%
+        filter(!is.na(log2FoldChange) & !is.na(padj) & padj < 0.05) %>%
         mutate(Organism = "M. cap", Season = "S", Group_Label = "M. cap - S") %>%
         select(log2FoldChange, Organism, Season, Group_Label),
     host_winter %>%
-        filter(!is.na(log2FoldChange)) %>%
+        filter(!is.na(log2FoldChange) & !is.na(padj) & padj < 0.05) %>%
         mutate(Organism = "M. cap", Season = "W", Group_Label = "M. cap - W") %>%
         select(log2FoldChange, Organism, Season, Group_Label),
     sym_summer %>%
-        filter(!is.na(log2FoldChange)) %>%
+        filter(!is.na(log2FoldChange) & !is.na(padj) & padj < 0.05) %>%
         mutate(Organism = "D. tre", Season = "S", Group_Label = "D. tre - S") %>%
         select(log2FoldChange, Organism, Season, Group_Label),
     sym_winter %>%
-        filter(!is.na(log2FoldChange)) %>%
+        filter(!is.na(log2FoldChange) & !is.na(padj) & padj < 0.05) %>%
         mutate(Organism = "D. tre", Season = "W", Group_Label = "D. tre - W") %>%
         select(log2FoldChange, Organism, Season, Group_Label)
 )
@@ -121,6 +132,9 @@ ridgeline_data <- ridgeline_data %>%
     mutate(Group_Label = factor(Group_Label, levels = c(
         "D. tre - W", "D. tre - S", "M. cap - W", "M. cap - S"
     )))
+
+cat("DEGs per group:\n")
+print(table(ridgeline_data$Group_Label))
 
 fig1_ridgeline <- ggplot(ridgeline_data, aes(x = log2FoldChange, y = Group_Label,
                                               fill = interaction(Organism, Season))) +
@@ -131,7 +145,7 @@ fig1_ridgeline <- ggplot(ridgeline_data, aes(x = log2FoldChange, y = Group_Label
         "M. cap.S" = "#E69F00", "M. cap.W" = "#F0E442",
         "D. tre.S" = "#56B4E9", "D. tre.W" = "#009E73"
     )) +
-    scale_x_continuous(limits = c(-2, 2), breaks = seq(-2, 2, 0.5)) +
+    scale_x_continuous(limits = c(-5, 5), breaks = seq(-5, 5, 1)) +
     labs(x = expression(Log[2]~Fold~Change~(OA~vs~Ambient)), y = "") +
     theme_pub +
     theme(legend.position = "none",
@@ -139,114 +153,384 @@ fig1_ridgeline <- ggplot(ridgeline_data, aes(x = log2FoldChange, y = Group_Label
 
 ggsave("figures/Fig1_ridgeline_log2FC.pdf", fig1_ridgeline, width = 10, height = 6, dpi = 300)
 ggsave("figures/Fig1_ridgeline_log2FC.png", fig1_ridgeline, width = 10, height = 6, dpi = 300)
-cat("Saved: Fig1_ridgeline_log2FC.pdf/png\n")
+cat("Saved: Fig1_ridgeline_log2FC.pdf/png (DEGs only)\n")
 
 # ==============================================================================
-# FIGURE 2: Venn Diagrams
+# FIGURE 2: Combined Venn Diagrams with Panel Labels
 # ==============================================================================
 
 cat("\n==============================================================================\n")
-cat("Figure 2: Venn Diagrams\n")
+cat("Figure 2: Combined Venn Diagrams\n")
 cat("==============================================================================\n\n")
 
 host_summer_ids <- host_summer_degs$gene_id
 host_winter_ids <- host_winter_degs$gene_id
 host_overlap <- length(intersect(host_summer_ids, host_winter_ids))
 
-pdf("figures/Fig2A_host_venn.pdf", width = 6, height = 6)
-grid.newpage()
-draw.pairwise.venn(
-    area1 = length(host_summer_ids), area2 = length(host_winter_ids),
-    cross.area = host_overlap, category = c("", ""),
-    fill = c(summer_color, winter_color), alpha = 0.6,
-    col = c(summer_color, winter_color), lwd = 2, cex = 2,
-    fontface = "bold", cat.cex = 0, margin = 0.1
-)
-dev.off()
-
 sym_summer_ids <- sym_summer_degs$gene_id
 sym_winter_ids <- sym_winter_degs$gene_id
 sym_overlap <- length(intersect(sym_summer_ids, sym_winter_ids))
 
-pdf("figures/Fig2B_symbiont_venn.pdf", width = 6, height = 6)
+cat("  Host: Summer =", length(host_summer_ids), "| Winter =", length(host_winter_ids), 
+    "| Overlap =", host_overlap, "\n")
+cat("  Symbiont: Summer =", length(sym_summer_ids), "| Winter =", length(sym_winter_ids), 
+    "| Overlap =", sym_overlap, "\n")
+
+# Save individual Venn diagrams first
+pdf("figures/Fig2A_host_venn.pdf", width = 6, height = 6)
 grid.newpage()
-draw.pairwise.venn(
-    area1 = length(sym_summer_ids), area2 = length(sym_winter_ids),
-    cross.area = sym_overlap, category = c("", ""),
+venn_host <- draw.pairwise.venn(
+    area1 = length(host_summer_ids), area2 = length(host_winter_ids),
+    cross.area = host_overlap, category = c("Summer", "Winter"),
     fill = c(summer_color, winter_color), alpha = 0.6,
-    col = c(summer_color, winter_color), lwd = 2, cex = 2,
-    fontface = "bold", cat.cex = 0, margin = 0.1
+    col = c(summer_color, winter_color), lwd = 2, cex = 1.8,
+    fontface = "bold", cat.cex = 1.2, cat.fontface = "bold",
+    cat.pos = c(-30, 30), cat.dist = c(0.05, 0.05),
+    margin = 0.1
 )
 dev.off()
 
-legend_plot <- ggplot(data.frame(Season = c("Summer", "Winter")),
-                      aes(x = 1, y = Season, fill = Season)) +
-    geom_tile(width = 0.3, height = 0.8) +
-    scale_fill_manual(values = c("Summer" = summer_color, "Winter" = winter_color)) +
-    theme_void() +
-    theme(legend.position = "right",
-          legend.title = element_text(size = 14, face = "bold"),
-          legend.text = element_text(size = 12))
+pdf("figures/Fig2B_symbiont_venn.pdf", width = 6, height = 6)
+grid.newpage()
+venn_sym <- draw.pairwise.venn(
+    area1 = length(sym_summer_ids), area2 = length(sym_winter_ids),
+    cross.area = sym_overlap, category = c("Summer", "Winter"),
+    fill = c(summer_color, winter_color), alpha = 0.6,
+    col = c(summer_color, winter_color), lwd = 2, cex = 1.8,
+    fontface = "bold", cat.cex = 1.2, cat.fontface = "bold",
+    cat.pos = c(-30, 30), cat.dist = c(0.05, 0.05),
+    margin = 0.1
+)
+dev.off()
 
-ggsave("figures/Fig2_legend.pdf", legend_plot, width = 3, height = 2)
-cat("Saved: Fig2A_host_venn.pdf, Fig2B_symbiont_venn.pdf, Fig2_legend.pdf\n")
-cat("  Host overlap:", host_overlap, "DEGs\n")
-cat("  Symbiont overlap:", sym_overlap, "DEGs\n")
+cat("Saved: Fig2A_host_venn.pdf, Fig2B_symbiont_venn.pdf\n")
+
+# Combined figure - KEY FIX: use upViewport() instead of popViewport()
+pdf("figures/Fig2_venn_combined.pdf", width = 12, height = 6)
+
+grid.newpage()
+pushViewport(viewport(layout = grid.layout(nrow = 1, ncol = 2)))
+
+# Panel A - Host
+pushViewport(viewport(layout.pos.row = 1, layout.pos.col = 1))
+grid.rect(gp = gpar(col = NA, fill = "white"))
+venn_a <- draw.pairwise.venn(
+    area1 = length(host_summer_ids), area2 = length(host_winter_ids),
+    cross.area = host_overlap, category = c("Summer", "Winter"),
+    fill = c(summer_color, winter_color), alpha = 0.6,
+    col = c(summer_color, winter_color), lwd = 2, cex = 1.8,
+    fontface = "bold", cat.cex = 1.2, cat.fontface = "bold",
+    cat.pos = c(-30, 30), cat.dist = c(0.05, 0.05),
+    margin = 0.05, ind = FALSE
+)
+grid.draw(venn_a)
+grid.text("A", x = unit(0.05, "npc"), y = unit(0.95, "npc"), 
+          just = c("left", "top"), gp = gpar(fontsize = 18, fontface = "bold"))
+grid.text(expression(italic("M. capitata")), x = unit(0.5, "npc"), y = unit(0.95, "npc"),
+          just = "center", gp = gpar(fontsize = 14, fontface = "bold"))
+upViewport()  # KEY FIX
+
+# Panel B - Symbiont
+pushViewport(viewport(layout.pos.row = 1, layout.pos.col = 2))
+grid.rect(gp = gpar(col = NA, fill = "white"))
+venn_b <- draw.pairwise.venn(
+    area1 = length(sym_summer_ids), area2 = length(sym_winter_ids),
+    cross.area = sym_overlap, category = c("Summer", "Winter"),
+    fill = c(summer_color, winter_color), alpha = 0.6,
+    col = c(summer_color, winter_color), lwd = 2, cex = 1.8,
+    fontface = "bold", cat.cex = 1.2, cat.fontface = "bold",
+    cat.pos = c(-30, 30), cat.dist = c(0.05, 0.05),
+    margin = 0.05, ind = FALSE
+)
+grid.draw(venn_b)
+grid.text("B", x = unit(0.05, "npc"), y = unit(0.95, "npc"), 
+          just = c("left", "top"), gp = gpar(fontsize = 18, fontface = "bold"))
+grid.text(expression(italic("D. trenchii")), x = unit(0.5, "npc"), y = unit(0.95, "npc"),
+          just = "center", gp = gpar(fontsize = 14, fontface = "bold"))
+upViewport()  # KEY FIX
+
+dev.off()
+
+# PNG version
+png("figures/Fig2_venn_combined.png", width = 12, height = 6, units = "in", res = 300)
+
+grid.newpage()
+pushViewport(viewport(layout = grid.layout(nrow = 1, ncol = 2)))
+
+# Panel A
+pushViewport(viewport(layout.pos.row = 1, layout.pos.col = 1))
+grid.rect(gp = gpar(col = NA, fill = "white"))
+venn_a <- draw.pairwise.venn(
+    area1 = length(host_summer_ids), area2 = length(host_winter_ids),
+    cross.area = host_overlap, category = c("Summer", "Winter"),
+    fill = c(summer_color, winter_color), alpha = 0.6,
+    col = c(summer_color, winter_color), lwd = 2, cex = 1.8,
+    fontface = "bold", cat.cex = 1.2, cat.fontface = "bold",
+    cat.pos = c(-30, 30), cat.dist = c(0.05, 0.05),
+    margin = 0.05, ind = FALSE
+)
+grid.draw(venn_a)
+grid.text("A", x = unit(0.05, "npc"), y = unit(0.95, "npc"), 
+          just = c("left", "top"), gp = gpar(fontsize = 18, fontface = "bold"))
+grid.text(expression(italic("M. capitata")), x = unit(0.5, "npc"), y = unit(0.95, "npc"),
+          just = "center", gp = gpar(fontsize = 14, fontface = "bold"))
+upViewport()
+
+# Panel B
+pushViewport(viewport(layout.pos.row = 1, layout.pos.col = 2))
+grid.rect(gp = gpar(col = NA, fill = "white"))
+venn_b <- draw.pairwise.venn(
+    area1 = length(sym_summer_ids), area2 = length(sym_winter_ids),
+    cross.area = sym_overlap, category = c("Summer", "Winter"),
+    fill = c(summer_color, winter_color), alpha = 0.6,
+    col = c(summer_color, winter_color), lwd = 2, cex = 1.8,
+    fontface = "bold", cat.cex = 1.2, cat.fontface = "bold",
+    cat.pos = c(-30, 30), cat.dist = c(0.05, 0.05),
+    margin = 0.05, ind = FALSE
+)
+grid.draw(venn_b)
+grid.text("B", x = unit(0.05, "npc"), y = unit(0.95, "npc"), 
+          just = c("left", "top"), gp = gpar(fontsize = 18, fontface = "bold"))
+grid.text(expression(italic("D. trenchii")), x = unit(0.5, "npc"), y = unit(0.95, "npc"),
+          just = "center", gp = gpar(fontsize = 14, fontface = "bold"))
+upViewport()
+
+dev.off()
+
+cat("Saved: Fig2_venn_combined.pdf/png\n")
 
 # ==============================================================================
-# FIGURE 3: Heatmaps
+# FIGURE 3: Heatmaps - Top 250 DEGs, Combined Panels, Custom Colors
 # ==============================================================================
 
 cat("\n==============================================================================\n")
-cat("Figure 3: Heatmaps (All DEGs)\n")
+cat("Figure 3: Heatmaps (Top 250 DEGs, Combined Panels)\n")
 cat("==============================================================================\n\n")
 
-create_deg_heatmap_all <- function(vsd_mat, deseq_results, filename, max_genes = 500) {
+# Color palettes for each panel
+# Host Summer: Warm colors (orange to dark red)
+heatmap_colors_host_summer <- colorRampPalette(c("#FFF5EB", "#FDD49E", "#FDBB84", 
+                                                  "#FC8D59", "#EF6548", "#D7301F", 
+                                                  "#990000"))(100)
+
+# Host Winter: Cool colors (light blue to dark blue)
+heatmap_colors_host_winter <- colorRampPalette(c("#F7FBFF", "#DEEBF7", "#C6DBEF",
+                                                  "#9ECAE1", "#6BAED6", "#3182BD",
+                                                  "#08519C"))(100)
+
+# Symbiont Winter: Green palette (light green to dark green)
+heatmap_colors_sym_winter <- colorRampPalette(c("#F7FCF5", "#E5F5E0", "#C7E9C0",
+                                                 "#A1D99B", "#74C476", "#31A354",
+                                                 "#006D2C"))(100)
+
+create_deg_heatmap_panel <- function(vsd_mat, deseq_results, color_palette, max_genes = 250) {
+    
     all_degs <- deseq_results %>%
         filter(!is.na(padj) & padj < 0.05) %>%
         arrange(desc(abs(log2FoldChange)))
-
+    
     if (nrow(all_degs) < 5) {
         cat("  Warning: Fewer than 5 DEGs, skipping\n")
         return(NULL)
     }
-
+    
+    # Limit to top max_genes
     if (nrow(all_degs) > max_genes) {
-        cat("  Note: Limiting to top", max_genes, "DEGs\n")
+        cat("  Note: Limiting to top", max_genes, "of", nrow(all_degs), "DEGs\n")
         all_degs <- head(all_degs, max_genes)
+    } else {
+        cat("  Using all", nrow(all_degs), "DEGs\n")
     }
-
+    
     common_genes <- intersect(all_degs$gene_id, rownames(vsd_mat))
     if (length(common_genes) < 5) return(NULL)
-
+    
     heatmap_mat <- vsd_mat[common_genes, , drop = FALSE]
     heatmap_mat_scaled <- t(scale(t(heatmap_mat)))
-
+    
+    # Treatment annotation without title
     sample_names <- colnames(heatmap_mat)
     treatments <- ifelse(grepl("B", sample_names), "OA", "Ambient")
     anno_col <- data.frame(Treatment = treatments, row.names = sample_names)
     anno_colors <- list(Treatment = c("OA" = "#E69F00", "Ambient" = "#56B4E9"))
-
-    plot_height <- max(8, min(20, nrow(heatmap_mat_scaled) / 20))
-
-    pdf(filename, width = 8, height = plot_height)
-    pheatmap::pheatmap(heatmap_mat_scaled,
-             color = colorRampPalette(c(down_color, "white", up_color))(100),
-             cluster_rows = TRUE, cluster_cols = TRUE,
-             show_rownames = FALSE, show_colnames = TRUE,
-             annotation_col = anno_col, annotation_colors = anno_colors,
-             fontsize = 10, border_color = NA, main = "")
-    dev.off()
-
-    cat("  Saved:", filename, "with", length(common_genes), "DEGs\n")
-    return(length(common_genes))
+    
+    # Create heatmap with no annotation name (removes "Treatment" title)
+    ht <- pheatmap::pheatmap(heatmap_mat_scaled,
+                              color = color_palette,
+                              cluster_rows = TRUE, cluster_cols = TRUE,
+                              show_rownames = FALSE, show_colnames = TRUE,
+                              annotation_col = anno_col, 
+                              annotation_colors = anno_colors,
+                              annotation_names_col = FALSE,  # Remove "Treatment" title
+                              fontsize = 10, 
+                              border_color = NA,
+                              silent = TRUE)
+    
+    return(list(heatmap = ht, n_genes = length(common_genes)))
 }
 
-cat("Creating heatmaps...\n")
-create_deg_heatmap_all(host_summer_vsd, host_summer, "figures/Fig3A_heatmap_host_summer.pdf")
-create_deg_heatmap_all(host_winter_vsd, host_winter, "figures/Fig3B_heatmap_host_winter.pdf")
-create_deg_heatmap_all(sym_summer_vsd, sym_summer, "figures/Fig3C_heatmap_symbiont_summer.pdf")
-create_deg_heatmap_all(sym_winter_vsd, sym_winter, "figures/Fig3D_heatmap_symbiont_winter.pdf")
+# Generate individual heatmaps
+cat("Creating Host Summer heatmap...\n")
+ht_host_summer <- create_deg_heatmap_panel(host_summer_vsd, host_summer, 
+                                            heatmap_colors_host_summer, max_genes = 250)
+
+cat("Creating Host Winter heatmap...\n")
+ht_host_winter <- create_deg_heatmap_panel(host_winter_vsd, host_winter, 
+                                            heatmap_colors_host_winter, max_genes = 250)
+
+cat("Creating Symbiont Winter heatmap...\n")
+ht_sym_winter <- create_deg_heatmap_panel(sym_winter_vsd, sym_winter, 
+                                           heatmap_colors_sym_winter, max_genes = 250)
+
+cat("Note: Symbiont Summer has only", nrow(sym_summer_degs), "DEGs - excluding from combined figure\n")
+
+# Save individual heatmaps
+if (!is.null(ht_host_summer)) {
+    pdf("figures/Fig3A_heatmap_host_summer.pdf", width = 8, height = 10)
+    grid.draw(ht_host_summer$heatmap$gtable)
+    dev.off()
+    cat("  Saved: Fig3A_heatmap_host_summer.pdf with", ht_host_summer$n_genes, "DEGs\n")
+}
+
+if (!is.null(ht_host_winter)) {
+    pdf("figures/Fig3B_heatmap_host_winter.pdf", width = 8, height = 10)
+    grid.draw(ht_host_winter$heatmap$gtable)
+    dev.off()
+    cat("  Saved: Fig3B_heatmap_host_winter.pdf with", ht_host_winter$n_genes, "DEGs\n")
+}
+
+if (!is.null(ht_sym_winter)) {
+    pdf("figures/Fig3C_heatmap_symbiont_winter.pdf", width = 8, height = 10)
+    grid.draw(ht_sym_winter$heatmap$gtable)
+    dev.off()
+    cat("  Saved: Fig3C_heatmap_symbiont_winter.pdf with", ht_sym_winter$n_genes, "DEGs\n")
+}
+
+# ==============================================================================
+# Combined Heatmap Figure (3 panels: Host Summer, Host Winter, Symbiont Winter)
+# ==============================================================================
+
+cat("\nCreating combined heatmap figure...\n")
+
+# Extract gtables
+gt_host_summer <- if (!is.null(ht_host_summer)) ht_host_summer$heatmap$gtable else NULL
+gt_host_winter <- if (!is.null(ht_host_winter)) ht_host_winter$heatmap$gtable else NULL
+gt_sym_winter <- if (!is.null(ht_sym_winter)) ht_sym_winter$heatmap$gtable else NULL
+
+# Combined figure
+pdf("figures/Fig3_heatmap_combined.pdf", width = 18, height = 10)
+
+grid.newpage()
+vp_layout <- viewport(layout = grid.layout(nrow = 2, ncol = 3,
+                                            heights = unit(c(0.05, 0.95), "npc"),
+                                            widths = unit(c(1, 1, 1), "null")))
+pushViewport(vp_layout)
+
+# Row 1: Titles
+pushViewport(viewport(layout.pos.row = 1, layout.pos.col = 1))
+grid.text("A", x = 0.05, y = 0.5, just = "left", gp = gpar(fontsize = 18, fontface = "bold"))
+grid.text(expression(italic("M. capitata")~"- Summer"), x = 0.5, y = 0.5, 
+          gp = gpar(fontsize = 12, fontface = "bold"))
+upViewport()
+
+pushViewport(viewport(layout.pos.row = 1, layout.pos.col = 2))
+grid.text("B", x = 0.05, y = 0.5, just = "left", gp = gpar(fontsize = 18, fontface = "bold"))
+grid.text(expression(italic("M. capitata")~"- Winter"), x = 0.5, y = 0.5, 
+          gp = gpar(fontsize = 12, fontface = "bold"))
+upViewport()
+
+pushViewport(viewport(layout.pos.row = 1, layout.pos.col = 3))
+grid.text("C", x = 0.05, y = 0.5, just = "left", gp = gpar(fontsize = 18, fontface = "bold"))
+grid.text(expression(italic("D. trenchii")~"- Winter"), x = 0.5, y = 0.5, 
+          gp = gpar(fontsize = 12, fontface = "bold"))
+upViewport()
+
+# Row 2: Heatmaps
+if (!is.null(gt_host_summer)) {
+    pushViewport(viewport(layout.pos.row = 2, layout.pos.col = 1))
+    pushViewport(viewport(width = 0.95, height = 0.95))
+    grid.draw(gt_host_summer)
+    upViewport(2)
+}
+
+if (!is.null(gt_host_winter)) {
+    pushViewport(viewport(layout.pos.row = 2, layout.pos.col = 2))
+    pushViewport(viewport(width = 0.95, height = 0.95))
+    grid.draw(gt_host_winter)
+    upViewport(2)
+}
+
+if (!is.null(gt_sym_winter)) {
+    pushViewport(viewport(layout.pos.row = 2, layout.pos.col = 3))
+    pushViewport(viewport(width = 0.95, height = 0.95))
+    grid.draw(gt_sym_winter)
+    upViewport(2)
+}
+
+dev.off()
+
+# PNG version
+png("figures/Fig3_heatmap_combined.png", width = 18, height = 10, units = "in", res = 300)
+
+grid.newpage()
+vp_layout <- viewport(layout = grid.layout(nrow = 2, ncol = 3,
+                                            heights = unit(c(0.05, 0.95), "npc"),
+                                            widths = unit(c(1, 1, 1), "null")))
+pushViewport(vp_layout)
+
+# Titles
+pushViewport(viewport(layout.pos.row = 1, layout.pos.col = 1))
+grid.text("A", x = 0.05, y = 0.5, just = "left", gp = gpar(fontsize = 18, fontface = "bold"))
+grid.text(expression(italic("M. capitata")~"- Summer"), x = 0.5, y = 0.5, 
+          gp = gpar(fontsize = 12, fontface = "bold"))
+upViewport()
+
+pushViewport(viewport(layout.pos.row = 1, layout.pos.col = 2))
+grid.text("B", x = 0.05, y = 0.5, just = "left", gp = gpar(fontsize = 18, fontface = "bold"))
+grid.text(expression(italic("M. capitata")~"- Winter"), x = 0.5, y = 0.5, 
+          gp = gpar(fontsize = 12, fontface = "bold"))
+upViewport()
+
+pushViewport(viewport(layout.pos.row = 1, layout.pos.col = 3))
+grid.text("C", x = 0.05, y = 0.5, just = "left", gp = gpar(fontsize = 18, fontface = "bold"))
+grid.text(expression(italic("D. trenchii")~"- Winter"), x = 0.5, y = 0.5, 
+          gp = gpar(fontsize = 12, fontface = "bold"))
+upViewport()
+
+# Heatmaps
+if (!is.null(gt_host_summer)) {
+    pushViewport(viewport(layout.pos.row = 2, layout.pos.col = 1))
+    pushViewport(viewport(width = 0.95, height = 0.95))
+    grid.draw(gt_host_summer)
+    upViewport(2)
+}
+
+if (!is.null(gt_host_winter)) {
+    pushViewport(viewport(layout.pos.row = 2, layout.pos.col = 2))
+    pushViewport(viewport(width = 0.95, height = 0.95))
+    grid.draw(gt_host_winter)
+    upViewport(2)
+}
+
+if (!is.null(gt_sym_winter)) {
+    pushViewport(viewport(layout.pos.row = 2, layout.pos.col = 3))
+    pushViewport(viewport(width = 0.95, height = 0.95))
+    grid.draw(gt_sym_winter)
+    upViewport(2)
+}
+
+dev.off()
+
+cat("Saved: Fig3_heatmap_combined.pdf/png (18x10 inches)\n")
+
+cat("\n=== Heatmap Summary ===\n")
+cat("Panel A (Host Summer):", ifelse(!is.null(ht_host_summer), 
+    paste(ht_host_summer$n_genes, "DEGs, warm colors"), "skipped"), "\n")
+cat("Panel B (Host Winter):", ifelse(!is.null(ht_host_winter), 
+    paste(ht_host_winter$n_genes, "DEGs, cool colors"), "skipped"), "\n")
+cat("Panel C (Symbiont Winter):", ifelse(!is.null(ht_sym_winter), 
+    paste(ht_sym_winter$n_genes, "DEGs, green colors"), "skipped"), "\n")
+cat("Note: Symbiont Summer excluded (only", nrow(sym_summer_degs), "DEGs)\n")
 
 # ==============================================================================
 # FIGURE 4: Sankey Plot - Final with Priority Categories & Colored Flows

@@ -592,6 +592,397 @@ All annotation files contain the following columns:
 | description | Protein function description |
 | source | SwissProt or TrEMBL |
 
+## GO_MWU Functional Enrichment Analysis (Host)
+
+### Overview
+
+Gene Ontology enrichment analysis was performed using the GO_MWU (Gene Ontology Mann-Whitney U) approach, which tests for functional enrichment using continuous measures rather than binary DEG lists. This rank-based method is more powerful than traditional overrepresentation analysis as it incorporates the magnitude and direction of differential expression.
+
+**Reference**: Wright RM et al. (2015) Gene expression associated with white syndromes in a reef-building coral, *Acropora hyacinthus*. BMC Genomics 16:371
+
+### Input Preparation
+
+#### Continuous Measure: Signed -log10(p-value)
+
+DESeq2 results were converted to signed significance scores that capture both magnitude and direction:
+```r
+signed_logP = sign(log2FoldChange) × -log10(pvalue)
+```
+
+This metric:
+- **Positive values**: Genes upregulated under OA
+- **Negative values**: Genes downregulated under OA
+- **Magnitude**: Reflects statistical significance (larger = more significant)
+
+| Season | Genes Tested | Signed -log10(p) Range | Genes at p < 0.05 |
+|--------|--------------|------------------------|-------------------|
+| Summer | 23,294 | -91.6 to +77.0 | 2,343 |
+| Winter | 23,062 | -51.2 to +21.6 | 1,579 |
+
+### GO Annotation Database
+
+| Component | Description |
+|-----------|-------------|
+| **GO Database** | go.obo (Gene Ontology release 2025-10-10) |
+| **Gene-GO Mapping** | go_annotations.tab (13.7 MB) |
+| **Annotation Source** | UniProt-derived GO terms for *M. capitata* genes |
+| **Format** | Tab-separated: gene_id → semicolon-delimited GO terms |
+
+### GO_MWU Parameters
+```r
+# Size filtering
+largest = 0.1      # Exclude GO terms with >10% of genes (too broad)
+smallest = 10      # Exclude GO terms with <10 genes (too specific)
+
+# Clustering parameters  
+clusterCutHeight = 0.25   # Height for cutting GO term dendrogram
+
+# Significance thresholds for visualization
+level1 = 0.01      # Italic text
+level2 = 0.001     # Regular text
+level3 = 0.0001    # Bold text
+
+# Multiple testing correction
+adjust.multcomp = "BH"    # Benjamini-Hochberg FDR
+```
+
+### Statistical Method
+
+GO_MWU performs a **Mann-Whitney U test** (Wilcoxon rank-sum) for each GO category:
+
+1. Rank all genes by their signed -log10(p) values
+2. For each GO term, compare ranks of member genes vs. non-member genes
+3. Calculate delta.rank = mean(rank_in_GO) - mean(rank_not_in_GO)
+4. Test whether GO term genes are shifted toward positive (upregulated) or negative (downregulated) ranks
+
+**Interpretation of delta.rank**:
+- **Positive delta.rank**: GO term enriched among upregulated genes
+- **Negative delta.rank**: GO term enriched among downregulated genes
+- **Magnitude**: Strength of directional enrichment
+
+### Results Summary
+
+| Season | Division | Significant Terms (p.adj < 0.05) | Upregulated | Downregulated |
+|--------|----------|----------------------------------|-------------|---------------|
+| Summer | BP | 67 | 43 | 24 |
+| Summer | MF | 40 | 21 | 19 |
+| Summer | CC | 56 | 34 | 22 |
+| Winter | BP | 84 | 27 | 57 |
+| Winter | MF | 64 | 24 | 40 |
+| Winter | CC | 56 | 14 | 42 |
+| **Summer Total** | | **163** | **98** | **65** |
+| **Winter Total** | | **204** | **65** | **139** |
+
+**Key Pattern**: Summer shows predominantly upregulated enrichment (60% up), while winter shows predominantly downregulated enrichment (68% down), suggesting distinct seasonal stress response strategies.
+
+### GO Term Clustering
+
+Semantically similar GO terms are clustered to reduce redundancy:
+
+1. Calculate pairwise dissimilarity between significant GO terms based on shared genes
+2. Hierarchical clustering (complete linkage) of dissimilarity matrix
+3. Cut tree at height = 0.25 to define clusters
+4. Extract representative GO term from each cluster (lowest p-value)
+
+### Output Files
+
+| File | Description |
+|------|-------------|
+| `output/<season>_<div>_MWU_results.csv` | Full MWU test results for all GO terms |
+| `output/<season>_<div>_dissimilarity.csv` | Pairwise dissimilarity matrix for clustering |
+| `output/GO_MWU_summary.csv` | Summary statistics |
+| `figures/<season>_<div>_GO_MWU.pdf` | Individual division plots |
+| `figures/<season>_combined_GO_MWU.pdf` | Combined BP/MF/CC plots |
+
+### Results File Format
+
+MWU results files contain:
+
+| Column | Description |
+|--------|-------------|
+| delta.rank | Direction score (positive = up in OA) |
+| pval | Raw Mann-Whitney U p-value |
+| level | GO term depth in ontology |
+| nseqs | Number of genes in GO term |
+| term | GO term ID(s) |
+| name | GO term name |
+| p.adj | BH-adjusted p-value |
+
+---
+
+## GO_MWU Functional Enrichment Analysis (Symbiont)
+
+### Overview
+
+Parallel GO_MWU analysis was performed for the *D. trenchii* symbiont to characterize functional responses to ocean acidification. The symbiont analysis uses the same methodology as the host but with symbiont-specific GO annotations.
+
+### Input Preparation
+
+| Season | Genes Tested | Genes at p < 0.05 |
+|--------|--------------|-------------------|
+| Summer | 35,008 | 1,088 |
+| Winter | 35,147 | 3,772 |
+
+### GO Annotation Database
+
+| Component | Description |
+|-----------|-------------|
+| **GO Database** | go.obo (Gene Ontology release 2025-10-10) |
+| **Gene-GO Mapping** | symbiont_go_annotations.tab (11.6 MB) |
+| **Annotation Source** | UniProt-derived GO terms for *D. trenchii* genes |
+
+### Results Summary
+
+| Season | Division | Significant Terms (p.adj < 0.05) | Upregulated | Downregulated |
+|--------|----------|----------------------------------|-------------|---------------|
+| Summer | BP | 25 | 11 | 14 |
+| Summer | MF | 8 | 3 | 5 |
+| Summer | CC | 13 | 1 | 12 |
+| Winter | BP | 126 | 76 | 50 |
+| Winter | MF | 55 | 43 | 12 |
+| Winter | CC | 76 | 29 | 47 |
+| **Summer Total** | | **46** | **15** | **31** |
+| **Winter Total** | | **257** | **148** | **109** |
+
+### Output Files
+
+| File | Description |
+|------|-------------|
+| `output/symbiont_<season>_<div>_MWU_results.csv` | Full MWU test results |
+| `output/symbiont_<season>_<div>_dissimilarity.csv` | Pairwise dissimilarity matrix |
+| `output/symbiont_GO_MWU_summary.csv` | Summary statistics |
+| `figures/symbiont_<season>_<div>_GO_MWU.pdf` | Individual division plots |
+| `figures/symbiont_<season>_combined_GO_MWU.pdf` | Combined BP/MF/CC plots |
+
+---
+
+## Publication Figures
+
+### Overview
+
+Publication-quality figures were generated to visualize differential expression patterns, functional enrichment, and sample relationships for both the coral host (*M. capitata*) and algal symbiont (*D. trenchii*) under ocean acidification.
+
+### Figure Inventory
+
+| Figure | Type | Description | Format |
+|--------|------|-------------|--------|
+| **Fig 1** | Ridgeline | Log2FC density distributions | PDF, PNG |
+| **Fig 2A-B** | Venn | Seasonal DEG overlap | PDF |
+| **Fig 3A-D** | Heatmap | DEG expression patterns | PDF |
+| **Fig 4** | Sankey | Calcification pathway flows | HTML |
+| **Fig 4D-E** | Bubble | GO_MWU enrichment | PDF, PNG |
+| **Fig 4F-G** | Bubble | Collapsed GO categories | PDF, PNG |
+| **Fig 5A-D** | Volcano | DEG significance vs fold change | PDF |
+| **Fig 5** | Combined | 2×2 volcano panel | PDF, PNG |
+| **Fig 6A-D** | PCA | Sample clustering by treatment | PDF |
+| **Fig 6** | Combined | 2×2 PCA panel | PDF, PNG |
+
+### Figure 1: Log2 Fold Change Distributions
+
+**Ridgeline density plot** showing the distribution of expression changes across all tested genes.
+
+- **X-axis**: Log2 fold change (OA vs Ambient), limited to ±2
+- **Y-axis**: Organism × Season groups
+- **Features**: Dashed line at LFC=0; dotted lines at ±1
+- **Color scheme**: 
+  - *M. capitata* Summer: #E69F00 (orange)
+  - *M. capitata* Winter: #F0E442 (yellow)
+  - *D. trenchii* Summer: #56B4E9 (light blue)
+  - *D. trenchii* Winter: #009E73 (teal)
+
+### Figure 2: Venn Diagrams
+
+**Seasonal overlap of DEGs** for host and symbiont separately.
+
+| Panel | Organism | Summer DEGs | Winter DEGs | Description |
+|-------|----------|-------------|-------------|-------------|
+| A | *M. capitata* | 772 | 215 | Host seasonal comparison |
+| B | *D. trenchii* | 2 | 279 | Symbiont seasonal comparison |
+
+- **Colors**: Summer (#D55E00), Winter (#0072B2)
+
+### Figure 3: Expression Heatmaps
+
+**Hierarchical clustering heatmaps** of DEG expression patterns.
+
+- **Scaling**: Row-wise Z-score normalization
+- **Clustering**: Complete linkage on rows (genes) and columns (samples)
+- **Color scale**: Blue (down) → White → Red (up)
+- **Annotation**: Treatment (OA vs Ambient)
+- **Gene limit**: Top 500 DEGs by |log2FC| per analysis
+
+| Panel | Analysis | DEGs Shown |
+|-------|----------|------------|
+| A | Host Summer | 500 (of 772) |
+| B | Host Winter | 215 |
+| C | Symbiont Summer | 2 |
+| D | Symbiont Winter | 279 |
+
+### Figure 4: Calcification Pathway Analysis
+
+#### Sankey Diagrams (HTML, Interactive)
+
+**Three-level Sankey plots** showing flow from organism/division → parent category → specific GO terms for calcification-related processes.
+
+**Calcification-relevant keyword filters**:
+```r
+CALC_KEYWORDS <- c(
+    "calcium", "carbonate", "carbonic",
+    "ion transport", "ion homeostasis", "metal ion",
+    "proton", "ATPase", "pH",
+    "solute", "biomineralization", "ossification",
+    "cation", "anion", "sodium", "potassium",
+    "phosphorylation", "phospholipid", "oxidative"
+)
+```
+
+**Parent categories assigned**:
+- Calcium Homeostasis
+- Carbon/Carbonate
+- Proton Transport
+- Metal Ion Homeostasis
+- ATPase Activity
+- Ion Transport
+- Ion Homeostasis/Regulation
+- Oxidative Phosphorylation
+
+**Color scheme**:
+- Individual season plots: Orange (#E69F00 host), Green (#2ECC71 symbiont)
+- Combined plot:
+  - Host Summer: #ff671f
+  - Host Winter: #ffb81c
+  - Symbiont Summer: #006341
+  - Symbiont Winter: #8fe2b0
+
+#### Bubble Plots (Fig 4D-E)
+
+**GO_MWU enrichment visualization** with annotated significant terms.
+
+- **X-axis**: Delta rank / 100 (direction score)
+- **Y-axis**: -log10(p.adj)
+- **Bubble size**: Number of genes (nseqs)
+- **Bubble color**: GO division (BP=#4DAF4A, CC=#E41A1C, MF=#377EB8)
+- **Faceting**: Division × Season
+- **Annotations**: 
+  - **Bold**: Calcification/ion keyword matches (inner lane)
+  - **Plain**: Top 6 significant terms per facet (outer lane)
+  - **Staggered positioning**: Bold labels 20% from center, plain labels 38%
+
+**GO term simplification** applied to labels:
+- Ion symbols (calcium → Ca2+, sodium → Na+)
+- Abbreviations (transmembrane → TM, endoplasmic reticulum → ER)
+- Maximum 4 words per label
+
+### Figure 5: Volcano Plots
+
+**Significance vs fold change** for each organism × season combination.
+
+- **X-axis**: Log2 fold change (capped at ±10)
+- **Y-axis**: -log10(p-value) (capped at 50)
+- **Thresholds**: 
+  - Vertical dashed lines at LFC = ±1
+  - Horizontal dashed line at p = 0.05
+- **Color categories**:
+  - Up (red, #D73027): padj < 0.05, LFC > 1
+  - Down (blue, #4575B4): padj < 0.05, LFC < -1
+  - Sig |LFC|<1 (gray): padj < 0.05, |LFC| ≤ 1
+  - NS (light gray): padj ≥ 0.05
+
+### Figure 6: PCA Plots
+
+**Principal component analysis** of variance-stabilized expression data.
+
+- **Input**: VST-transformed counts from DESeq2
+- **Points**: Individual samples colored by treatment
+- **Shapes**: Treatment (circle=OA, triangle=Ambient)
+- **Colors**: Treatment (orange=#E69F00 OA, blue=#56B4E9 Ambient)
+- **Ellipses**: 95% confidence ellipses per treatment
+- **Axis labels**: PC with % variance explained
+
+### Color Palettes
+```r
+# Organism colors
+host_color <- "#E69F00"
+symbiont_color <- "#56B4E9"
+
+# Season colors
+summer_color <- "#D55E00"
+winter_color <- "#0072B2"
+
+# Expression direction
+up_color <- "#D73027"
+down_color <- "#4575B4"
+
+# GO divisions
+division_colors <- c(
+    "BP" = "#4DAF4A",   # Green
+    "CC" = "#E41A1C",   # Red
+    "MF" = "#377EB8"    # Blue
+)
+```
+
+### Output Files
+
+#### Figures
+
+| File | Dimensions | Description |
+|------|------------|-------------|
+| `Fig1_ridgeline_log2FC.pdf/png` | 10×6 in | Expression distributions |
+| `Fig2A_host_venn.pdf` | 6×6 in | Host seasonal overlap |
+| `Fig2B_symbiont_venn.pdf` | 6×6 in | Symbiont seasonal overlap |
+| `Fig3A-D_heatmap_*.pdf` | 8×variable | Expression heatmaps |
+| `Fig4_calcification_sankey_summer.html` | Interactive | Summer calcification flows |
+| `Fig4_calcification_sankey_winter.html` | Interactive | Winter calcification flows |
+| `Fig4_calcification_sankey_combined.html` | Interactive | Combined seasonal flows |
+| `Fig4D_bubble_host_GOMWU.pdf/png` | 15×11 in | Host GO enrichment |
+| `Fig4E_bubble_symbiont_GOMWU.pdf/png` | 15×11 in | Symbiont GO enrichment |
+| `Fig4F_bubble_collapsed_host.pdf/png` | Variable | Host collapsed categories |
+| `Fig4G_bubble_collapsed_symbiont.pdf/png` | Variable | Symbiont collapsed categories |
+| `Fig5A-D_volcano_*.pdf` | 8×6 in | Individual volcanos |
+| `Fig5_volcano_combined.pdf/png` | 12×10 in | Combined 2×2 panel |
+| `Fig6A-D_pca_*.pdf` | 7×6 in | Individual PCAs |
+| `Fig6_pca_combined.pdf/png` | 12×10 in | Combined 2×2 panel |
+
+#### Data Files
+
+| File | Description |
+|------|-------------|
+| `data/DEG_summary_statistics.csv` | DEG counts by organism/season |
+| `data/bubble_plot_annotated_terms.csv` | GO terms shown in bubble plots |
+| `data/calcification_summary_summer.csv` | Summer calcification pathway stats |
+| `data/calcification_summary_winter.csv` | Winter calcification pathway stats |
+| `data/calcification_summary_combined.csv` | Combined seasonal stats |
+| `data/excluded_calcification_terms_*.csv` | Terms not matching parent categories |
+
+### R Dependencies
+```r
+library(tidyverse)
+library(ggplot2)
+library(ggridges)
+library(VennDiagram)
+library(pheatmap)
+library(circlize)
+library(DESeq2)
+library(RColorBrewer)
+library(viridis)
+library(scales)
+library(cowplot)
+library(grid)
+library(gridExtra)
+library(ggrepel)
+library(ComplexHeatmap)
+library(networkD3)
+library(htmlwidgets)
+```
+
+### Scripts
+
+| Script | Purpose |
+|--------|---------|
+| `scripts/12_publication_figures_v4.R` | Main figure generation (Sankey focus) |
+| `scripts/12_publication_figures_v5.R` | Updated with staggered bubble plots |
+
+
 ## Directory Structure
 
 ```
@@ -616,9 +1007,91 @@ mc_rework/
 │   └── organism_distribution.tsv
 ├── 06_featurecounts/       # Gene-level counts (pending)
 ├── 07_deseq2/              # DESeq2 analysis (pending)
+├── 08_host_deg_annotation/ # Host BLASTx annotation
+├── 09_symbiont_deg_annotation/ # Symbiont BLASTx annotation
+├── 10_GO_MWU/              # Host GO enrichment analysis
+│   ├── input/
+│   │   ├── go_annotations.tab         # Gene-to-GO mapping (13.7 MB)
+│   │   ├── go.obo                      # GO database (31.4 MB)
+│   │   ├── summer_log2fc.csv           # LFC input (alternative)
+│   │   ├── summer_signed_logP.csv      # Signed -log10(p) input
+│   │   ├── winter_log2fc.csv
+│   │   └── winter_signed_logP.csv
+│   ├── output/
+│   │   ├── summer_BP_MWU_results.csv   # BP results (147 KB)
+│   │   ├── summer_BP_dissimilarity.csv # BP clustering (5.6 MB)
+│   │   ├── summer_MF_MWU_results.csv   # MF results (71 KB)
+│   │   ├── summer_CC_MWU_results.csv   # CC results (32 KB)
+│   │   ├── winter_*_MWU_results.csv
+│   │   ├── winter_*_dissimilarity.csv
+│   │   └── GO_MWU_summary.csv
+│   ├── figures/
+│   │   ├── summer_BP_GO_MWU.pdf
+│   │   ├── summer_MF_GO_MWU.pdf
+│   │   ├── summer_CC_GO_MWU.pdf
+│   │   ├── summer_combined_GO_MWU.pdf
+│   │   ├── winter_BP_GO_MWU.pdf
+│   │   ├── winter_MF_GO_MWU.pdf
+│   │   ├── winter_CC_GO_MWU.pdf
+│   │   └── winter_combined_GO_MWU.pdf
+│   ├── scripts/
+│   │   └── 10_GO_MWU_analysis.R
+│   ├── gomwu_a.pl
+│   ├── gomwu_b.pl
+│   └── gomwu.functions.R
+├── 11_symbiont_GO_MWU/     # Symbiont GO enrichment analysis
+│   ├── input/
+│   │   ├── symbiont_go_annotations.tab (11.6 MB)
+│   │   ├── go.obo
+│   │   ├── symbiont_summer_signed_logP.csv
+│   │   └── symbiont_winter_signed_logP.csv
+│   ├── output/
+│   │   ├── symbiont_summer_*_MWU_results.csv
+│   │   ├── symbiont_summer_*_dissimilarity.csv
+│   │   ├── symbiont_winter_*_MWU_results.csv
+│   │   ├── symbiont_winter_*_dissimilarity.csv
+│   │   └── symbiont_GO_MWU_summary.csv
+│   ├── figures/
+│   │   ├── symbiont_summer_*_GO_MWU.pdf
+│   │   ├── symbiont_summer_combined_GO_MWU.pdf
+│   │   ├── symbiont_winter_*_GO_MWU.pdf
+│   │   └── symbiont_winter_combined_GO_MWU.pdf
+│   ├── scripts/
+│   │   └── 11_symbiont_GO_MWU_analysis.R
+│   ├── gomwu_a.pl
+│   ├── gomwu_b.pl
+│   └── gomwu.functions.R
+├── 12_publication_figures/ # Publication-ready visualizations
+│   ├── data/
+│   │   ├── DEG_summary_statistics.csv
+│   │   ├── bubble_plot_annotated_terms.csv
+│   │   ├── calcification_summary_summer.csv
+│   │   ├── calcification_summary_winter.csv
+│   │   ├── calcification_summary_combined.csv
+│   │   └── excluded_calcification_terms_*.csv
+│   ├── figures/
+│   │   ├── Fig1_ridgeline_log2FC.pdf/png
+│   │   ├── Fig2A_host_venn.pdf
+│   │   ├── Fig2B_symbiont_venn.pdf
+│   │   ├── Fig3*_heatmap_*.pdf
+│   │   ├── Fig4_calcification_sankey_*.html
+│   │   ├── Fig4D_bubble_host_GOMWU.pdf/png
+│   │   ├── Fig4E_bubble_symbiont_GOMWU.pdf/png
+│   │   ├── Fig4F_bubble_collapsed_host.pdf/png
+│   │   ├── Fig4G_bubble_collapsed_symbiont.pdf/png
+│   │   ├── Fig5*_volcano_*.pdf
+│   │   ├── Fig5_volcano_combined.pdf/png
+│   │   ├── Fig6*_pca_*.pdf
+│   │   └── Fig6_pca_combined.pdf/png
+│   └── scripts/
+│       ├── 12_publication_figures_v4.R
+│       └── 12_publication_figures_v5.R
 ├── logs/                   # SLURM job logs
 ├── scripts/                # Pipeline scripts
-└── metadata/               # Sample information
+├── FILES_MANIFEST.md
+├── README.md
+├── sample_info.txt
+└── sample_info_with_chemistry.txt
 ```
 
 
