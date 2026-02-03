@@ -294,7 +294,7 @@ print(calc_summary)
 cat("\nCreating calcification bar plot...\n")
 
 # Define colors
-treatment_colors <- c("Ambient" = "#2166AC", "OA" = "#B2182B")
+treatment_colors <- c("Ambient" = "#343F3E", "OA" = "#8F91A2")
 
 # Create bar plot
 calc_plot <- ggplot(calc_summary, aes(x = season, y = mean_calc, fill = treatment)) +
@@ -305,9 +305,9 @@ calc_plot <- ggplot(calc_summary, aes(x = season, y = mean_calc, fill = treatmen
                 width = 0.2, linewidth = 0.5) +
   scale_fill_manual(values = treatment_colors, name = "Treatment") +
   labs(
-    x = "Season",
-    y = expression("Calcification (mg CaCO"[3]*" mg"^{-1}*" d"^{-1}*")"),
-    title = "Mass-Normalized Calcification Rate"
+    x = NULL,
+    y = expression("Calcification (g CaCO"[3]*" g"^{-1}*" d"^{-1}*")"),
+    title = NULL
   ) +
   theme_classic(base_size = 12) +
   theme(
