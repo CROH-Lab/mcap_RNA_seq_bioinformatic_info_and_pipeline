@@ -91,29 +91,19 @@ cat("  Symbiont Summer:", nrow(sym_summer_degs), "\n")
 cat("  Symbiont Winter:", nrow(sym_winter_degs), "\n")
 
 # ==============================================================================
-# UPDATED FIGURE SECTIONS - Figures 1, 2, 3
-# Replace the corresponding sections in 12_publication_figures.R
-# ==============================================================================
-# Key fixes:
-# - Figure 1: DEGs only (padj < 0.05)
-# - Figure 2: Fixed popViewport() -> upViewport() to avoid grid/graphics mixing
-# - Figure 3: Top 250 DEGs, custom colors, combined panel, same viewport fix
-# ==============================================================================
-
-# ==============================================================================
-# FIGURE 1-2 COMBINED: Venn Diagrams + Sample-Level Ridgeline Plots
-# Color palette matches heatmaps (warm=summer, cool=winter, green=symbiont)
+# FIGURE 1-2 COMBINED: Venn Diagrams + Sample-Level L2FC Ridgeline Plots
+# Layout: Row 1 = Venns, Row 2 = Summer Host | Winter Host+Symbiont
 # ==============================================================================
 
 cat("\n==============================================================================\n")
-cat("Figure 1-2 Combined: Venn Diagrams + Sample Ridgeline Plots\n")
+cat("Figure 1-2 Combined: Venn Diagrams + Sample L2FC Ridgeline Plots\n")
 cat("==============================================================================\n\n")
 
 # ------------------------------------------------------------------------------
-# Color Palettes (matching heatmaps)
+# Color Palettes
 # ------------------------------------------------------------------------------
 
-# Host Summer: Warm palette
+# Host Summer: Warm palette (for ridgeline and Venn summer)
 host_summer_colors <- c(
     "1BS" = "#FDBB84",
     "2BS" = "#EF6548",
@@ -134,9 +124,9 @@ sym_winter_colors <- c(
     "3BW" = "#006D2C"
 )
 
-# Venn colors (summer vs winter)
-venn_summer_color <- "#EF6548"  # Warm
-venn_winter_color <- "#4292C6"  # Cool
+# Venn colors - match the ridgeline mid-tones
+venn_summer_color <- "#EF6548"  # Warm (matches host summer)
+venn_winter_color <- "#4292C6"  # Cool (matches host winter)
 
 # ------------------------------------------------------------------------------
 # Prepare DEG IDs
@@ -156,112 +146,146 @@ cat("  Host Winter:", length(host_winter_ids), "\n")
 cat("  Symbiont Winter:", length(sym_winter_ids), "\n")
 
 # ------------------------------------------------------------------------------
-# Prepare Ridgeline Data - Z-score expression for DEGs per sample
+# Prepare Ridgeline Data - Per-sample L2FC relative to Ambient mean
 # ------------------------------------------------------------------------------
 
-prepare_ridgeline_data <- function(vsd_mat, deg_ids, sample_pattern = "B", label_prefix = "") {
+prepare_ridgeline_l2fc <- function(vsd_mat, deg_ids, season = "S") {
     # Filter to DEGs present in VST matrix
     common_genes <- intersect(deg_ids, rownames(vsd_mat))
     cat("  Using", length(common_genes), "DEGs\n")
     
-    # Get OA samples (B treatment)
-    oa_samples <- grep(sample_pattern, colnames(vsd_mat), value = TRUE)
+    # Define sample patterns based on season
+    if (season == "S") {
+        oa_pattern <- "BS$"
+        ambient_pattern <- "DS$"
+    } else {
+        oa_pattern <- "BW$"
+        ambient_pattern <- "DW$"
+    }
     
-    # Extract expression matrix for DEGs
-    expr_mat <- vsd_mat[common_genes, oa_samples, drop = FALSE]
+    # Get OA (B) and Ambient (D) samples
+    oa_samples <- grep(oa_pattern, colnames(vsd_mat), value = TRUE)
+    ambient_samples <- grep(ambient_pattern, colnames(vsd_mat), value = TRUE)
     
-    # Z-score normalize by row (gene)
-    expr_scaled <- t(scale(t(expr_mat)))
+    cat("    OA samples:", paste(oa_samples, collapse = ", "), "\n")
+    cat("    Ambient samples:", paste(ambient_samples, collapse = ", "), "\n")
     
-    # Convert to long format
-    expr_long <- as.data.frame(expr_scaled) %>%
-        mutate(gene_id = rownames(expr_scaled)) %>%
-        pivot_longer(cols = -gene_id, names_to = "sample", values_to = "z_score") %>%
-        mutate(
-            # Extract sample number and season
-            sample_num = gsub("[^0-9]", "", sample),
-            sample_label = paste0(sample_num, substr(sample, 2, 3))
+    # Calculate mean ambient expression per gene
+    ambient_mean <- rowMeans(vsd_mat[common_genes, ambient_samples, drop = FALSE])
+    
+    # Calculate L2FC for each OA sample relative to ambient mean
+    # Since VST is already log2-scale, subtraction gives log2 fold change
+    expr_long <- lapply(oa_samples, function(samp) {
+        l2fc <- vsd_mat[common_genes, samp] - ambient_mean
+        data.frame(
+            gene_id = common_genes,
+            sample = samp,
+            log2FC = l2fc,
+            sample_num = gsub("[^0-9]", "", samp),
+            sample_label = paste0(gsub("[^0-9]", "", samp), "B", season)
         )
+    }) %>% bind_rows()
     
     return(expr_long)
 }
 
-cat("\nPreparing Host Summer ridgeline data...\n")
-ridge_host_summer <- prepare_ridgeline_data(host_summer_vsd, host_summer_ids, "B")
+cat("\nPreparing Host Summer L2FC data...\n")
+ridge_host_summer <- prepare_ridgeline_l2fc(host_summer_vsd, host_summer_ids, "S")
+ridge_host_summer$organism <- "M. capitata"
 ridge_host_summer$group <- "Host Summer"
 
-cat("Preparing Host Winter ridgeline data...\n")
-ridge_host_winter <- prepare_ridgeline_data(host_winter_vsd, host_winter_ids, "B")
+cat("Preparing Host Winter L2FC data...\n")
+ridge_host_winter <- prepare_ridgeline_l2fc(host_winter_vsd, host_winter_ids, "W")
+ridge_host_winter$organism <- "M. capitata"
 ridge_host_winter$group <- "Host Winter"
 
-cat("Preparing Symbiont Winter ridgeline data...\n")
-ridge_sym_winter <- prepare_ridgeline_data(sym_winter_vsd, sym_winter_ids, "B")
+cat("Preparing Symbiont Winter L2FC data...\n")
+ridge_sym_winter <- prepare_ridgeline_l2fc(sym_winter_vsd, sym_winter_ids, "W")
+ridge_sym_winter$organism <- "D. trenchii"
 ridge_sym_winter$group <- "Symbiont Winter"
 
 # ------------------------------------------------------------------------------
 # Create Ridgeline Plots
 # ------------------------------------------------------------------------------
 
-# Host Summer ridgeline
+# Panel C: Host Summer ridgeline (L2FC)
 ridge_host_summer <- ridge_host_summer %>%
     mutate(sample_label = factor(sample_label, levels = c("3BS", "2BS", "1BS")))
 
-p_ridge_host_summer <- ggplot(ridge_host_summer, 
-                               aes(x = z_score, y = sample_label, fill = sample_label)) +
+p_ridge_summer <- ggplot(ridge_host_summer, 
+                          aes(x = log2FC, y = sample_label, fill = sample_label)) +
     geom_density_ridges(alpha = 0.8, scale = 1.2, rel_min_height = 0.01) +
     geom_vline(xintercept = 0, linetype = "dashed", color = "gray40", linewidth = 0.6) +
+    geom_vline(xintercept = c(-1, 1), linetype = "dotted", color = "gray60", linewidth = 0.4) +
     scale_fill_manual(values = host_summer_colors) +
-    scale_x_continuous(limits = c(-3, 3), breaks = seq(-3, 3, 1)) +
-    labs(x = "Z-score (DEG Expression)", y = "", 
+    scale_x_continuous(limits = c(-4, 4), breaks = seq(-4, 4, 1)) +
+    labs(x = expression(Log[2]~Fold~Change), y = "", 
          title = expression(italic("M. capitata")~"- Summer")) +
-    theme_bw(base_size = 10) +
+    theme_bw(base_size = 11) +
     theme(
         legend.position = "none",
-        plot.title = element_text(size = 11, face = "bold", hjust = 0.5, color = "#D7301F"),
-        axis.text.y = element_text(size = 10, face = "bold"),
-        axis.title.x = element_text(size = 10),
+        plot.title = element_text(size = 12, face = "bold", hjust = 0.5, color = "#D7301F"),
+        axis.text.y = element_text(size = 11, face = "bold"),
+        axis.title.x = element_text(size = 11),
         panel.grid.minor = element_blank()
     )
 
-# Host Winter ridgeline
-ridge_host_winter <- ridge_host_winter %>%
-    mutate(sample_label = factor(sample_label, levels = c("3BW", "2BW", "1BW")))
+# Panel D: Winter combined ridgeline (Host + Symbiont)
+# Combine host winter and symbiont winter data
+ridge_winter_combined <- bind_rows(
+    ridge_host_winter %>% mutate(group_label = paste0(sample_label, "\n(Host)")),
+    ridge_sym_winter %>% mutate(group_label = paste0(sample_label, "\n(Sym)"))
+)
 
-p_ridge_host_winter <- ggplot(ridge_host_winter, 
-                               aes(x = z_score, y = sample_label, fill = sample_label)) +
-    geom_density_ridges(alpha = 0.8, scale = 1.2, rel_min_height = 0.01) +
-    geom_vline(xintercept = 0, linetype = "dashed", color = "gray40", linewidth = 0.6) +
-    scale_fill_manual(values = host_winter_colors) +
-    scale_x_continuous(limits = c(-3, 3), breaks = seq(-3, 3, 1)) +
-    labs(x = "Z-score (DEG Expression)", y = "",
-         title = expression(italic("M. capitata")~"- Winter")) +
-    theme_bw(base_size = 10) +
-    theme(
-        legend.position = "none",
-        plot.title = element_text(size = 11, face = "bold", hjust = 0.5, color = "#08519C"),
-        axis.text.y = element_text(size = 10, face = "bold"),
-        axis.title.x = element_text(size = 10),
-        panel.grid.minor = element_blank()
+# Create ordered factor for y-axis: Host samples first (bottom), then Symbiont (top)
+ridge_winter_combined <- ridge_winter_combined %>%
+    mutate(
+        plot_order = case_when(
+            organism == "D. trenchii" & sample_label == "3BW" ~ 6,
+            organism == "D. trenchii" & sample_label == "2BW" ~ 5,
+            organism == "D. trenchii" & sample_label == "1BW" ~ 4,
+            organism == "M. capitata" & sample_label == "3BW" ~ 3,
+            organism == "M. capitata" & sample_label == "2BW" ~ 2,
+            organism == "M. capitata" & sample_label == "1BW" ~ 1
+        ),
+        display_label = case_when(
+            organism == "D. trenchii" ~ paste0(sample_label, " (Sym)"),
+            organism == "M. capitata" ~ paste0(sample_label, " (Host)")
+        ),
+        # Create color key combining organism and sample
+        color_key = paste(organism, sample_label, sep = "_")
     )
 
-# Symbiont Winter ridgeline
-ridge_sym_winter <- ridge_sym_winter %>%
-    mutate(sample_label = factor(sample_label, levels = c("3BW", "2BW", "1BW")))
+ridge_winter_combined <- ridge_winter_combined %>%
+    mutate(display_label = factor(display_label, 
+                                   levels = c("3BW (Sym)", "2BW (Sym)", "1BW (Sym)",
+                                             "3BW (Host)", "2BW (Host)", "1BW (Host)")))
 
-p_ridge_sym_winter <- ggplot(ridge_sym_winter, 
-                              aes(x = z_score, y = sample_label, fill = sample_label)) +
+# Combined winter color palette
+winter_combined_colors <- c(
+    "1BW (Host)" = "#9ECAE1",
+    "2BW (Host)" = "#4292C6",
+    "3BW (Host)" = "#08519C",
+    "1BW (Sym)" = "#A1D99B",
+    "2BW (Sym)" = "#41AB5D",
+    "3BW (Sym)" = "#006D2C"
+)
+
+p_ridge_winter <- ggplot(ridge_winter_combined, 
+                          aes(x = log2FC, y = display_label, fill = display_label)) +
     geom_density_ridges(alpha = 0.8, scale = 1.2, rel_min_height = 0.01) +
     geom_vline(xintercept = 0, linetype = "dashed", color = "gray40", linewidth = 0.6) +
-    scale_fill_manual(values = sym_winter_colors) +
-    scale_x_continuous(limits = c(-3, 3), breaks = seq(-3, 3, 1)) +
-    labs(x = "Z-score (DEG Expression)", y = "",
-         title = expression(italic("D. trenchii")~"- Winter")) +
-    theme_bw(base_size = 10) +
+    geom_vline(xintercept = c(-1, 1), linetype = "dotted", color = "gray60", linewidth = 0.4) +
+    scale_fill_manual(values = winter_combined_colors) +
+    scale_x_continuous(limits = c(-4, 4), breaks = seq(-4, 4, 1)) +
+    labs(x = expression(Log[2]~Fold~Change), y = "", 
+         title = "Winter") +
+    theme_bw(base_size = 11) +
     theme(
         legend.position = "none",
-        plot.title = element_text(size = 11, face = "bold", hjust = 0.5, color = "#006D2C"),
+        plot.title = element_text(size = 12, face = "bold", hjust = 0.5),
         axis.text.y = element_text(size = 10, face = "bold"),
-        axis.title.x = element_text(size = 10),
+        axis.title.x = element_text(size = 11),
         panel.grid.minor = element_blank()
     )
 
@@ -269,42 +293,34 @@ p_ridge_sym_winter <- ggplot(ridge_sym_winter,
 # Create Combined Figure
 # Layout:
 #   Row 1: [A] Host Venn    [B] Symbiont Venn
-#   Row 2: [C] Host Summer Ridge  [D] Host Winter Ridge  [E] Sym Winter Ridge
+#   Row 2: [C] Host Summer Ridge  [D] Winter Combined Ridge
 # ------------------------------------------------------------------------------
 
 cat("\nCreating combined figure...\n")
 
-pdf("figures/Fig1_combined_venn_ridgeline.pdf", width = 15, height = 10)
+pdf("figures/Fig1_combined_venn_ridgeline.pdf", width = 12, height = 10)
 
 grid.newpage()
 
-# Define layout: 2 rows, 6 columns (for flexible positioning)
-# Row 1: Venns span columns 1-3 and 4-6
-# Row 2: Ridgelines span columns 1-2, 3-4, 5-6
-layout_matrix <- rbind(
-    c(1, 1, 1, 2, 2, 2),
-    c(3, 3, 4, 4, 5, 5)
-)
-
 pushViewport(viewport(layout = grid.layout(
-    nrow = 2, ncol = 6,
+    nrow = 2, ncol = 2,
     heights = unit(c(0.45, 0.55), "npc"),
-    widths = unit(rep(1/6, 6), "npc")
+    widths = unit(c(0.5, 0.5), "npc")
 )))
 
 # ------------------------------------------------------------------------------
-# Panel A: Host Venn (row 1, cols 1-3)
+# Panel A: Host Venn (row 1, col 1)
 # ------------------------------------------------------------------------------
-pushViewport(viewport(layout.pos.row = 1, layout.pos.col = 1:3))
-pushViewport(viewport(width = 0.85, height = 0.9))
+pushViewport(viewport(layout.pos.row = 1, layout.pos.col = 1))
+pushViewport(viewport(width = 0.9, height = 0.9))
 
 grid.rect(gp = gpar(col = NA, fill = "white"))
 venn_host <- draw.pairwise.venn(
     area1 = length(host_summer_ids), area2 = length(host_winter_ids),
     cross.area = host_overlap, category = c("Summer", "Winter"),
     fill = c(venn_summer_color, venn_winter_color), alpha = 0.6,
-    col = c(venn_summer_color, venn_winter_color), lwd = 2, cex = 1.6,
-    fontface = "bold", cat.cex = 1.1, cat.fontface = "bold",
+    col = c(venn_summer_color, venn_winter_color), lwd = 2, cex = 1.8,
+    fontface = "bold", cat.cex = 1.2, cat.fontface = "bold",
     cat.pos = c(-30, 30), cat.dist = c(0.05, 0.05),
     margin = 0.05, ind = FALSE
 )
@@ -315,22 +331,22 @@ upViewport()
 grid.text("A", x = unit(0.02, "npc"), y = unit(0.98, "npc"), 
           just = c("left", "top"), gp = gpar(fontsize = 18, fontface = "bold"))
 grid.text(expression(italic("M. capitata")), x = unit(0.5, "npc"), y = unit(0.97, "npc"),
-          just = "center", gp = gpar(fontsize = 13, fontface = "bold"))
+          just = "center", gp = gpar(fontsize = 14, fontface = "bold"))
 upViewport()
 
 # ------------------------------------------------------------------------------
-# Panel B: Symbiont Venn (row 1, cols 4-6)
+# Panel B: Symbiont Venn (row 1, col 2)
 # ------------------------------------------------------------------------------
-pushViewport(viewport(layout.pos.row = 1, layout.pos.col = 4:6))
-pushViewport(viewport(width = 0.85, height = 0.9))
+pushViewport(viewport(layout.pos.row = 1, layout.pos.col = 2))
+pushViewport(viewport(width = 0.9, height = 0.9))
 
 grid.rect(gp = gpar(col = NA, fill = "white"))
 venn_sym <- draw.pairwise.venn(
     area1 = length(sym_summer_ids), area2 = length(sym_winter_ids),
     cross.area = sym_overlap, category = c("Summer", "Winter"),
     fill = c(venn_summer_color, venn_winter_color), alpha = 0.6,
-    col = c(venn_summer_color, venn_winter_color), lwd = 2, cex = 1.6,
-    fontface = "bold", cat.cex = 1.1, cat.fontface = "bold",
+    col = c(venn_summer_color, venn_winter_color), lwd = 2, cex = 1.8,
+    fontface = "bold", cat.cex = 1.2, cat.fontface = "bold",
     cat.pos = c(-30, 30), cat.dist = c(0.05, 0.05),
     margin = 0.05, ind = FALSE
 )
@@ -340,18 +356,17 @@ upViewport()
 grid.text("B", x = unit(0.02, "npc"), y = unit(0.98, "npc"), 
           just = c("left", "top"), gp = gpar(fontsize = 18, fontface = "bold"))
 grid.text(expression(italic("D. trenchii")), x = unit(0.5, "npc"), y = unit(0.97, "npc"),
-          just = "center", gp = gpar(fontsize = 13, fontface = "bold"))
+          just = "center", gp = gpar(fontsize = 14, fontface = "bold"))
 upViewport()
 
 # ------------------------------------------------------------------------------
-# Panel C: Host Summer Ridgeline (row 2, cols 1-2)
+# Panel C: Host Summer Ridgeline (row 2, col 1)
 # ------------------------------------------------------------------------------
-pushViewport(viewport(layout.pos.row = 2, layout.pos.col = 1:2))
+pushViewport(viewport(layout.pos.row = 2, layout.pos.col = 1))
 pushViewport(viewport(width = 0.95, height = 0.92))
 
-# Convert ggplot to grob and draw
-p_ridge_host_summer_grob <- ggplotGrob(p_ridge_host_summer)
-grid.draw(p_ridge_host_summer_grob)
+p_ridge_summer_grob <- ggplotGrob(p_ridge_summer)
+grid.draw(p_ridge_summer_grob)
 
 upViewport()
 grid.text("C", x = unit(0.02, "npc"), y = unit(0.98, "npc"), 
@@ -359,30 +374,16 @@ grid.text("C", x = unit(0.02, "npc"), y = unit(0.98, "npc"),
 upViewport()
 
 # ------------------------------------------------------------------------------
-# Panel D: Host Winter Ridgeline (row 2, cols 3-4)
+# Panel D: Winter Combined Ridgeline (row 2, col 2)
 # ------------------------------------------------------------------------------
-pushViewport(viewport(layout.pos.row = 2, layout.pos.col = 3:4))
+pushViewport(viewport(layout.pos.row = 2, layout.pos.col = 2))
 pushViewport(viewport(width = 0.95, height = 0.92))
 
-p_ridge_host_winter_grob <- ggplotGrob(p_ridge_host_winter)
-grid.draw(p_ridge_host_winter_grob)
+p_ridge_winter_grob <- ggplotGrob(p_ridge_winter)
+grid.draw(p_ridge_winter_grob)
 
 upViewport()
 grid.text("D", x = unit(0.02, "npc"), y = unit(0.98, "npc"), 
-          just = c("left", "top"), gp = gpar(fontsize = 18, fontface = "bold"))
-upViewport()
-
-# ------------------------------------------------------------------------------
-# Panel E: Symbiont Winter Ridgeline (row 2, cols 5-6)
-# ------------------------------------------------------------------------------
-pushViewport(viewport(layout.pos.row = 2, layout.pos.col = 5:6))
-pushViewport(viewport(width = 0.95, height = 0.92))
-
-p_ridge_sym_winter_grob <- ggplotGrob(p_ridge_sym_winter)
-grid.draw(p_ridge_sym_winter_grob)
-
-upViewport()
-grid.text("E", x = unit(0.02, "npc"), y = unit(0.98, "npc"), 
           just = c("left", "top"), gp = gpar(fontsize = 18, fontface = "bold"))
 upViewport()
 
@@ -392,26 +393,26 @@ dev.off()
 # PNG version
 # ------------------------------------------------------------------------------
 
-png("figures/Fig1_combined_venn_ridgeline.png", width = 15, height = 10, units = "in", res = 300)
+png("figures/Fig1_combined_venn_ridgeline.png", width = 12, height = 10, units = "in", res = 300)
 
 grid.newpage()
 
 pushViewport(viewport(layout = grid.layout(
-    nrow = 2, ncol = 6,
+    nrow = 2, ncol = 2,
     heights = unit(c(0.45, 0.55), "npc"),
-    widths = unit(rep(1/6, 6), "npc")
+    widths = unit(c(0.5, 0.5), "npc")
 )))
 
 # Panel A
-pushViewport(viewport(layout.pos.row = 1, layout.pos.col = 1:3))
-pushViewport(viewport(width = 0.85, height = 0.9))
+pushViewport(viewport(layout.pos.row = 1, layout.pos.col = 1))
+pushViewport(viewport(width = 0.9, height = 0.9))
 grid.rect(gp = gpar(col = NA, fill = "white"))
 venn_host <- draw.pairwise.venn(
     area1 = length(host_summer_ids), area2 = length(host_winter_ids),
     cross.area = host_overlap, category = c("Summer", "Winter"),
     fill = c(venn_summer_color, venn_winter_color), alpha = 0.6,
-    col = c(venn_summer_color, venn_winter_color), lwd = 2, cex = 1.6,
-    fontface = "bold", cat.cex = 1.1, cat.fontface = "bold",
+    col = c(venn_summer_color, venn_winter_color), lwd = 2, cex = 1.8,
+    fontface = "bold", cat.cex = 1.2, cat.fontface = "bold",
     cat.pos = c(-30, 30), cat.dist = c(0.05, 0.05),
     margin = 0.05, ind = FALSE
 )
@@ -420,19 +421,19 @@ upViewport()
 grid.text("A", x = unit(0.02, "npc"), y = unit(0.98, "npc"), 
           just = c("left", "top"), gp = gpar(fontsize = 18, fontface = "bold"))
 grid.text(expression(italic("M. capitata")), x = unit(0.5, "npc"), y = unit(0.97, "npc"),
-          just = "center", gp = gpar(fontsize = 13, fontface = "bold"))
+          just = "center", gp = gpar(fontsize = 14, fontface = "bold"))
 upViewport()
 
 # Panel B
-pushViewport(viewport(layout.pos.row = 1, layout.pos.col = 4:6))
-pushViewport(viewport(width = 0.85, height = 0.9))
+pushViewport(viewport(layout.pos.row = 1, layout.pos.col = 2))
+pushViewport(viewport(width = 0.9, height = 0.9))
 grid.rect(gp = gpar(col = NA, fill = "white"))
 venn_sym <- draw.pairwise.venn(
     area1 = length(sym_summer_ids), area2 = length(sym_winter_ids),
     cross.area = sym_overlap, category = c("Summer", "Winter"),
     fill = c(venn_summer_color, venn_winter_color), alpha = 0.6,
-    col = c(venn_summer_color, venn_winter_color), lwd = 2, cex = 1.6,
-    fontface = "bold", cat.cex = 1.1, cat.fontface = "bold",
+    col = c(venn_summer_color, venn_winter_color), lwd = 2, cex = 1.8,
+    fontface = "bold", cat.cex = 1.2, cat.fontface = "bold",
     cat.pos = c(-30, 30), cat.dist = c(0.05, 0.05),
     margin = 0.05, ind = FALSE
 )
@@ -441,50 +442,39 @@ upViewport()
 grid.text("B", x = unit(0.02, "npc"), y = unit(0.98, "npc"), 
           just = c("left", "top"), gp = gpar(fontsize = 18, fontface = "bold"))
 grid.text(expression(italic("D. trenchii")), x = unit(0.5, "npc"), y = unit(0.97, "npc"),
-          just = "center", gp = gpar(fontsize = 13, fontface = "bold"))
+          just = "center", gp = gpar(fontsize = 14, fontface = "bold"))
 upViewport()
 
 # Panel C
-pushViewport(viewport(layout.pos.row = 2, layout.pos.col = 1:2))
+pushViewport(viewport(layout.pos.row = 2, layout.pos.col = 1))
 pushViewport(viewport(width = 0.95, height = 0.92))
-grid.draw(ggplotGrob(p_ridge_host_summer))
+grid.draw(ggplotGrob(p_ridge_summer))
 upViewport()
 grid.text("C", x = unit(0.02, "npc"), y = unit(0.98, "npc"), 
           just = c("left", "top"), gp = gpar(fontsize = 18, fontface = "bold"))
 upViewport()
 
 # Panel D
-pushViewport(viewport(layout.pos.row = 2, layout.pos.col = 3:4))
+pushViewport(viewport(layout.pos.row = 2, layout.pos.col = 2))
 pushViewport(viewport(width = 0.95, height = 0.92))
-grid.draw(ggplotGrob(p_ridge_host_winter))
+grid.draw(ggplotGrob(p_ridge_winter))
 upViewport()
 grid.text("D", x = unit(0.02, "npc"), y = unit(0.98, "npc"), 
           just = c("left", "top"), gp = gpar(fontsize = 18, fontface = "bold"))
 upViewport()
 
-# Panel E
-pushViewport(viewport(layout.pos.row = 2, layout.pos.col = 5:6))
-pushViewport(viewport(width = 0.95, height = 0.92))
-grid.draw(ggplotGrob(p_ridge_sym_winter))
-upViewport()
-grid.text("E", x = unit(0.02, "npc"), y = unit(0.98, "npc"), 
-          just = c("left", "top"), gp = gpar(fontsize = 18, fontface = "bold"))
-upViewport()
-
 dev.off()
 
-cat("\n✓ Saved: Fig1_combined_venn_ridgeline.pdf/png (15x10 inches)\n")
+cat("\n✓ Saved: Fig1_combined_venn_ridgeline.pdf/png (12x10 inches)\n")
 
 # ------------------------------------------------------------------------------
 # Also save individual ridgeline plots
 # ------------------------------------------------------------------------------
 
-ggsave("figures/Fig1C_ridgeline_host_summer.pdf", p_ridge_host_summer, 
-       width = 5, height = 4, dpi = 300)
-ggsave("figures/Fig1D_ridgeline_host_winter.pdf", p_ridge_host_winter, 
-       width = 5, height = 4, dpi = 300)
-ggsave("figures/Fig1E_ridgeline_symbiont_winter.pdf", p_ridge_sym_winter, 
-       width = 5, height = 4, dpi = 300)
+ggsave("figures/Fig1C_ridgeline_host_summer.pdf", p_ridge_summer, 
+       width = 6, height = 4, dpi = 300)
+ggsave("figures/Fig1D_ridgeline_winter_combined.pdf", p_ridge_winter, 
+       width = 6, height = 5, dpi = 300)
 
 cat("✓ Saved individual ridgeline plots\n")
 
@@ -493,21 +483,21 @@ cat("✓ Saved individual ridgeline plots\n")
 # ------------------------------------------------------------------------------
 
 cat("\n=== Figure 1-2 Combined Summary ===\n")
-cat("Layout: 2 rows × 3 columns\n")
+cat("Layout: 2 rows × 2 columns\n")
 cat("  Row 1: A) Host Venn, B) Symbiont Venn\n")
-cat("  Row 2: C) Host Summer Ridge, D) Host Winter Ridge, E) Symbiont Winter Ridge\n")
-cat("\nColor scheme (matches heatmaps):\n")
-cat("  Host Summer: Warm (orange-red gradient)\n")
-cat("  Host Winter: Cool (blue gradient)\n")
-cat("  Symbiont Winter: Green gradient\n")
-cat("  Venn Summer: #EF6548 | Venn Winter: #4292C6\n")
+cat("  Row 2: C) Host Summer L2FC, D) Winter Combined L2FC\n")
+cat("\nColor scheme:\n")
+cat("  Venn Summer: #EF6548 (warm) | Venn Winter: #4292C6 (cool)\n")
+cat("  Host Summer samples: warm gradient\n")
+cat("  Host Winter samples: cool gradient\n")
+cat("  Symbiont Winter samples: green gradient\n")
 cat("\nRidgeline data:\n")
-cat("  Shows Z-score normalized expression for DEGs\n")
-cat("  Individual OA treatment samples (1BS/2BS/3BS or 1BW/2BW/3BW)\n")
-cat("  Host Summer DEGs:", length(host_summer_ids), "\n")
-cat("  Host Winter DEGs:", length(host_winter_ids), "\n")
-cat("  Symbiont Winter DEGs:", length(sym_winter_ids), "\n")
+cat("  Shows per-sample Log2 Fold Change relative to Ambient mean\n")
+cat("  Panel C: Host Summer DEGs (", length(host_summer_ids), " genes) × 3 OA samples\n", sep = "")
+cat("  Panel D: Host Winter DEGs (", length(host_winter_ids), " genes) + Symbiont Winter DEGs (", 
+    length(sym_winter_ids), " genes)\n", sep = "")
 cat("  (Symbiont Summer excluded - only", length(sym_summer_ids), "DEGs)\n")
+
 # ==============================================================================
 # FIGURE 3: Heatmaps - Top 250 DEGs, Combined Panels, Custom Colors
 # ==============================================================================
