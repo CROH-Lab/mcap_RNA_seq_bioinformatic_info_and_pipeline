@@ -1,0 +1,45 @@
+Two-way ANOVA: Calcification ~ Treatment + Season (Additive Model)
+=============================================================
+
+Type I ANOVA (Sequential):
+            Df    Sum Sq   Mean Sq F value Pr(>F)
+treatment    1 2.630e-07 2.626e-07   0.234  0.640
+season       1 1.332e-06 1.332e-06   1.187  0.304
+Residuals    9 1.010e-05 1.122e-06               
+
+Type II ANOVA (Marginal):
+Anova Table (Type II tests)
+
+Response: calc_normalized
+              Sum Sq Df F value Pr(>F)
+treatment 2.6260e-07  1  0.2339 0.6402
+season    1.3318e-06  1  1.1867 0.3043
+Residuals 1.0101e-05  9               
+
+
+Group Means and Summary:
+# A tibble: 4 × 7
+  season_label treatment_label mean_calc  se_calc     n season treatment
+  <chr>        <chr>               <dbl>    <dbl> <int> <fct>  <fct>    
+1 Summer       Ambient           0.00306 0.000699     3 Summer Ambient  
+2 Summer       OA                0.00335 0.000774     3 Summer OA       
+3 Winter       Ambient           0.00298 0.000336     3 Winter Ambient  
+4 Winter       OA                0.00210 0.000556     3 Winter OA       
+
+
+Individual Sample Data:
+# A tibble: 12 × 7
+   sample mesocosm treatment_label season_label   tp1 g_day calc_normalized
+   <chr>     <dbl> <chr>           <chr>        <dbl> <dbl>           <dbl>
+ 1 1DS           1 Ambient         Summer       120.  0.526         0.00438
+ 2 2DS           2 Ambient         Summer       170.  0.477         0.00281
+ 3 3DS           3 Ambient         Summer       189.  0.378         0.00200
+ 4 1BS           1 OA              Summer       109.  0.404         0.00370
+ 5 2BS           2 OA              Summer       141.  0.634         0.00449
+ 6 3BS           3 OA              Summer       155.  0.291         0.00187
+ 7 1DW           1 Ambient         Winter       151.  0.546         0.00361
+ 8 2DW           2 Ambient         Winter       265.  0.653         0.00247
+ 9 3DW           3 Ambient         Winter       114.  0.326         0.00286
+10 1BW           1 OA              Winter        74.5 0.229         0.00307
+11 2BW           2 OA              Winter       149.  0.310         0.00208
+12 3BW           3 OA              Winter       101.  0.116         0.00115

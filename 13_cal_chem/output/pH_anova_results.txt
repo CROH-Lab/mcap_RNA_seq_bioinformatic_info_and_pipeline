@@ -1,0 +1,31 @@
+Two-way ANOVA: pH(T) ~ Treatment + Season (Additive Model)
+=============================================================
+
+Type I ANOVA (Sequential):
+            Df Sum Sq Mean Sq F value  Pr(>F)    
+treatment    1 1.1921  1.1921  494.94 < 2e-16 ***
+season       1 0.0263  0.0263   10.91 0.00158 ** 
+Residuals   63 0.1517  0.0024                    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Type II ANOVA (Marginal):
+Anova Table (Type II tests)
+
+Response: pH_total
+           Sum Sq Df F value    Pr(>F)    
+treatment 1.19207  1 494.943 < 2.2e-16 ***
+season    0.02629  1  10.915  0.001576 ** 
+Residuals 0.15174 63                      
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+
+Group Means:
+# A tibble: 4 × 5
+  treatment season mean_pH  sd_pH     n
+  <fct>     <fct>    <dbl>  <dbl> <int>
+1 Ambient   Summer    8.06 0.0239    12
+2 Ambient   Winter    8.10 0.0435    21
+3 OA        Summer    7.79 0.0391    12
+4 OA        Winter    7.83 0.0672    21
