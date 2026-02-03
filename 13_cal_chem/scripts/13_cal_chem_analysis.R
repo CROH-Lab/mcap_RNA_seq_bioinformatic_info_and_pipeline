@@ -34,14 +34,13 @@ sw_chem <- read_csv(file.path(input_dir, "sw_chem.csv"), show_col_types = FALSE)
 # Load calcification data
 calc_data <- read_csv(file.path(input_dir, "calc_data.csv"), show_col_types = FALSE)
 
-# Clean sw_chem: filter rows with complete data for seacarb calculations
-sw_chem_clean <- sw_chem %>%
-  filter(!is.na(pH_total) & !is.na(TA_seacarb) & !is.na(temp) & !is.na(sal_cor)) %>%
+# Add treatment and season labels to ALL data
+sw_chem_labeled <- sw_chem %>%
   mutate(
     # Convert treatment codes: B = OA, D = Ambient
     treatment_label = case_when(
       treatment == "B" ~ "OA",
-      treatment == "D" ~ "Ambient",
+      treatment == "D" ~ "Amb.",
       TRUE ~ treatment
     ),
     # Convert season codes
@@ -49,14 +48,20 @@ sw_chem_clean <- sw_chem %>%
       season == "S" ~ "Summer",
       season == "W" ~ "Winter",
       TRUE ~ season
-    ),
+    )
+  )
+
+# Subset for seacarb calculations (need pH_total, TA, temp, sal)
+sw_chem_for_seacarb <- sw_chem_labeled %>%
+  filter(!is.na(pH_total) & !is.na(TA_seacarb) & !is.na(temp) & !is.na(sal_cor)) %>%
+  mutate(
     # Convert TA from µmol/kg to mol/kg for seacarb
     TA_mol_kg = TA_seacarb / 1e6
   )
 
 cat("Data loaded successfully.\n")
-cat(sprintf("  - SW chemistry records: %d total, %d with complete data\n", 
-            nrow(sw_chem), nrow(sw_chem_clean)))
+cat(sprintf("  - SW chemistry records: %d total\n", nrow(sw_chem)))
+cat(sprintf("  - Records with complete data for seacarb: %d\n", nrow(sw_chem_for_seacarb)))
 cat(sprintf("  - Calcification records: %d\n", nrow(calc_data)))
 
 # =============================================================================
@@ -65,11 +70,8 @@ cat(sprintf("  - Calcification records: %d\n", nrow(calc_data)))
 
 cat("\nCalculating carbonate chemistry with seacarb...\n")
 
-# Apply seacarb carb() function to each row
-# flag = 8: pH and ALK given
-# Using standard pressure (0 dbar)
-
-carb_results <- sw_chem_clean %>%
+# Apply seacarb carb() function to each row with complete data
+carb_results <- sw_chem_for_seacarb %>%
   rowwise() %>%
   mutate(
     carb_calc = list(
@@ -98,12 +100,7 @@ carb_results <- sw_chem_clean %>%
 carb_extracted <- carb_results %>%
   mutate(
     pCO2 = map_dbl(carb_calc, ~ if(!is.null(.x)) .x$pCO2 else NA_real_),
-    CO2 = map_dbl(carb_calc, ~ if(!is.null(.x)) .x$CO2 else NA_real_),
-    HCO3 = map_dbl(carb_calc, ~ if(!is.null(.x)) .x$HCO3 else NA_real_),
-    CO3 = map_dbl(carb_calc, ~ if(!is.null(.x)) .x$CO3 else NA_real_),
-    DIC = map_dbl(carb_calc, ~ if(!is.null(.x)) .x$DIC else NA_real_),
-    OmegaAragonite = map_dbl(carb_calc, ~ if(!is.null(.x)) .x$OmegaAragonite else NA_real_),
-    OmegaCalcite = map_dbl(carb_calc, ~ if(!is.null(.x)) .x$OmegaCalcite else NA_real_)
+    OmegaAragonite = map_dbl(carb_calc, ~ if(!is.null(.x)) .x$OmegaAragonite else NA_real_)
   ) %>%
   select(-carb_calc)
 
@@ -115,79 +112,134 @@ cat("Seacarb calculations complete.\n")
 
 cat("\nGenerating summary statistics table...\n")
 
-# Helper function for mean ± SE (n) formatting
-format_mean_se <- function(x, digits = 2) {
+# Helper function for mean ± SD formatting (no n)
+format_mean_sd <- function(x, digits = 2) {
   x <- x[!is.na(x)]
   n <- length(x)
   if (n == 0) return(NA_character_)
   m <- mean(x)
-  se <- sd(x) / sqrt(n)
-  sprintf("%.*f ± %.*f (%d)", digits, m, digits, se, n)
+  s <- sd(x)
+  sprintf("%.*f ± %.*f", digits, m, digits, s)
 }
 
-# Summary per mesocosm, treatment, season
-chem_summary <- carb_extracted %>%
+# Function to count n
+count_n <- function(x) {
+  sum(!is.na(x))
+}
+
+# --- Calculate measured parameters from ALL available data ---
+# Temperature (use all rows with temp data)
+temp_summary <- sw_chem_labeled %>%
+  filter(!is.na(temp)) %>%
+  group_by(season_label, mesocosm, treatment_label) %>%
+  summarise(Temp = format_mean_sd(temp, 1), n_temp = count_n(temp), .groups = "drop")
+
+# Salinity (use all rows with sal_cor data)
+sal_summary <- sw_chem_labeled %>%
+  filter(!is.na(sal_cor)) %>%
+  group_by(season_label, mesocosm, treatment_label) %>%
+  summarise(Salinity = format_mean_sd(sal_cor, 2), n_sal = count_n(sal_cor), .groups = "drop")
+
+# pH(T) (use all rows with pH_total data)
+ph_summary <- sw_chem_labeled %>%
+  filter(!is.na(pH_total)) %>%
+  group_by(season_label, mesocosm, treatment_label) %>%
+  summarise(`pH(T)` = format_mean_sd(pH_total, 2), n_ph = count_n(pH_total), .groups = "drop")
+
+# --- Calculate AT and derived parameters from seacarb subset ---
+at_summary <- carb_extracted %>%
   group_by(season_label, mesocosm, treatment_label) %>%
   summarise(
-    Temp = format_mean_se(temp, 1),
-    Salinity = format_mean_se(sal_cor, 2),
-    `pH(T)` = format_mean_se(pH_total, 2),
-    AT = format_mean_se(TA_seacarb, 1),
-    pCO2 = format_mean_se(pCO2, 0),
-    OmegaArag = format_mean_se(OmegaAragonite, 2),
+    AT = format_mean_sd(TA_seacarb, 1),
+    pCO2 = format_mean_sd(pCO2, 0),
+    OmegaArag = format_mean_sd(OmegaAragonite, 2),
+    n_at = count_n(TA_seacarb),
     .groups = "drop"
-  ) %>%
+  )
+
+# Merge all summaries
+chem_summary <- temp_summary %>%
+  left_join(sal_summary, by = c("season_label", "mesocosm", "treatment_label")) %>%
+  left_join(ph_summary, by = c("season_label", "mesocosm", "treatment_label")) %>%
+  left_join(at_summary, by = c("season_label", "mesocosm", "treatment_label")) %>%
   rename(
     Season = season_label,
-    `Sample #` = mesocosm,
+    Sample = mesocosm,
     Treatment = treatment_label
   ) %>%
   # Reorder columns as requested
-  select(Season, `Sample #`, Treatment, Temp, Salinity, `pH(T)`, AT, pCO2, OmegaArag) %>%
-  # Sort: Season (Summer first), then Treatment (Ambient first), then Sample #
+  select(Season, Treatment, Sample, Temp, Salinity, `pH(T)`, AT, pCO2, OmegaArag, 
+         n_temp, n_sal, n_ph, n_at) %>%
+  # Sort: Season (Summer first), then Treatment (Amb. first), then Sample
   mutate(
     season_order = ifelse(Season == "Summer", 1, 2),
-    treatment_order = ifelse(Treatment == "Ambient", 1, 2)
+    treatment_order = ifelse(Treatment == "Amb.", 1, 2)
   ) %>%
-  arrange(season_order, treatment_order, `Sample #`) %>%
+  arrange(season_order, treatment_order, Sample) %>%
   select(-season_order, -treatment_order)
 
-# Create GT table
-chem_gt <- chem_summary %>%
+# Calculate n per season for footnote
+n_per_season <- chem_summary %>%
+  group_by(Season) %>%
+  summarise(
+    n_temp = sum(n_temp),
+    n_sal = sum(n_sal),
+    n_ph = sum(n_ph),
+    n_at = sum(n_at),
+    .groups = "drop"
+  )
+
+# Create footnote text
+footnote_text <- sprintf(
+"Carbonate chemistry calculated using seacarb (flag=8: pH and TA). OA = Ocean Acidification treatment. Summer n: Temp=%d, Sal=%d, pH(T)=%d, AT/pCO2/Ωarag=%d. Winter n: Temp=%d, Sal=%d, pH(T)=%d, AT/pCO2/Ωarag=%d.",
+  n_per_season$n_temp[n_per_season$Season == "Summer"],
+  n_per_season$n_sal[n_per_season$Season == "Summer"],
+  n_per_season$n_ph[n_per_season$Season == "Summer"],
+  n_per_season$n_at[n_per_season$Season == "Summer"],
+  n_per_season$n_temp[n_per_season$Season == "Winter"],
+  n_per_season$n_sal[n_per_season$Season == "Winter"],
+  n_per_season$n_ph[n_per_season$Season == "Winter"],
+  n_per_season$n_at[n_per_season$Season == "Winter"]
+)
+
+# Remove n columns before making table
+chem_summary_table <- chem_summary %>%
+  select(-n_temp, -n_sal, -n_ph, -n_at)
+
+# Create GT table (clean format matching user's style)
+chem_gt <- chem_summary_table %>%
   gt() %>%
-  tab_header(
-    title = "Carbonate Chemistry Parameters",
-    subtitle = "Mean ± SE (n) per mesocosm across experimental period"
-  ) %>%
-  tab_spanner(
-    label = "Measured",
-    columns = c(Temp, Salinity, `pH(T)`, AT)
-  ) %>%
-  tab_spanner(
-    label = "Calculated (seacarb)",
-    columns = c(pCO2, OmegaArag)
-  ) %>%
   cols_label(
+    Season = "Season",
+    Treatment = "Treatment",
+    Sample = "Sample",
     Temp = "Temp (°C)",
     Salinity = "Salinity",
     `pH(T)` = "pH(T)",
-    AT = "AT (µmol kg⁻¹)",
-    pCO2 = "pCO₂ (µatm)",
+    AT = html("AT (µmol kg<sup>−1</sup>)"),
+    pCO2 = html("pCO<sub>2</sub> (µatm)"),
     OmegaArag = "Ωarag"
   ) %>%
   tab_footnote(
-    footnote = "Carbonate chemistry calculated using seacarb (flag=8: pH and TA). OA = Ocean Acidification treatment.",
-    locations = cells_title(groups = "subtitle")
+    footnote = footnote_text,
+    locations = cells_column_labels(columns = Season)
   ) %>%
   tab_options(
     table.font.size = px(11),
-    heading.title.font.size = px(14),
-    heading.subtitle.font.size = px(12),
-    column_labels.font.weight = "bold"
+    column_labels.font.weight = "bold",
+    table.border.top.style = "solid",
+    table.border.top.width = px(2),
+    table.border.bottom.style = "solid",
+    table.border.bottom.width = px(2),
+    column_labels.border.bottom.style = "solid",
+    column_labels.border.bottom.width = px(1)
   )
 
 # Save GT table to Word document
 gtsave(chem_gt, file.path(output_dir, "carbonate_chemistry_table.docx"))
+
+# Also save as CSV for reference
+write_csv(chem_summary_table, file.path(output_dir, "carbonate_chemistry_summary.csv"))
 
 cat("Carbonate chemistry table saved to output/carbonate_chemistry_table.docx\n")
 
@@ -197,13 +249,13 @@ cat("Carbonate chemistry table saved to output/carbonate_chemistry_table.docx\n"
 
 cat("\nRunning two-way ANOVA on pH(T)...\n")
 
-# Prepare data for ANOVA (need numeric values, not summary)
-ph_anova_data <- carb_extracted %>%
+# Prepare data for ANOVA (use ALL pH data)
+ph_anova_data <- sw_chem_labeled %>%
   select(season_label, treatment_label, pH_total) %>%
   filter(!is.na(pH_total)) %>%
   mutate(
     season = factor(season_label, levels = c("Summer", "Winter")),
-    treatment = factor(treatment_label, levels = c("Ambient", "OA"))
+    treatment = factor(treatment_label, levels = c("Amb.", "OA"))
   )
 
 # Two-way ANOVA (additive model: no interaction)
@@ -262,7 +314,7 @@ calc_processed <- calc_data %>%
     ),
     # Calculate mass-normalized calcification
     # g_day is in g CaCO3 d-1, tp1 is initial weight in g
-    # g_day / tp1 = g CaCO3 g-1 d-1 = mg CaCO3 mg-1 d-1 (same ratio)
+    # g_day / tp1 = g CaCO3 g-1 d-1 
     calc_normalized = g_day / tp1
   )
 
@@ -293,12 +345,12 @@ print(calc_summary)
 
 cat("\nCreating calcification bar plot...\n")
 
-# Define colors
+# Define colors (user's preferred colors)
 treatment_colors <- c("Ambient" = "#343F3E", "OA" = "#8F91A2")
 
 # Create bar plot
 calc_plot <- ggplot(calc_summary, aes(x = season, y = mean_calc, fill = treatment)) +
-  geom_bar(stat = "identity", position = position_dodge(width = 0.8), 
+  geom_bar(stat = "identity", position = position_dodge(width = 0.8),
            width = 0.7, color = "black", linewidth = 0.3) +
   geom_errorbar(aes(ymin = mean_calc - se_calc, ymax = mean_calc + se_calc),
                 position = position_dodge(width = 0.8),
@@ -321,9 +373,9 @@ calc_plot <- ggplot(calc_summary, aes(x = season, y = mean_calc, fill = treatmen
   )
 
 # Save plot
-ggsave(file.path(fig_dir, "calcification_barplot.png"), calc_plot, 
+ggsave(file.path(fig_dir, "calcification_barplot.png"), calc_plot,
        width = 5, height = 4.5, dpi = 300)
-ggsave(file.path(fig_dir, "calcification_barplot.pdf"), calc_plot, 
+ggsave(file.path(fig_dir, "calcification_barplot.pdf"), calc_plot,
        width = 5, height = 4.5)
 
 cat("Calcification bar plot saved to figures/calcification_barplot.png and .pdf\n")
@@ -363,8 +415,8 @@ print(calc_anova_typeII)
 cat("\n\nGroup Means and Summary:\n")
 print(calc_summary)
 cat("\n\nIndividual Sample Data:\n")
-print(calc_processed %>% 
-        select(sample, mesocosm, treatment_label, season_label, 
+print(calc_processed %>%
+        select(sample, mesocosm, treatment_label, season_label,
                tp1, g_day, calc_normalized) %>%
         arrange(season_label, treatment_label, mesocosm))
 sink()
@@ -382,6 +434,7 @@ cat("=" , rep("=", 60), "\n", sep = "")
 cat("\nOutput files generated:\n")
 cat("  Tables:\n")
 cat("    - output/carbonate_chemistry_table.docx\n")
+cat("    - output/carbonate_chemistry_summary.csv\n")
 cat("  Figures:\n")
 cat("    - figures/calcification_barplot.png\n")
 cat("    - figures/calcification_barplot.pdf\n")
