@@ -2123,6 +2123,273 @@ cat("  - Shapes: OA = circle, Ambient = triangle\n")
 cat("  - Combined legend at bottom (gray scale for universal reference)\n")
 
 # ==============================================================================
+# FIGURE 6E-F: Combined Host + Symbiont PCA per Season
+# ==============================================================================
+
+cat("\n==============================================================================\n")
+cat("Figure 6E-F: Combined Host + Symbiont PCA by Season\n")
+cat("==============================================================================\n\n")
+
+# Function to run PCA and return data frame with metadata
+run_pca_with_metadata <- function(vsd_mat, organism_label) {
+    pca_result <- prcomp(t(vsd_mat), scale. = FALSE)
+    percent_var <- round(100 * (pca_result$sdev^2 / sum(pca_result$sdev^2)), 1)
+    
+    pca_data <- data.frame(
+        PC1 = pca_result$x[, 1], 
+        PC2 = pca_result$x[, 2],
+        sample = rownames(pca_result$x),
+        Treatment = ifelse(grepl("B", rownames(pca_result$x)), "OA", "Ambient"),
+        Organism = organism_label
+    )
+    
+    return(list(data = pca_data, percent_var = percent_var))
+}
+
+# ------------------------------------------------------------------------------
+# Summer: Host + Symbiont Combined
+# ------------------------------------------------------------------------------
+
+cat("Creating Summer combined PCA...\n")
+
+# Run separate PCAs (different gene sets)
+host_summer_pca <- run_pca_with_metadata(host_summer_vsd, "M. capitata")
+sym_summer_pca <- run_pca_with_metadata(sym_summer_vsd, "D. trenchii")
+
+# Scale PC coordinates to make them comparable (z-score normalize)
+scale_pca <- function(pca_data) {
+    pca_data$PC1_scaled <- scale(pca_data$PC1)[,1]
+    pca_data$PC2_scaled <- scale(pca_data$PC2)[,1]
+    return(pca_data)
+}
+
+host_summer_scaled <- scale_pca(host_summer_pca$data)
+sym_summer_scaled <- scale_pca(sym_summer_pca$data)
+
+# Combine
+summer_combined <- bind_rows(host_summer_scaled, sym_summer_scaled)
+summer_combined$Organism <- factor(summer_combined$Organism, 
+                                    levels = c("M. capitata", "D. trenchii"))
+
+# Color palette for summer
+summer_colors <- c(
+    "M. capitata.OA" = "#D7301F",
+    "M. capitata.Ambient" = "#FDBB84",
+    "D. trenchii.OA" = "#7B2D8E",
+    "D. trenchii.Ambient" = "#C9A0DC"
+)
+
+summer_combined <- summer_combined %>%
+    mutate(color_group = paste(Organism, Treatment, sep = "."))
+
+pca_summer_combined <- ggplot(summer_combined, 
+                               aes(x = PC1_scaled, y = PC2_scaled, 
+                                   color = color_group, shape = Treatment)) +
+    geom_point(size = 5, alpha = 0.8) +
+    geom_text_repel(aes(label = sample),
+                    size = 3,
+                    fontface = "bold",
+                    box.padding = 0.5,
+                    point.padding = 0.3,
+                    min.segment.length = 0,
+                    segment.color = "gray50",
+                    show.legend = FALSE) +
+    scale_color_manual(
+        values = summer_colors,
+        name = "Organism / Treatment",
+        labels = c(
+            "M. capitata.OA" = expression(italic("M. capitata")~"- OA"),
+            "M. capitata.Ambient" = expression(italic("M. capitata")~"- Ambient"),
+            "D. trenchii.OA" = expression(italic("D. trenchii")~"- OA"),
+            "D. trenchii.Ambient" = expression(italic("D. trenchii")~"- Ambient")
+        )
+    ) +
+    scale_shape_manual(values = c("OA" = 16, "Ambient" = 17), name = "Treatment") +
+    labs(x = "PC1 (scaled)",
+         y = "PC2 (scaled)",
+         title = "Summer: Host + Symbiont") +
+    theme_pub +
+    theme(legend.position = "right") +
+    guides(color = guide_legend(override.aes = list(size = 4)),
+           shape = "none")  # Hide shape legend since color legend shows treatment
+
+# ------------------------------------------------------------------------------
+# Winter: Host + Symbiont Combined
+# ------------------------------------------------------------------------------
+
+cat("Creating Winter combined PCA...\n")
+
+host_winter_pca <- run_pca_with_metadata(host_winter_vsd, "M. capitata")
+sym_winter_pca <- run_pca_with_metadata(sym_winter_vsd, "D. trenchii")
+
+host_winter_scaled <- scale_pca(host_winter_pca$data)
+sym_winter_scaled <- scale_pca(sym_winter_pca$data)
+
+winter_combined <- bind_rows(host_winter_scaled, sym_winter_scaled)
+winter_combined$Organism <- factor(winter_combined$Organism, 
+                                    levels = c("M. capitata", "D. trenchii"))
+
+# Color palette for winter
+winter_colors <- c(
+    "M. capitata.OA" = "#08519C",
+    "M. capitata.Ambient" = "#9ECAE1",
+    "D. trenchii.OA" = "#006D2C",
+    "D. trenchii.Ambient" = "#A1D99B"
+)
+
+winter_combined <- winter_combined %>%
+    mutate(color_group = paste(Organism, Treatment, sep = "."))
+
+pca_winter_combined <- ggplot(winter_combined, 
+                               aes(x = PC1_scaled, y = PC2_scaled, 
+                                   color = color_group, shape = Treatment)) +
+    geom_point(size = 5, alpha = 0.8) +
+    geom_text_repel(aes(label = sample),
+                    size = 3,
+                    fontface = "bold",
+                    box.padding = 0.5,
+                    point.padding = 0.3,
+                    min.segment.length = 0,
+                    segment.color = "gray50",
+                    show.legend = FALSE) +
+    scale_color_manual(
+        values = winter_colors,
+        name = "Organism / Treatment",
+        labels = c(
+            "M. capitata.OA" = expression(italic("M. capitata")~"- OA"),
+            "M. capitata.Ambient" = expression(italic("M. capitata")~"- Ambient"),
+            "D. trenchii.OA" = expression(italic("D. trenchii")~"- OA"),
+            "D. trenchii.Ambient" = expression(italic("D. trenchii")~"- Ambient")
+        )
+    ) +
+    scale_shape_manual(values = c("OA" = 16, "Ambient" = 17), name = "Treatment") +
+    labs(x = "PC1 (scaled)",
+         y = "PC2 (scaled)",
+         title = "Winter: Host + Symbiont") +
+    theme_pub +
+    theme(legend.position = "right") +
+    guides(color = guide_legend(override.aes = list(size = 4)),
+           shape = "none")
+
+# ------------------------------------------------------------------------------
+# Save individual combined plots
+# ------------------------------------------------------------------------------
+
+ggsave("figures/Fig6E_pca_summer_holobiont.pdf", pca_summer_combined, width = 9, height = 7)
+ggsave("figures/Fig6E_pca_summer_holobiont.png", pca_summer_combined, width = 9, height = 7, dpi = 300)
+cat("Saved: Fig6E_pca_summer_holobiont.pdf/png\n")
+
+ggsave("figures/Fig6F_pca_winter_holobiont.pdf", pca_winter_combined, width = 9, height = 7)
+ggsave("figures/Fig6F_pca_winter_holobiont.png", pca_winter_combined, width = 9, height = 7, dpi = 300)
+cat("Saved: Fig6F_pca_winter_holobiont.pdf/png\n")
+
+# ------------------------------------------------------------------------------
+# Combined E+F figure
+# ------------------------------------------------------------------------------
+
+cat("Creating combined holobiont PCA figure...\n")
+
+pca_E <- pca_summer_combined + theme(legend.position = "none")
+pca_F <- pca_winter_combined + theme(legend.position = "none")
+
+# Create unified legend
+legend_data_holobiont <- data.frame(
+    x = 1:4,
+    y = 1:4,
+    color_group = c("M. capitata.OA", "M. capitata.Ambient", 
+                    "D. trenchii.OA", "D. trenchii.Ambient"),
+    Treatment = c("OA", "Ambient", "OA", "Ambient")
+)
+
+# Use neutral colors for shared legend (organism differentiated by position in legend)
+holobiont_legend_colors <- c(
+    "M. capitata.OA" = "#B03A2E",
+    "M. capitata.Ambient" = "#F5B7B1",
+    "D. trenchii.OA" = "#1E8449",
+    "D. trenchii.Ambient" = "#A9DFBF"
+)
+
+legend_plot_holobiont <- ggplot(legend_data_holobiont, 
+                                 aes(x = x, y = y, color = color_group, shape = Treatment)) +
+    geom_point(size = 5) +
+    scale_color_manual(
+        values = holobiont_legend_colors,
+        name = "Organism / Treatment",
+        labels = c(
+            "M. capitata.OA" = expression(italic("M. capitata")~"- OA"),
+            "M. capitata.Ambient" = expression(italic("M. capitata")~"- Ambient"),
+            "D. trenchii.OA" = expression(italic("D. trenchii")~"- OA"),
+            "D. trenchii.Ambient" = expression(italic("D. trenchii")~"- Ambient")
+        )
+    ) +
+    scale_shape_manual(values = c("OA" = 16, "Ambient" = 17), name = "Treatment") +
+    theme_void() +
+    theme(
+        legend.position = "bottom",
+        legend.direction = "horizontal",
+        legend.title = element_text(size = 11, face = "bold"),
+        legend.text = element_text(size = 10),
+        legend.key.size = unit(0.8, "cm")
+    ) +
+    guides(color = guide_legend(nrow = 1, override.aes = list(size = 4)),
+           shape = "none")
+
+# Extract legend
+holobiont_legend <- ggplotGrob(legend_plot_holobiont)$grobs
+legend_idx <- which(sapply(holobiont_legend, function(x) x$name) == "guide-box")
+
+if (length(legend_idx) > 0) {
+    holobiont_legend_grob <- holobiont_legend[[legend_idx]]
+    
+    pdf("figures/Fig6EF_pca_holobiont_combined.pdf", width = 14, height = 7)
+    grid.arrange(
+        arrangeGrob(pca_E, pca_F, ncol = 2,
+                    left = textGrob("", rot = 90, gp = gpar(fontsize = 12)),
+                    top = textGrob("Holobiont PCA: Host + Symbiont by Season", 
+                                   gp = gpar(fontsize = 14, fontface = "bold"))),
+        holobiont_legend_grob,
+        nrow = 2,
+        heights = c(10, 1)
+    )
+    dev.off()
+    
+    png("figures/Fig6EF_pca_holobiont_combined.png", width = 14, height = 7, units = "in", res = 300)
+    grid.arrange(
+        arrangeGrob(pca_E, pca_F, ncol = 2,
+                    left = textGrob("", rot = 90, gp = gpar(fontsize = 12)),
+                    top = textGrob("Holobiont PCA: Host + Symbiont by Season", 
+                                   gp = gpar(fontsize = 14, fontface = "bold"))),
+        holobiont_legend_grob,
+        nrow = 2,
+        heights = c(10, 1)
+    )
+    dev.off()
+    
+    cat("Saved: Fig6EF_pca_holobiont_combined.pdf/png (14x7 inches)\n")
+}
+
+# ------------------------------------------------------------------------------
+# Summary
+# ------------------------------------------------------------------------------
+
+cat("\n=== Holobiont PCA Summary ===\n")
+cat("Method: Separate PCAs run on host and symbiont (different gene sets),\n")
+cat("        then PC coordinates scaled (z-score) for visual comparison.\n")
+cat("\nInterpretation notes:\n")
+cat("  - Host and symbiont occupy different PCA spaces (different genes)\n")
+cat("  - Scaling allows visual comparison of clustering patterns\n")
+cat("  - Treatment separation can be compared between organisms\n")
+cat("\nOutput files:\n")
+cat("  - Fig6E_pca_summer_holobiont.pdf/png (summer only)\n")
+cat("  - Fig6F_pca_winter_holobiont.pdf/png (winter only)\n")
+cat("  - Fig6EF_pca_holobiont_combined.pdf/png (side-by-side)\n")
+cat("\nVariance explained (original PCAs):\n")
+cat("  Host Summer PC1:", host_summer_pca$percent_var[1], "%, PC2:", host_summer_pca$percent_var[2], "%\n")
+cat("  Host Winter PC1:", host_winter_pca$percent_var[1], "%, PC2:", host_winter_pca$percent_var[2], "%\n")
+cat("  Sym Summer PC1:", sym_summer_pca$percent_var[1], "%, PC2:", sym_summer_pca$percent_var[2], "%\n")
+cat("  Sym Winter PC1:", sym_winter_pca$percent_var[1], "%, PC2:", sym_winter_pca$percent_var[2], "%\n")
+
+# ==============================================================================
 # SUMMARY
 # ==============================================================================
 
