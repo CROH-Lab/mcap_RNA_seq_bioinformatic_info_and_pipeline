@@ -1928,56 +1928,139 @@ cat("Saved: Fig5_volcano_*.pdf/png\n")
 # ==============================================================================
 # FIGURE 6: PCA Plots
 # ==============================================================================
-
 cat("\n==============================================================================\n")
-cat("Figure 6: PCA Plots\n")
+cat("Figure 6: PCA Plots (Updated - Heatmap Colors + Sample Labels)\n")
 cat("==============================================================================\n\n")
 
-create_pca_from_matrix <- function(vsd_mat, title_text) {
+# Color palettes matching heatmaps
+# Host Summer: Warm (orange-red)
+# Host Winter: Cool (blue)
+# Symbiont Winter: Green (matches heatmap)
+# Symbiont Summer: Purple/violet (distinct - not in heatmaps)
+
+pca_colors <- list(
+    host_summer = c("OA" = "#D7301F", "Ambient" = "#FDBB84"),
+    host_winter = c("OA" = "#08519C", "Ambient" = "#9ECAE1"),
+    sym_summer = c("OA" = "#7B2D8E", "Ambient" = "#C9A0DC"),
+    sym_winter = c("OA" = "#006D2C", "Ambient" = "#A1D99B")
+)
+
+create_pca_from_matrix <- function(vsd_mat, title_text, color_palette) {
     pca_result <- prcomp(t(vsd_mat), scale. = FALSE)
     percent_var <- round(100 * (pca_result$sdev^2 / sum(pca_result$sdev^2)), 1)
-
+    
     pca_data <- data.frame(
-        PC1 = pca_result$x[, 1], PC2 = pca_result$x[, 2],
+        PC1 = pca_result$x[, 1], 
+        PC2 = pca_result$x[, 2],
         sample = rownames(pca_result$x),
         Treatment = ifelse(grepl("B", rownames(pca_result$x)), "OA", "Ambient")
     )
-
+    
+    # Extract sample number for labeling (e.g., "1BS" -> "1")
+    pca_data$sample_num <- gsub("[^0-9]", "", pca_data$sample)
+    
     ggplot(pca_data, aes(x = PC1, y = PC2, color = Treatment, shape = Treatment)) +
-        geom_point(size = 4, alpha = 0.8) +
-        stat_ellipse(level = 0.95, linetype = "dashed") +
-        scale_color_manual(values = c("OA" = "#E69F00", "Ambient" = "#56B4E9"), name = "Treatment") +
+        geom_point(size = 5, alpha = 0.8) +
+        geom_text(aes(label = sample_num), color = "white", size = 2.5, fontface = "bold") +
+        stat_ellipse(level = 0.95, linetype = "dashed", linewidth = 0.8) +
+        scale_color_manual(values = color_palette, name = "Treatment") +
         scale_shape_manual(values = c("OA" = 16, "Ambient" = 17), name = "Treatment") +
         labs(x = paste0("PC1: ", percent_var[1], "% variance"),
              y = paste0("PC2: ", percent_var[2], "% variance"),
              title = title_text) +
-        theme_pub + theme(legend.position = "right")
+        theme_pub + 
+        theme(legend.position = "right")
 }
 
-pca_host_summer <- create_pca_from_matrix(host_summer_vsd, "M. cap - Summer")
-pca_host_winter <- create_pca_from_matrix(host_winter_vsd, "M. cap - Winter")
-pca_sym_summer <- create_pca_from_matrix(sym_summer_vsd, "D. tre - Summer")
-pca_sym_winter <- create_pca_from_matrix(sym_winter_vsd, "D. tre - Winter")
+# Create individual PCA plots
+pca_host_summer <- create_pca_from_matrix(host_summer_vsd, 
+                                           expression(italic("M. capitata")~"- Summer"),
+                                           pca_colors$host_summer)
 
+pca_host_winter <- create_pca_from_matrix(host_winter_vsd, 
+                                           expression(italic("M. capitata")~"- Winter"),
+                                           pca_colors$host_winter)
+
+pca_sym_summer <- create_pca_from_matrix(sym_summer_vsd, 
+                                          expression(italic("D. trenchii")~"- Summer"),
+                                          pca_colors$sym_summer)
+
+pca_sym_winter <- create_pca_from_matrix(sym_winter_vsd, 
+                                          expression(italic("D. trenchii")~"- Winter"),
+                                          pca_colors$sym_winter)
+
+# Save individual plots
 ggsave("figures/Fig6A_pca_host_summer.pdf", pca_host_summer, width = 7, height = 6)
 ggsave("figures/Fig6B_pca_host_winter.pdf", pca_host_winter, width = 7, height = 6)
 ggsave("figures/Fig6C_pca_symbiont_summer.pdf", pca_sym_summer, width = 7, height = 6)
 ggsave("figures/Fig6D_pca_symbiont_winter.pdf", pca_sym_winter, width = 7, height = 6)
 
+cat("Saved individual PCA plots\n")
+
+# ==============================================================================
+# Combined PCA Figure with Fixed Legend
+# ==============================================================================
+
+# Create a dummy plot just for extracting a consistent legend
+# Using generic colors for the combined legend
+legend_plot <- ggplot(data.frame(x = 1:2, y = 1:2, 
+                                  Treatment = c("OA", "Ambient")),
+                       aes(x = x, y = y, color = Treatment, shape = Treatment)) +
+    geom_point(size = 5) +
+    scale_color_manual(values = c("OA" = "#E69F00", "Ambient" = "#56B4E9"), 
+                       name = "Treatment",
+                       labels = c("OA" = "Ocean Acidification", "Ambient" = "Ambient")) +
+    scale_shape_manual(values = c("OA" = 16, "Ambient" = 17), 
+                       name = "Treatment",
+                       labels = c("OA" = "Ocean Acidification", "Ambient" = "Ambient")) +
+    theme_pub +
+    theme(legend.position = "bottom",
+          legend.direction = "horizontal",
+          legend.box = "horizontal",
+          legend.title = element_text(size = 12, face = "bold"),
+          legend.text = element_text(size = 11)) +
+    guides(color = guide_legend(override.aes = list(size = 4)),
+           shape = guide_legend(override.aes = list(size = 4)))
+
+# Extract the legend
+pca_legend <- get_legend(legend_plot)
+
+# Create combined plot without legends
 pca_combined <- plot_grid(
     pca_host_summer + theme(legend.position = "none"),
     pca_host_winter + theme(legend.position = "none"),
     pca_sym_summer + theme(legend.position = "none"),
     pca_sym_winter + theme(legend.position = "none"),
-    ncol = 2, nrow = 2, labels = c("A", "B", "C", "D"), label_size = 16
+    ncol = 2, nrow = 2, 
+    labels = c("A", "B", "C", "D"), 
+    label_size = 16
 )
-pca_legend <- get_legend(pca_host_summer + theme(legend.position = "bottom"))
-pca_combined_legend <- plot_grid(pca_combined, pca_legend, ncol = 1, rel_heights = c(1, 0.1))
 
-ggsave("figures/Fig6_pca_combined.pdf", pca_combined_legend, width = 12, height = 10)
-ggsave("figures/Fig6_pca_combined.png", pca_combined_legend, width = 12, height = 10, dpi = 300)
-cat("Saved: Fig6_pca_*.pdf/png\n")
+# Combine plots with legend at bottom
+pca_combined_legend <- plot_grid(
+    pca_combined, 
+    pca_legend, 
+    ncol = 1, 
+    rel_heights = c(1, 0.08)
+)
 
+# Save combined figure
+ggsave("figures/Fig6_pca_combined.pdf", pca_combined_legend, width = 12, height = 11)
+ggsave("figures/Fig6_pca_combined.png", pca_combined_legend, width = 12, height = 11, dpi = 300)
+
+cat("Saved: Fig6_pca_combined.pdf/png (12x11 inches)\n")
+
+cat("\n=== PCA Summary ===\n")
+cat("Color scheme (matches heatmaps where applicable):\n")
+cat("  Panel A (Host Summer): OA = #D7301F (dark red), Ambient = #FDBB84 (light orange)\n")
+cat("  Panel B (Host Winter): OA = #08519C (dark blue), Ambient = #9ECAE1 (light blue)\n")
+cat("  Panel C (Sym Summer):  OA = #7B2D8E (dark purple), Ambient = #C9A0DC (light purple)\n")
+cat("  Panel D (Sym Winter):  OA = #006D2C (dark green), Ambient = #A1D99B (light green)\n")
+cat("\nFeatures:\n")
+cat("  - Sample numbers (1, 2, 3) displayed on points\n")
+cat("  - 95% confidence ellipses for each treatment\n")
+cat("  - Shapes: OA = circle, Ambient = triangle\n")
+cat("  - Combined legend at bottom with full treatment names\n")
 # ==============================================================================
 # SUMMARY
 # ==============================================================================
