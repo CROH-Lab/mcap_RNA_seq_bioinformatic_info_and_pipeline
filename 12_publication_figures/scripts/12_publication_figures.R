@@ -2220,7 +2220,7 @@ pca_winter_combined <- ggplot(winter_combined,
                                aes(x = PC1_scaled, y = PC2_scaled, 
                                    color = Treatment, shape = Organism)) +
     geom_point(size = 5, alpha = 0.8, stroke = 1.5) +
-    stat_ellipse(aes(group = Treatment), level = 0.95, linetype = "dashed", linewidth = 0.8) +
+    stat_ellipse(aes(group = Treatment), level = 0.9, linetype = "dashed", linewidth = 0.8) +
     geom_text_repel(aes(label = sample),
                     size = 3,
                     fontface = "bold",
