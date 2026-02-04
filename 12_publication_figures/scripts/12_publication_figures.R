@@ -1926,8 +1926,9 @@ ggsave("figures/Fig5_volcano_combined.png", vol_combined_legend, width = 12, hei
 cat("Saved: Fig5_volcano_*.pdf/png\n")
 
 # ==============================================================================
-# FIGURE 6: PCA Plots
+# FIGURE 6: PCA Plots - Updated with heatmap colors and sample labels
 # ==============================================================================
+
 cat("\n==============================================================================\n")
 cat("Figure 6: PCA Plots (Updated - Heatmap Colors + Sample Labels)\n")
 cat("==============================================================================\n\n")
@@ -1956,13 +1957,16 @@ create_pca_from_matrix <- function(vsd_mat, title_text, color_palette) {
         Treatment = ifelse(grepl("B", rownames(pca_result$x)), "OA", "Ambient")
     )
     
-    # Extract sample number for labeling (e.g., "1BS" -> "1")
-    pca_data$sample_num <- gsub("[^0-9]", "", pca_data$sample)
-    
     ggplot(pca_data, aes(x = PC1, y = PC2, color = Treatment, shape = Treatment)) +
         geom_point(size = 5, alpha = 0.8) +
-        geom_text(aes(label = sample_num), color = "white", size = 2.5, fontface = "bold") +
-        stat_ellipse(level = 0.95, linetype = "dashed", linewidth = 0.8) +
+        geom_text_repel(aes(label = sample), 
+                        size = 3, 
+                        fontface = "bold",
+                        box.padding = 0.5,
+                        point.padding = 0.3,
+                        min.segment.length = 0,
+                        segment.color = "gray50",
+                        show.legend = FALSE) +
         scale_color_manual(values = color_palette, name = "Treatment") +
         scale_shape_manual(values = c("OA" = 16, "Ambient" = 17), name = "Treatment") +
         labs(x = paste0("PC1: ", percent_var[1], "% variance"),
@@ -1998,57 +2002,113 @@ ggsave("figures/Fig6D_pca_symbiont_winter.pdf", pca_sym_winter, width = 7, heigh
 cat("Saved individual PCA plots\n")
 
 # ==============================================================================
-# Combined PCA Figure with Fixed Legend
+# Combined PCA Figure - Manual Legend Approach
 # ==============================================================================
 
-# Create a dummy plot just for extracting a consistent legend
-# Using generic colors for the combined legend
-legend_plot <- ggplot(data.frame(x = 1:2, y = 1:2, 
-                                  Treatment = c("OA", "Ambient")),
-                       aes(x = x, y = y, color = Treatment, shape = Treatment)) +
-    geom_point(size = 5) +
-    scale_color_manual(values = c("OA" = "#E69F00", "Ambient" = "#56B4E9"), 
-                       name = "Treatment",
-                       labels = c("OA" = "Ocean Acidification", "Ambient" = "Ambient")) +
-    scale_shape_manual(values = c("OA" = 16, "Ambient" = 17), 
-                       name = "Treatment",
-                       labels = c("OA" = "Ocean Acidification", "Ambient" = "Ambient")) +
-    theme_pub +
-    theme(legend.position = "bottom",
-          legend.direction = "horizontal",
-          legend.box = "horizontal",
-          legend.title = element_text(size = 12, face = "bold"),
-          legend.text = element_text(size = 11)) +
-    guides(color = guide_legend(override.aes = list(size = 4)),
-           shape = guide_legend(override.aes = list(size = 4)))
+# Create plots without legends for the grid
+pca_A <- pca_host_summer + theme(legend.position = "none")
+pca_B <- pca_host_winter + theme(legend.position = "none")
+pca_C <- pca_sym_summer + theme(legend.position = "none")
+pca_D <- pca_sym_winter + theme(legend.position = "none")
 
-# Extract the legend
-pca_legend <- get_legend(legend_plot)
-
-# Create combined plot without legends
-pca_combined <- plot_grid(
-    pca_host_summer + theme(legend.position = "none"),
-    pca_host_winter + theme(legend.position = "none"),
-    pca_sym_summer + theme(legend.position = "none"),
-    pca_sym_winter + theme(legend.position = "none"),
-    ncol = 2, nrow = 2, 
-    labels = c("A", "B", "C", "D"), 
-    label_size = 16
+# Create a standalone legend plot
+legend_data <- data.frame(
+    x = c(1, 2),
+    y = c(1, 2),
+    Treatment = factor(c("OA", "Ambient"), levels = c("OA", "Ambient"))
 )
 
-# Combine plots with legend at bottom
-pca_combined_legend <- plot_grid(
-    pca_combined, 
-    pca_legend, 
-    ncol = 1, 
-    rel_heights = c(1, 0.08)
+legend_plot <- ggplot(legend_data, aes(x = x, y = y, color = Treatment, shape = Treatment)) +
+    geom_point(size = 5) +
+    scale_color_manual(
+        values = c("OA" = "gray30", "Ambient" = "gray70"),
+        name = "Treatment",
+        labels = c("OA" = "Ocean Acidification (OA)", "Ambient" = "Ambient")
+    ) +
+    scale_shape_manual(
+        values = c("OA" = 16, "Ambient" = 17),
+        name = "Treatment",
+        labels = c("OA" = "Ocean Acidification (OA)", "Ambient" = "Ambient")
+    ) +
+    theme_void() +
+    theme(
+        legend.position = "bottom",
+        legend.direction = "horizontal",
+        legend.title = element_text(size = 12, face = "bold"),
+        legend.text = element_text(size = 11),
+        legend.key.size = unit(1.2, "cm")
+    ) +
+    guides(
+        color = guide_legend(override.aes = list(size = 5)),
+        shape = guide_legend(override.aes = list(size = 5))
+    )
+
+# Extract legend using cowplot
+pca_legend <- cowplot::get_legend(legend_plot)
+
+# Combine panels
+pca_grid <- plot_grid(
+    pca_A, pca_B,
+    pca_C, pca_D,
+    ncol = 2, nrow = 2,
+    labels = c("A", "B", "C", "D"),
+    label_size = 16,
+    align = "hv"
+)
+
+# Add legend below
+pca_combined_final <- plot_grid(
+    pca_grid,
+    pca_legend,
+    ncol = 1,
+    rel_heights = c(1, 0.1)
 )
 
 # Save combined figure
-ggsave("figures/Fig6_pca_combined.pdf", pca_combined_legend, width = 12, height = 11)
-ggsave("figures/Fig6_pca_combined.png", pca_combined_legend, width = 12, height = 11, dpi = 300)
+ggsave("figures/Fig6_pca_combined.pdf", pca_combined_final, width = 12, height = 11)
+ggsave("figures/Fig6_pca_combined.png", pca_combined_final, width = 12, height = 11, dpi = 300)
 
 cat("Saved: Fig6_pca_combined.pdf/png (12x11 inches)\n")
+
+# ==============================================================================
+# Alternative: Use gridExtra for more control over legend
+# ==============================================================================
+
+# If cowplot legend still doesn't work, try this alternative approach:
+library(gridExtra)
+
+# Create the legend as a separate grob
+legend_grob <- ggplotGrob(legend_plot)$grobs
+legend_index <- which(sapply(legend_grob, function(x) x$name) == "guide-box")
+
+if (length(legend_index) > 0) {
+    legend_only <- legend_grob[[legend_index]]
+    
+    # Alternative combined figure using grid.arrange
+    pdf("figures/Fig6_pca_combined_v2.pdf", width = 12, height = 11)
+    grid.arrange(
+        arrangeGrob(pca_A, pca_B, pca_C, pca_D, 
+                    ncol = 2, 
+                    top = NULL),
+        legend_only,
+        nrow = 2,
+        heights = c(10, 1)
+    )
+    dev.off()
+    
+    png("figures/Fig6_pca_combined_v2.png", width = 12, height = 11, units = "in", res = 300)
+    grid.arrange(
+        arrangeGrob(pca_A, pca_B, pca_C, pca_D, 
+                    ncol = 2,
+                    top = NULL),
+        legend_only,
+        nrow = 2,
+        heights = c(10, 1)
+    )
+    dev.off()
+    
+    cat("Saved alternative: Fig6_pca_combined_v2.pdf/png\n")
+}
 
 cat("\n=== PCA Summary ===\n")
 cat("Color scheme (matches heatmaps where applicable):\n")
@@ -2057,10 +2117,11 @@ cat("  Panel B (Host Winter): OA = #08519C (dark blue), Ambient = #9ECAE1 (light
 cat("  Panel C (Sym Summer):  OA = #7B2D8E (dark purple), Ambient = #C9A0DC (light purple)\n")
 cat("  Panel D (Sym Winter):  OA = #006D2C (dark green), Ambient = #A1D99B (light green)\n")
 cat("\nFeatures:\n")
-cat("  - Sample numbers (1, 2, 3) displayed on points\n")
-cat("  - 95% confidence ellipses for each treatment\n")
+cat("  - Full sample codes (1BS, 2BW, etc.) as labels\n")
+cat("  - No ellipses (too few points per group)\n")
 cat("  - Shapes: OA = circle, Ambient = triangle\n")
-cat("  - Combined legend at bottom with full treatment names\n")
+cat("  - Combined legend at bottom (gray scale for universal reference)\n")
+
 # ==============================================================================
 # SUMMARY
 # ==============================================================================
