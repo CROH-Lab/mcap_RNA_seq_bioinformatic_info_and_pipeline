@@ -1,0 +1,8 @@
+"cluster","term","pval","direction","nseqs","season","division"
+1,"cell projection assembly",5.34746855318793e-07,"down",20,"winter","BP"
+2,"ribonucleoprotein complex biogenesis",5.34746855318793e-07,"up",9,"winter","BP"
+4,"nucleoside triphosphate metabolic process",1.22711675066023e-05,"up",6,"winter","BP"
+6,"protein folding",0.000462419062729821,"up",12,"winter","BP"
+5,"DNA metabolic process",0.00297687313877448,"up",19,"winter","BP"
+7,"leukocyte migration",0.019642935612385,"down",1,"winter","BP"
+3,"aminoglycan catabolic process",0.0224191216950655,"down",4,"winter","BP"

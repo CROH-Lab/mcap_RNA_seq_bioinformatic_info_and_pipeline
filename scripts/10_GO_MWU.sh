@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=GO_MWU
+#SBATCH --job-name=h_GO_MWU
 #SBATCH --output=/home/darmstrong4/mc_rework/logs/GO_MWU_%j.out
 #SBATCH --error=/home/darmstrong4/mc_rework/logs/GO_MWU_%j.err
 #SBATCH --time=02:00:00

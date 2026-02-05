@@ -1,0 +1,81 @@
+"Organism","Season","Division","GO_Term","p.adj","z_score","abs_z_score","Direction","Gene_Count","delta.rank"
+"Host","Summer","BP","cytoplasmic translation",1.09730530901093e-15,-4.10244554382807,4.10244554382807,"Down",89,-2186
+"Host","Summer","MF","structural constituent of ribosome",5.34561226678741e-15,-2.97675443652463,2.97675443652463,"Down",124,-1555
+"Host","Summer","CC","cytosolic ribosome",1.04725703599672e-13,-3.08200923102685,3.08200923102685,"Down",92,-1614
+"Host","Summer","BP","peptide biosynthetic process",5.92321519552687e-12,-2.06692485692913,2.06692485692913,"Down",310,-1045
+"Host","Summer","BP","translational initiation",1.89925859548279e-11,-3.25505524910678,3.25505524910678,"Down",107,-1711
+"Host","Summer","CC","ribosome",3.38616699195429e-11,-2.18645148797403,2.18645148797403,"Down",159,-1112
+"Host","Summer","CC","obsolete intrinsic component of plasma membrane",1.27439221809927e-10,0.801714288148424,0.801714288148424,"Up",630,563
+"Host","Summer","BP","cotranslational protein targeting to membrane",1.42684276502225e-10,-4.01503054500419,4.01503054500419,"Down",63,-2137
+"Host","Summer","CC","plasma membrane region",1.57459448901362e-10,0.826690002098105,0.826690002098105,"Up",582,577
+"Host","Summer","CC","cytosolic small ribosomal subunit",2.70304236353156e-09,-4.08638972771756,4.08638972771756,"Down",33,-2177
+"Host","Summer","CC","obsolete cytosolic part",4.40177219744864e-09,-1.89744679798487,1.89744679798487,"Down",172,-950
+"Host","Summer","BP","peptide metabolic process",1.69320370692786e-08,-1.61379404669922,1.61379404669922,"Down",394,-791
+"Host","Summer","CC","respiratory chain complex",2.7379966496192e-08,-2.9392908656001,2.9392908656001,"Down",59,-1534
+"Host","Summer","BP","oxidative phosphorylation",8.295546503277e-08,-2.98389035479596,2.98389035479596,"Down",90,-1559
+"Host","Summer","CC","inner mitochondrial membrane protein complex",1.13751917350486e-07,-2.49151199407369,2.49151199407369,"Down",78,-1283
+"Host","Summer","MF","oxidoreduction-driven active transmembrane transporter activity",3.70633774441269e-07,-3.7349457528542,3.7349457528542,"Down",38,-1980
+"Host","Summer","BP","protein localization to endoplasmic reticulum",3.9595220145603e-07,-2.93037096776093,2.93037096776093,"Down",86,-1529
+"Host","Summer","CC","small ribosomal subunit",5.49258377724338e-07,-2.82154821412304,2.82154821412304,"Down",54,-1468
+"Host","Summer","CC","cytosolic large ribosomal subunit",5.49258377724338e-07,-2.81262831628387,2.81262831628387,"Down",54,-1463
+"Host","Summer","CC","mitochondrial protein-containing complex",6.1563944974222e-07,-1.65839353589508,1.65839353589508,"Down",175,-816
+"Host","Winter","CC","obsolete mitochondrial part",5.38641570243431e-15,1.26805479071047,1.26805479071047,"Up",690,643
+"Host","Winter","CC","mitochondrial envelope",8.99391343596838e-12,1.3264748447376,1.3264748447376,"Up",470,677
+"Host","Winter","CC","cilium",9.69727669587397e-11,-0.955343736086528,0.955343736086528,"Down",459,-651
+"Host","Winter","CC","organelle envelope",1.97262512297808e-10,1.03952928525143,1.03952928525143,"Up",757,510
+"Host","Winter","CC","plasma membrane bounded cell projection cytoplasm",8.53372154560477e-09,-1.622019646749,1.622019646749,"Down",139,-1039
+"Host","Winter","CC","anchoring junction",2.94001800378207e-08,-1.05156500154297,1.05156500154297,"Down",287,-707
+"Host","Winter","CC","mitochondrial protein-containing complex",7.23737274305171e-08,1.65981280006883,1.65981280006883,"Up",176,871
+"Host","Winter","CC","obsolete axoneme part",9.28483089541237e-08,-2.6185970389764,2.6185970389764,"Down",49,-1619
+"Host","Winter","CC","axonemal dynein complex",1.11174778961894e-07,-3.30073708158723,3.30073708158723,"Down",31,-2016
+"Host","Winter","CC","organelle inner membrane",3.02215708517466e-07,1.22338063174856,1.22338063174856,"Up",326,617
+"Host","Winter","CC","inner dynein arm",3.32298629393878e-07,-3.99318654549696,3.99318654549696,"Down",20,-2419
+"Host","Winter","CC","cell leading edge",4.54198332313943e-07,-1.06359265972502,1.06359265972502,"Down",232,-714
+"Host","Winter","BP","ribonucleoprotein complex biogenesis",5.34746854318793e-07,1.46049732162335,1.46049732162335,"Up",390,755
+"Host","Winter","BP","cell projection assembly",5.34746854318793e-07,-1.10826681868694,1.10826681868694,"Down",398,-740
+"Host","Winter","BP","cell morphogenesis",9.4569680371028e-07,-0.737127651926389,0.737127651926389,"Down",798,-524
+"Host","Winter","CC","obsolete mitochondrial membrane part",1.86877627845338e-06,1.64434866812048,1.64434866812048,"Up",143,862
+"Host","Winter","CC","cytoplasmic region",2.28578454780658e-06,-0.754310020757896,0.754310020757896,"Down",381,-534
+"Host","Winter","BP","peptide biosynthetic process",2.73829754764818e-06,1.51204442811787,1.51204442811787,"Up",310,785
+"Host","Winter","CC","respiratory chain complex",2.96882003857538e-06,2.40896408112254,2.40896408112254,"Up",59,1307
+"Host","Winter","MF","gated channel activity",3.82091176050046e-06,-1.53267132882516,1.53267132882516,"Down",140,-987
+"Symbiont","Summer","MF","structural constituent of ribosome",6.08594521319049e-39,-3.74375640655131,3.74375640655131,"Down",201,-1758
+"Symbiont","Summer","MF","structural molecule activity",1.72935099233131e-30,-2.60312828054374,2.60312828054374,"Down",341,-1207
+"Symbiont","Summer","CC","cytosolic ribosome",1.31927692670406e-27,-2.55344574873942,2.55344574873942,"Down",252,-1183
+"Symbiont","Summer","CC","ribosome",3.21496719726766e-25,-2.23464950299502,2.23464950299502,"Down",305,-1029
+"Symbiont","Summer","CC","large ribosomal subunit",5.45000168026044e-24,-3.08339275465219,3.08339275465219,"Down",143,-1439
+"Symbiont","Summer","BP","cytoplasmic translation",1.86342551319675e-21,-2.75010577046486,2.75010577046486,"Down",275,-1278
+"Symbiont","Summer","CC","obsolete cytosolic part",2.72637455208739e-21,-1.94483473413647,1.94483473413647,"Down",345,-889
+"Symbiont","Summer","CC","obsolete polysomal ribosome",7.36496792034678e-21,-3.06269169973372,3.06269169973372,"Down",125,-1429
+"Symbiont","Summer","BP","protein targeting to membrane",6.31398361050901e-18,-3.01093906243756,3.01093906243756,"Down",188,-1404
+"Symbiont","Summer","CC","obsolete polysome",4.66892005262714e-14,-2.01935853184296,2.01935853184296,"Down",205,-925
+"Symbiont","Summer","BP","translational initiation",2.05382340218051e-13,-2.49755290045956,2.49755290045956,"Down",212,-1156
+"Symbiont","Summer","BP","establishment of protein localization to membrane",8.89440201554283e-13,-2.37334657094875,2.37334657094875,"Down",224,-1096
+"Symbiont","Summer","BP","nuclear-transcribed mRNA catabolic process, nonsense-mediated decay",2.35467200419935e-12,-2.43544973570416,2.43544973570416,"Down",204,-1126
+"Symbiont","Summer","BP","localization within membrane",2.71271012072873e-10,-1.63017869937577,1.63017869937577,"Down",414,-737
+"Symbiont","Summer","CC","small ribosomal subunit",4.21629378975428e-08,-2.35885583250583,2.35885583250583,"Down",85,-1089
+"Symbiont","Summer","BP","nucleic acid catabolic process",3.80628435878813e-07,-1.46457026002803,1.46457026002803,"Down",375,-657
+"Symbiont","Summer","BP","establishment of protein localization to organelle",5.96483123343495e-07,-1.28861129322105,1.28861129322105,"Down",489,-572
+"Symbiont","Summer","BP","obsolete organic cyclic compound catabolic process",7.89944909314239e-07,-1.17061528018579,1.17061528018579,"Down",599,-515
+"Symbiont","Summer","CC","rough endoplasmic reticulum membrane",3.93786802915305e-06,-2.44580026316339,2.44580026316339,"Down",60,-1131
+"Symbiont","Summer","CC","preribosome",3.70569222314524e-05,-1.30724224264767,1.30724224264767,"Down",197,-581
+"Symbiont","Winter","MF","structural constituent of ribosome",3.00170689224345e-41,-3.08816756453608,3.08816756453608,"Down",200,-1815
+"Symbiont","Winter","CC","obsolete cytosolic part",3.21461509938045e-36,-2.02243063949685,2.02243063949685,"Down",345,-1167
+"Symbiont","Winter","CC","cytosolic ribosome",1.11190752858808e-35,-2.30695608399035,2.30695608399035,"Down",251,-1340
+"Symbiont","Winter","BP","cytoplasmic translation",1.91606678838273e-34,-2.7296326113593,2.7296326113593,"Down",275,-1597
+"Symbiont","Winter","CC","large ribosomal subunit",1.37222913106189e-32,-2.86120507124069,2.86120507124069,"Down",143,-1677
+"Symbiont","Winter","CC","ribosome",1.5351095361437e-30,-1.96322303255022,1.96322303255022,"Down",303,-1131
+"Symbiont","Winter","CC","obsolete polysomal ribosome",1.63371525116273e-28,-2.85133713674959,2.85133713674959,"Down",125,-1671
+"Symbiont","Winter","MF","structural molecule activity",1.97337194287708e-22,-1.82178263817773,1.82178263817773,"Down",339,-1045
+"Symbiont","Winter","CC","obsolete polysome",2.9565197839431e-22,-2.01420736075426,2.01420736075426,"Down",205,-1162
+"Symbiont","Winter","BP","amide biosynthetic process",2.3968760663984e-20,-1.43857784877319,1.43857784877319,"Down",684,-812
+"Symbiont","Winter","BP","translational initiation",2.77669124222021e-18,-2.29544349375073,2.29544349375073,"Down",212,-1333
+"Symbiont","Winter","CC","obsolete intrinsic component of plasma membrane",3.40953630766447e-17,1.23398774256748,1.23398774256748,"Up",332,813
+"Symbiont","Winter","BP","establishment of protein localization to membrane",5.25107643145056e-16,-2.09479549243161,2.09479549243161,"Down",226,-1211
+"Symbiont","Winter","BP","nucleic acid catabolic process",6.69262323057458e-15,-1.61455601386455,1.61455601386455,"Down",374,-919
+"Symbiont","Winter","MF","ATP-dependent activity",2.22869085011382e-14,0.94452833082843,0.94452833082843,"Up",620,637
+"Symbiont","Winter","BP","nuclear-transcribed mRNA catabolic process, nonsense-mediated decay",3.50074459914975e-14,-2.07341496770088,2.07341496770088,"Down",204,-1198
+"Symbiont","Winter","BP","protein targeting to membrane",1.57175321166148e-13,-2.09972945967716,2.09972945967716,"Down",189,-1214
+"Symbiont","Winter","BP","ribonucleoprotein complex biogenesis",1.31117209174463e-12,-1.21326001122632,1.21326001122632,"Down",607,-675
+"Symbiont","Winter","MF","mRNA binding",1.98846570089607e-12,-1.17049896176487,1.17049896176487,"Down",507,-649
+"Symbiont","Winter","MF","monoatomic ion transmembrane transporter activity",1.22939735168858e-11,0.898477969869944,0.898477969869944,"Up",540,609

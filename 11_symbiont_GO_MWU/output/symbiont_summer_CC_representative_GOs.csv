@@ -1,0 +1,6 @@
+"cluster","term","pval","direction","nseqs","season","division"
+1,"cytosolic ribosome",1.00000000000132e-15,"down",14,"summer","CC"
+3,"plastid stroma",0.00520126474670774,"up",6,"summer","CC"
+2,"cell pole",0.0196664688039386,"up",2,"summer","CC"
+4,"I band",0.0480035477181755,"up",2,"summer","CC"
+5,"methyltransferase complex",0.0480035477181755,"down",2,"summer","CC"

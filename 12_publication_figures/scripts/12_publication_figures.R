@@ -1222,248 +1222,66 @@ cat("      Symbiont Summer=#006341, Symbiont Winter=#8fe2b0\n")
 cat("      Excludes: Protein Phosphorylation, Na/K Transport, Phospholipid Transport\n")
 
 # ==============================================================================
-# FIGURE 4D-E: GO_MWU Bubble Plots - VERSION 5 (Staggered Lanes)
-# Y-axis: -log10(p.adj), X-axis: delta.rank (direction), Size: nseqs
-# Faceted by Division (BP/MF/CC) × Season (Summer/Winter)
-# Annotations: Top 10 significant terms + keyword matches (bolded)
-# Labels positioned by delta rank sign: positive=RIGHT, negative=LEFT
-# Staggered lanes: Bold=inner, Plain=outer
+# FIGURE 4: GO_MWU Bubble Plots with Z-Score
+# 
+# Two versions:
+#   A) All significant GO terms (full landscape)
+#   B) Representative GOs only (non-redundant, cleaner) - if available
+#
+# Four plots per version: Host Summer, Host Winter, Symbiont Summer, Symbiont Winter
+# X-axis: Absolute standardized z-score (from delta.rank)
+# Y-axis: -log10(p.adj)
+# Color: Division (BP=green, CC=red, MF=blue)
+# Size: Gene count (nseqs)
+# Annotations: Top 20 significant terms (truncated to 20 chars, non-overlapping)
+# 
+# Plus: gt publication-ready tables of annotated terms (.docx format)
 # ==============================================================================
 
+library(tidyverse)
+library(ggrepel)
+library(scales)
+library(gt)
+library(patchwork)
+
 cat("\n==============================================================================\n")
-cat("Figure 4D-E: GO_MWU Bubble Plots (v5 - Staggered Lanes)\n")
+cat("Figure 4: GO_MWU Bubble Plots with Z-Score\n")
 cat("==============================================================================\n\n")
+
+# -----------------------------------------------------------------------------
+# Create Output Directories
+# -----------------------------------------------------------------------------
+
+dir.create("figures", showWarnings = FALSE, recursive = TRUE)
+dir.create("tables", showWarnings = FALSE, recursive = TRUE)
+dir.create("data", showWarnings = FALSE, recursive = TRUE)
+
+cat("Output directories created/verified\n\n")
 
 # -----------------------------------------------------------------------------
 # Configuration
 # -----------------------------------------------------------------------------
-
-ANNOTATION_KEYWORDS <- c(
-    "\\bion\\b",
-    "ion transport",
-    "ion channel",
-    "ion homeostasis",
-    "proton",
-    "calcium",
-    "carbonate",
-    "carbonic",
-    "bicarbonate",
-    "calcium channel",
-    "chemosensory",
-    "plasmamembrane",
-    "ossification",
-    "biomineralization",
-    "calcification",
-    "endoplasmic reticulum"
-)
-
-BUBBLE_P_ADJ_CUTOFF <- 0.05
-TOP_N_ANNOTATE <- 6
-
-division_colors <- c(
+ 
+# Division colors
+DIVISION_COLORS <- c(
     "BP" = "#4DAF4A",
     "CC" = "#E41A1C",
     "MF" = "#377EB8"
 )
 
-# -----------------------------------------------------------------------------
-# GO Term Simplification Function
-# -----------------------------------------------------------------------------
+# Organism title colors
+HOST_COLOR <- "#D55E00"
+SYMBIONT_COLOR <- "#0072B2"
 
-simplify_go_term <- function(term) {
-    
-    # Remove uninformative words
-    remove_words <- c(
-        "\\bobsolete\\s*",
-        "\\bmonoatomic\\s*",
-        "\\bprocess\\b",
-        "\\bactivity\\b",
-        "\\bpart\\b"
-    )
-    for (pattern in remove_words) {
-        term <- str_replace_all(term, regex(pattern, ignore_case = TRUE), "")
-    }
-    
-    # Ion symbols
-    ion_replacements <- c(
-        "\\bcalcium\\b" = "Ca2+",
-        "\\bsodium\\b" = "Na+",
-        "\\bpotassium\\b" = "K+",
-        "\\bcadmium\\b" = "Cd2+",
-        "\\blithium\\b" = "Li+",
-        "\\biron\\b" = "Fe",
-        "\\bmagnesium\\b" = "Mg2+",
-        "\\bzinc\\b" = "Zn2+",
-        "\\bcopper\\b" = "Cu2+",
-        "\\bproton\\b" = "H+",
-        "\\bhydrogen\\b" = "H+"
-    )
-    for (pattern in names(ion_replacements)) {
-        term <- str_replace_all(term, regex(pattern, ignore_case = TRUE), 
-                                ion_replacements[pattern])
-    }
-    
-    # Multi-word phrase abbreviations
-    phrase_abbrevs <- c(
-        "endoplasmic reticulum" = "ER",
-        "plasma membrane" = "PM",
-        "cell membrane" = "membrane",
-        "rough ER" = "rough ER",
-        "ER-Golgi intermediate compartment" = "ER-Golgi",
-        "positive regulation of" = "+reg.",
-        "negative regulation of" = "-reg.",
-        "regulation of" = "reg.",
-        "response to " = "",
-        "involved in " = "",
-        "establishment of " = "",
-        " involved in.*$" = "",
-        "-containing complex" = "",
-        "-transporting " = " ",
-        "-driven active" = "-driven",
-        "-dependent " = "-dep. ",
-        "-mediated " = "-med. ",
-        "-directed " = "-dir. ",
-        "-transcribed " = "-txd ",
-        "-type " = " ",
-        "transmembrane transporter" = "TM transporter",
-        "transmembrane transport" = "TM transport",
-        "ion transmembrane" = "ion TM",
-        "active transmembrane" = "active TM",
-        "ATP synthase" = "ATP synth.",
-        "two-sector ATPase" = "ATPase",
-        "nervous system" = "NS",
-        "central nervous system" = "CNS",
-        "nucleic acid" = "nucl. acid",
-        "amino acid" = "AA",
-        "fatty acid" = "FA",
-        "cell-cell" = "cell-cell",
-        "protein-RNA" = "prot.-RNA"
-    )
-    for (pattern in names(phrase_abbrevs)) {
-        term <- str_replace_all(term, regex(pattern, ignore_case = TRUE), 
-                                phrase_abbrevs[pattern])
-    }
-    
-    # Single word abbreviations
-    word_abbrevs <- c(
-        "\\bchemosensory\\b" = "chemosen.",
-        "\\bprotein\\b" = "prot.",
-        "\\bcomplex\\b" = "cplx",
-        "\\bligand\\b" = "lig.",
-        "\\borganic\\b" = "org.",
-        "\\bmitochondrial\\b" = "mito.",
-        "\\bmitochondrion\\b" = "mito.",
-        "\\bcytoplasmic\\b" = "cyto.",
-        "\\bcytosolic\\b" = "cyto.",
-        "\\bcytoplasm\\b" = "cyto.",
-        "\\bnuclear\\b" = "nucl.",
-        "\\bribosomal\\b" = "ribo.",
-        "\\bribosome\\b" = "ribo.",
-        "\\bpolysomal\\b" = "polysomal",
-        "\\bpolysome\\b" = "polysome",
-        "\\bpreribosome\\b" = "preribo.",
-        "\\bribonucleoprotein\\b" = "RNP",
-        "\\bspliceosomal\\b" = "spliceo.",
-        "\\btransmembrane\\b" = "TM",
-        "\\btransporter\\b" = "transporter",
-        "\\btransport\\b" = "transport",
-        "\\bchannel\\b" = "ch.",
-        "\\bvoltage-gated\\b" = "V-gated",
-        "\\btransmitter-gated\\b" = "transmit.-gated",
-        "\\borganelle\\b" = "organelle",
-        "\\benvelope\\b" = "env.",
-        "\\bmembrane\\b" = "memb.",
-        "\\blumenal\\b" = "lumen.",
-        "\\blumen\\b" = "lumen",
-        "\\bcomponent\\b" = "comp.",
-        "\\bcompartment\\b" = "compart.",
-        "\\bintermediate\\b" = "interm.",
-        "\\bintrinsic\\b" = "intrins.",
-        "\\bbounded\\b" = "bound.",
-        "\\bprojection\\b" = "proj.",
-        "\\bjunction\\b" = "junct.",
-        "\\banchoring\\b" = "anchor.",
-        "\\bsynaptic\\b" = "synap.",
-        "\\blocalization\\b" = "local.",
-        "\\borganization\\b" = "org.",
-        "\\bbiosynthetic\\b" = "biosynth.",
-        "\\bcatabolic\\b" = "catabol.",
-        "\\bmetabolic\\b" = "metab.",
-        "\\bphosphorylation\\b" = "phosph.",
-        "\\boxidative\\b" = "oxid.",
-        "\\boxidoreductase\\b" = "oxidored.",
-        "\\boxidoreduction\\b" = "redox",
-        "\\btranslational\\b" = "transl.",
-        "\\btranslation\\b" = "transl.",
-        "\\btranscription\\b" = "txn",
-        "\\binitiation\\b" = "init.",
-        "\\bassembly\\b" = "assemb.",
-        "\\bbiogenesis\\b" = "biogen.",
-        "\\bdevelopment\\b" = "dev.",
-        "\\bsignaling\\b" = "signal.",
-        "\\bstructural\\b" = "struct.",
-        "\\bconstituent\\b" = "const.",
-        "\\bmolecule\\b" = "mol.",
-        "\\bbinding\\b" = "bind.",
-        "\\bregulator\\b" = "reg.",
-        "\\bexcitatory\\b" = "excit.",
-        "\\bextracellular\\b" = "EC",
-        "\\bintracellular\\b" = "IC",
-        "\\binorganic\\b" = "inorg.",
-        "\\bmonovalent\\b" = "monoval.",
-        "\\bmicrotubule\\b" = "MT",
-        "\\bcytoskeletal\\b" = "cytoskel.",
-        "\\blocomotory\\b" = "locomo.",
-        "\\bmovement\\b" = "movmt",
-        "\\bmotor\\b" = "motor",
-        "\\bdynein\\b" = "dynein",
-        "\\bpolypeptide\\b" = "polypep.",
-        "\\bconformation\\b" = "conform.",
-        "\\bdehydrogenase\\b" = "DH",
-        "\\bendopeptidase\\b" = "endopep.",
-        "\\bphospholipid\\b" = "phospholip.",
-        "\\bphosphatidylinositol\\b" = "PI",
-        "\\bbisphosphate\\b" = "bisP",
-        "\\bcysteine\\b" = "Cys",
-        "\\bhomeostasis\\b" = "homeo.",
-        "\\bbehavior\\b" = "behav.",
-        "\\bsensory\\b" = "sens.",
-        "\\borgan\\b" = "organ"
-    )
-    for (pattern in names(word_abbrevs)) {
-        term <- str_replace_all(term, regex(pattern, ignore_case = TRUE), 
-                                word_abbrevs[pattern])
-    }
-    
-    # Cleanup
-    term <- str_replace_all(term, "\\s+", " ")
-    term <- str_replace_all(term, "^\\s+|\\s+$", "")
-    term <- str_replace_all(term, "\\s*-\\s*", "-")
-    term <- str_replace_all(term, "\\s+,", ",")
-    term <- str_replace_all(term, ",\\s*$", "")
-    term <- str_replace_all(term, "\\s*\\.$", "")
-    term <- str_replace_all(term, "^\\s*of\\s+", "")
-    term <- str_replace_all(term, "\\s+of$", "")
-    term <- str_replace_all(term, "\\s+to$", "")
-    term <- str_replace_all(term, "\\s+or$", "")
-    
-    # Limit to 4 words
-    words <- str_split(term, "\\s+")[[1]]
-    words <- words[words != ""]
-    if (length(words) > 4) {
-        term <- paste(words[1:4], collapse = " ")
-    } else {
-        term <- paste(words, collapse = " ")
-    }
-    
-    return(term)
-}
+# Annotation settings
+TOP_N_ANNOTATE <- 20
+LABEL_MAX_CHARS <- 20
 
 # -----------------------------------------------------------------------------
-# Load GO_MWU Results
+# Load GO_MWU Results (All Significant Terms)
 # -----------------------------------------------------------------------------
 
-load_gomwu_bubble_results <- function(base_dir, prefix = "", organism_label) {
+load_all_gomwu_results <- function(base_dir, prefix = "", organism_label) {
     
     seasons <- c("summer", "winter")
     divisions <- c("BP", "MF", "CC")
@@ -1473,79 +1291,152 @@ load_gomwu_bubble_results <- function(base_dir, prefix = "", organism_label) {
         for (div in divisions) {
             if (prefix == "") {
                 filename <- file.path(base_dir, "output",
-                                     paste0(season, "_", div, "_MWU_results.csv"))
+                                      paste0(season, "_", div, "_MWU_results.csv"))
             } else {
                 filename <- file.path(base_dir, "output",
-                                     paste0(prefix, "_", season, "_", div, "_MWU_results.csv"))
+                                      paste0(prefix, "_", season, "_", div, "_MWU_results.csv"))
             }
             
             if (file.exists(filename)) {
+                # GO_MWU outputs space-separated files
                 df <- read.table(filename, header = TRUE, stringsAsFactors = FALSE,
-                                sep = "", quote = "\"", comment.char = "")
-                names(df) <- gsub('^"', '', names(df))
-                names(df) <- gsub('"$', '', names(df))
+                                 sep = "", quote = "\"", comment.char = "")
+                
+                # Clean column names
+                names(df) <- gsub('^"|"$', '', names(df))
                 names(df) <- trimws(names(df))
+                
                 df$season <- season
                 df$division <- div
                 df$organism <- organism_label
+                
                 all_results[[paste(organism_label, season, div, sep = "_")]] <- df
+                cat("  Loaded:", basename(filename), "-", nrow(df), "terms\n")
             } else {
-                cat("  Warning: File not found -", filename, "\n")
+                cat("  Warning: Not found -", filename, "\n")
             }
         }
     }
+    
     return(bind_rows(all_results))
 }
 
 # -----------------------------------------------------------------------------
-# Process Data for Plotting
+# Load Representative GO Results (handles new format: pval, direction, nseqs)
 # -----------------------------------------------------------------------------
 
-process_for_bubble <- function(gomwu_data, p_cutoff = 0.05, top_n = 6) {
+load_representative_gos <- function(base_dir, prefix = "", organism_label) {
     
-    keyword_pattern <- paste(ANNOTATION_KEYWORDS, collapse = "|")
+    # Try loading the combined representative GO file first
+    if (prefix == "") {
+        combined_file <- file.path(base_dir, "output", "all_representative_GOs.csv")
+    } else {
+        combined_file <- file.path(base_dir, "output", paste0(prefix, "_all_representative_GOs.csv"))
+    }
+    
+    if (file.exists(combined_file)) {
+        cat("  Loading combined file:", basename(combined_file), "\n")
+        df <- read.csv(combined_file, stringsAsFactors = FALSE)
+        df$organism <- organism_label
+        
+        # Standardize column names
+        # The new format has: season, division, term, direction, pval, nseqs, cluster
+        if (!"name" %in% names(df) && "term" %in% names(df)) {
+            df$name <- df$term
+        }
+        # Use pval as p.adj (they're the same from gomwuPlot)
+        if (!"p.adj" %in% names(df) && "pval" %in% names(df)) {
+            df$p.adj <- df$pval
+        }
+        
+        cat("    Loaded", nrow(df), "representative terms\n")
+        cat("    Columns:", paste(names(df), collapse = ", "), "\n")
+        return(df)
+    }
+    
+    # Fall back to loading individual files
+    cat("  Combined file not found, trying individual files...\n")
+    seasons <- c("summer", "winter")
+    divisions <- c("BP", "MF", "CC")
+    all_results <- list()
+    
+    for (season in seasons) {
+        for (div in divisions) {
+            if (prefix == "") {
+                filename <- file.path(base_dir, "output",
+                                      paste0(season, "_", div, "_representative_GOs.csv"))
+            } else {
+                filename <- file.path(base_dir, "output",
+                                      paste0(prefix, "_", season, "_", div, "_representative_GOs.csv"))
+            }
+            
+            if (file.exists(filename)) {
+                df <- read.csv(filename, stringsAsFactors = FALSE)
+                # Individual files already have season and division columns
+                all_results[[paste(season, div, sep = "_")]] <- df
+                cat("    Loaded:", basename(filename), "-", nrow(df), "terms\n")
+            }
+        }
+    }
+    
+    if (length(all_results) == 0) {
+        cat("  WARNING: No representative GO files found!\n")
+        return(NULL)
+    }
+    
+    result <- bind_rows(all_results)
+    result$organism <- organism_label
+    
+    # Standardize column names
+    if (!"name" %in% names(result) && "term" %in% names(result)) {
+        result$name <- result$term
+    }
+    if (!"p.adj" %in% names(result) && "pval" %in% names(result)) {
+        result$p.adj <- result$pval
+    }
+    
+    return(result)
+}
+
+# -----------------------------------------------------------------------------
+# Process Data: Calculate Standardized Z-Score (All Terms Version)
+# -----------------------------------------------------------------------------
+
+process_zscore_data <- function(gomwu_data) {
     
     df <- gomwu_data %>%
-        filter(!is.na(p.adj)) %>%
-        mutate(
-            neg_log10_padj = pmin(-log10(p.adj), 30),
-            x_value = delta.rank / 100,
-            go_name = name,
-            season_label = factor(
-                ifelse(season == "summer", "Summer", "Winter"),
-                levels = c("Summer", "Winter")
-            ),
-            division = factor(division, levels = c("BP", "CC", "MF")),
-            matches_keyword = str_detect(tolower(go_name), regex(keyword_pattern, ignore_case = TRUE))
-        )
+        filter(!is.na(p.adj), !is.na(delta.rank))
     
-    top_significant <- df %>%
-        filter(p.adj < p_cutoff) %>%
-        group_by(season_label, division) %>%
-        slice_min(order_by = p.adj, n = top_n, with_ties = FALSE) %>%
-        ungroup() %>%
-        mutate(is_top_significant = TRUE) %>%
-        select(go_name, season_label, division, is_top_significant)
-    
+    # Calculate standardized z-score from delta.rank
     df <- df %>%
-        left_join(top_significant, by = c("go_name", "season_label", "division")) %>%
+        group_by(organism, season) %>%
         mutate(
-            is_top_significant = replace_na(is_top_significant, FALSE),
-            should_annotate = (p.adj < p_cutoff & matches_keyword) | is_top_significant,
-            annotate_label = ifelse(
-                should_annotate, 
-                sapply(go_name, simplify_go_term),
-                NA_character_
-            ),
-            label_fontface = case_when(
-                !should_annotate ~ NA_character_,
-                matches_keyword ~ "bold",
-                TRUE ~ "plain"
-            ),
-            label_side = case_when(
-                !should_annotate ~ NA_character_,
-                delta.rank >= 0 ~ "right",
-                TRUE ~ "left"
+            # Standardized z-score
+            z_score = (delta.rank - mean(delta.rank, na.rm = TRUE)) / sd(delta.rank, na.rm = TRUE),
+            
+            # Absolute z-score for x-axis
+            abs_z_score = abs(z_score),
+            
+            # Direction based on original delta.rank
+            direction = ifelse(delta.rank > 0, "Up", "Down"),
+            
+            # -log10(p.adj) for y-axis
+            neg_log10_padj = -log10(p.adj),
+            
+            # Cap extreme values for visualization
+            neg_log10_padj_capped = pmin(neg_log10_padj, 50)
+        ) %>%
+        ungroup()
+    
+    # Format labels
+    df <- df %>%
+        mutate(
+            Season = factor(str_to_title(season), levels = c("Summer", "Winter")),
+            Division = factor(division, levels = c("BP", "CC", "MF")),
+            short_label = ifelse(
+                nchar(name) > LABEL_MAX_CHARS,
+                paste0(substr(name, 1, LABEL_MAX_CHARS - 1), "…"),
+                name
             )
         )
     
@@ -1553,315 +1444,691 @@ process_for_bubble <- function(gomwu_data, p_cutoff = 0.05, top_n = 6) {
 }
 
 # -----------------------------------------------------------------------------
-# Create Bubble Plot Function - STAGGERED LANES
+# Process Data: Representative GOs Version
 # -----------------------------------------------------------------------------
 
-create_gomwu_bubble <- function(bubble_data, organism_name, org_color) {
+process_representative_zscore <- function(rep_data) {
     
-    sig_line <- -log10(BUBBLE_P_ADJ_CUTOFF)
+    # Check if data exists
+    if (is.null(rep_data) || nrow(rep_data) == 0) {
+        cat("  No representative GO data to process\n")
+        return(NULL)
+    }
     
-    # Separate data by side AND fontface
-    label_data <- bubble_data %>%
-        filter(!is.na(annotate_label))
+    # Debug: print column names
+    cat("  Input columns:", paste(names(rep_data), collapse = ", "), "\n")
     
-    bold_left <- label_data %>% filter(label_fontface == "bold", label_side == "left")
-    bold_right <- label_data %>% filter(label_fontface == "bold", label_side == "right")
-    plain_left <- label_data %>% filter(label_fontface == "plain", label_side == "left")
-    plain_right <- label_data %>% filter(label_fontface == "plain", label_side == "right")
+    # Ensure p.adj column exists (use pval if needed)
+    if (!"p.adj" %in% names(rep_data)) {
+        if ("pval" %in% names(rep_data)) {
+            rep_data$p.adj <- rep_data$pval
+            cat("  Using 'pval' as 'p.adj'\n")
+        } else {
+            cat("  ERROR: No p-value column found!\n")
+            return(NULL)
+        }
+    }
     
-    # STAGGERED nudge distances
-    # Bold = 20% (inner lane, closer to points)
-    # Plain = 38% (outer lane, further out)
-    x_range <- range(bubble_data$x_value, na.rm = TRUE)
-    nudge_bold <- diff(x_range) * 0.20   # Inner lane
-    nudge_plain <- diff(x_range) * 0.38  # Outer lane
+    # Ensure name column exists (use term if needed)
+    if (!"name" %in% names(rep_data)) {
+        if ("term" %in% names(rep_data)) {
+            rep_data$name <- rep_data$term
+            cat("  Using 'term' as 'name'\n")
+        } else {
+            cat("  ERROR: No term/name column found!\n")
+            return(NULL)
+        }
+    }
     
-    p <- ggplot(bubble_data, aes(x = x_value, y = neg_log10_padj)) +
+    # Ensure nseqs column exists
+    if (!"nseqs" %in% names(rep_data)) {
+        cat("  WARNING: No nseqs column, using 10 as default\n")
+        rep_data$nseqs <- 10
+    }
+    
+    df <- rep_data %>%
+        filter(!is.na(p.adj))
+    
+    if (nrow(df) == 0) {
+        cat("  No valid p.adj values found\n")
+        return(NULL)
+    }
+    
+    # For representative GOs, create z-score from p-value ranking
+    df <- df %>%
+        group_by(organism, season) %>%
+        mutate(
+            # -log10(p.adj) for y-axis
+            neg_log10_padj = -log10(p.adj),
+            neg_log10_padj_capped = pmin(neg_log10_padj, 50),
+            
+            # Use rank-based z-score within each group
+            rank_val = rank(-neg_log10_padj),
+            n_terms = n(),
+            z_score = qnorm((n_terms - rank_val + 0.5) / (n_terms + 1)),
+            
+            # Adjust sign by direction (handle both "up"/"down" and "Up"/"Down")
+            direction_lower = tolower(direction),
+            z_score = ifelse(direction_lower == "up", abs(z_score), -abs(z_score)),
+            abs_z_score = abs(z_score),
+            
+            # Standardize direction label
+            direction = ifelse(direction_lower == "up", "Up", "Down")
+        ) %>%
+        ungroup() %>%
+        select(-direction_lower)
+    
+    # Format labels
+    df <- df %>%
+        mutate(
+            Season = factor(str_to_title(season), levels = c("Summer", "Winter")),
+            Division = factor(division, levels = c("BP", "CC", "MF")),
+            short_label = ifelse(
+                nchar(name) > LABEL_MAX_CHARS,
+                paste0(substr(name, 1, LABEL_MAX_CHARS - 1), "…"),
+                name
+            )
+        )
+    
+    return(df)
+}
+
+# -----------------------------------------------------------------------------
+# Create Single Bubble Plot
+# -----------------------------------------------------------------------------
+
+create_zscore_bubble <- function(data, organism_name, season_name, title_color,
+                                  annotate_top_n = TOP_N_ANNOTATE) {
+    
+    # Filter to this organism and season
+    plot_data <- data %>%
+        filter(organism == organism_name, Season == season_name)
+    
+    if (nrow(plot_data) == 0) {
+        cat("  Warning: No data for", organism_name, season_name, "\n")
+        return(NULL)
+    }
+    
+    # Identify top N most significant terms for annotation
+    top_terms <- plot_data %>%
+        slice_min(order_by = p.adj, n = annotate_top_n, with_ties = FALSE)
+    
+    # Mark which points to annotate
+    plot_data <- plot_data %>%
+        mutate(annotate = name %in% top_terms$name)
+    
+    # Create plot
+    p <- ggplot(plot_data, aes(x = abs_z_score, y = neg_log10_padj_capped)) +
         
-        # Points
-        geom_point(aes(size = nseqs, fill = division),
-                   shape = 21, alpha = 0.6, color = "gray30", stroke = 0.3) +
-        
-        # Significance threshold line
-        geom_hline(yintercept = sig_line, color = "darkorange",
-                   linetype = "solid", linewidth = 0.8) +
-        
-        # Vertical line at 0
-        geom_vline(xintercept = 0, color = "gray50",
-                   linetype = "dashed", linewidth = 0.5) +
-        
-        # BOLD LEFT labels (inner lane)
-        geom_text_repel(
-            data = bold_left,
-            aes(label = annotate_label),
-            size = 2.4,
-            fontface = "bold",
-            color = "black",
-            xlim = c(-Inf, NA),
-            ylim = c(0, NA),  # Keep labels within plot
-            hjust = 1,
-            direction = "y",
-            nudge_x = -nudge_bold,
-            segment.color = "gray40",
-            segment.size = 0.4,
-            segment.linetype = "solid",
-            min.segment.length = 0,
-            box.padding = 0.2,
-            point.padding = 0.15,
-            force = 4,
-            force_pull = 0,
-            max.overlaps = 50,
-            seed = 42,
-            na.rm = TRUE
+        # All points
+        geom_point(
+            aes(size = nseqs, fill = Division),
+            shape = 21, 
+            color = "gray30", 
+            stroke = 0.4, 
+            alpha = 0.7
         ) +
         
-        # BOLD RIGHT labels (inner lane)
+        # Annotations for top N
         geom_text_repel(
-            data = bold_right,
-            aes(label = annotate_label),
-            size = 2.4,
-            fontface = "bold",
-            color = "black",
-            xlim = c(NA, Inf),
-            ylim = c(0, NA),
-            hjust = 0,
-            direction = "y",
-            nudge_x = nudge_bold,
-            segment.color = "gray40",
-            segment.size = 0.4,
-            segment.linetype = "solid",
-            min.segment.length = 0,
-            box.padding = 0.2,
-            point.padding = 0.15,
-            force = 4,
-            force_pull = 0,
-            max.overlaps = 50,
-            seed = 42,
-            na.rm = TRUE
-        ) +
-        
-        # PLAIN LEFT labels (outer lane)
-        geom_text_repel(
-            data = plain_left,
-            aes(label = annotate_label),
-            size = 2.2,
+            data = plot_data %>% filter(annotate),
+            aes(label = short_label),
+            size = 2.8,
+            color = "gray20",
             fontface = "plain",
-            color = "gray30",
-            xlim = c(-Inf, NA),
-            ylim = c(0, NA),
-            hjust = 1,
-            direction = "y",
-            nudge_x = -nudge_plain,
-            segment.color = "gray60",
+            max.overlaps = Inf,
+            box.padding = 0.4,
+            point.padding = 0.3,
+            segment.color = "gray50",
             segment.size = 0.3,
-            segment.linetype = "dashed",
-            min.segment.length = 0,
-            box.padding = 0.2,
-            point.padding = 0.15,
-            force = 4,
-            force_pull = 0,
-            max.overlaps = 50,
-            seed = 123,  # Different seed for plain labels
-            na.rm = TRUE
+            segment.alpha = 0.6,
+            min.segment.length = 0.2,
+            force = 2,
+            force_pull = 0.5,
+            seed = 42
         ) +
         
-        # PLAIN RIGHT labels (outer lane)
-        geom_text_repel(
-            data = plain_right,
-            aes(label = annotate_label),
-            size = 2.2,
-            fontface = "plain",
-            color = "gray30",
-            xlim = c(NA, Inf),
-            ylim = c(0, NA),
-            hjust = 0,
-            direction = "y",
-            nudge_x = nudge_plain,
-            segment.color = "gray60",
-            segment.size = 0.3,
-            segment.linetype = "dashed",
-            min.segment.length = 0,
-            box.padding = 0.2,
-            point.padding = 0.15,
-            force = 4,
-            force_pull = 0,
-            max.overlaps = 50,
-            seed = 123,
-            na.rm = TRUE
+        # Significance threshold line (p.adj = 0.05)
+        geom_hline(
+            yintercept = -log10(0.05), 
+            linetype = "dashed", 
+            color = "gray50", 
+            linewidth = 0.5
         ) +
         
         # Scales
         scale_fill_manual(
-            values = division_colors,
+            values = DIVISION_COLORS,
             name = "GO Division",
-            labels = c("BP" = "Biological Process",
-                      "CC" = "Cellular Component",
-                      "MF" = "Molecular Function")
+            labels = c(
+                "BP" = "Biological Process",
+                "CC" = "Cellular Component",
+                "MF" = "Molecular Function"
+            )
         ) +
         
         scale_size_continuous(
-            name = "# Genes",
-            range = c(1, 12),
-            breaks = c(10, 50, 100, 200, 500)
+            name = "Gene Count",
+            range = c(1.5, 12),
+            breaks = c(10, 50, 100, 200, 500),
+            labels = scales::comma
         ) +
         
-        # Axes - expanded with 8% extra at top
-        scale_x_continuous(expand = expansion(mult = c(0.40, 0.40))) +
-        scale_y_continuous(expand = expansion(mult = c(0.02, 0.08))) +
-        
-        # Facet
-        facet_grid(season_label ~ division, scales = "free_x") +
+        scale_x_continuous(expand = expansion(mult = c(0.02, 0.15))) +
+        scale_y_continuous(expand = expansion(mult = c(0.02, 0.05))) +
         
         # Labels
         labs(
-            x = "Delta Rank (Direction Score)",
-            y = expression(-log[10]~italic(p)[adj]),
-            title = paste0("GO Enrichment: ", organism_name),
-            caption = "Bold = calcification/ion keywords | Plain = top 10 significant | Left = down | Right = up"
+            x = "|Z-score|",
+            y = expression(-log[10](p[adj])),
+            title = paste0(season_name)
         ) +
         
         # Theme
         theme_bw(base_size = 11) +
         theme(
-            plot.title = element_text(size = 14, face = "bold.italic",
-                                      hjust = 0.5, color = org_color),
-            plot.caption = element_text(size = 8, face = "italic", hjust = 0.5,
-                                        color = "gray40"),
-            axis.title = element_text(size = 11, face = "bold"),
+            plot.title = element_text(size = 12, face = "bold", hjust = 0.5),
+            axis.title = element_text(size = 10, face = "bold"),
             axis.text = element_text(size = 9),
-            strip.text = element_text(size = 10, face = "bold"),
-            strip.background = element_rect(fill = "gray95"),
-            legend.position = "right",
-            legend.box = "vertical",
             panel.grid.minor = element_blank(),
-            panel.spacing = unit(1.2, "lines"),  # Increased spacing
-            plot.margin = margin(10, 15, 10, 10)  # Extra right margin
+            panel.grid.major = element_line(color = "gray92", linewidth = 0.3),
+            legend.position = "right",
+            legend.title = element_text(size = 9, face = "bold"),
+            legend.text = element_text(size = 8),
+            plot.margin = margin(5, 5, 5, 5)
         ) +
         
         guides(
-            fill = guide_legend(override.aes = list(size = 5), order = 1),
-            size = guide_legend(order = 2)
+            fill = guide_legend(order = 1, override.aes = list(size = 4, alpha = 0.9)),
+            size = guide_legend(order = 2, override.aes = list(fill = "gray60"))
         )
     
     return(p)
 }
 
 # -----------------------------------------------------------------------------
-# Generate Plots
+# Create Organism Figure (Summer + Winter side by side)
 # -----------------------------------------------------------------------------
 
-cat("Loading Host GO_MWU results...\n")
-host_gomwu <- load_gomwu_bubble_results("../10_GO_MWU", prefix = "", "Host")
-cat("  Loaded", nrow(host_gomwu), "GO terms\n")
-
-cat("Loading Symbiont GO_MWU results...\n")
-symbiont_gomwu <- load_gomwu_bubble_results("../11_symbiont_GO_MWU", prefix = "symbiont", "Symbiont")
-cat("  Loaded", nrow(symbiont_gomwu), "GO terms\n")
-
-# Process data
-host_bubble_data <- process_for_bubble(host_gomwu, BUBBLE_P_ADJ_CUTOFF, TOP_N_ANNOTATE)
-symbiont_bubble_data <- process_for_bubble(symbiont_gomwu, BUBBLE_P_ADJ_CUTOFF, TOP_N_ANNOTATE)
-
-# Show simplified terms
-cat("\n=== Simplified Labels (Host Sample) ===\n")
-host_sample <- host_bubble_data %>%
-    filter(!is.na(annotate_label)) %>%
-    select(go_name, annotate_label, label_fontface) %>%
-    head(20)
-for (i in 1:nrow(host_sample)) {
-    cat(sprintf("  %-50s -> %s\n", 
-                substr(host_sample$go_name[i], 1, 50),
-                host_sample$annotate_label[i]))
+create_organism_figure <- function(data, organism_name, organism_label, title_color,
+                                    annotate_top_n = TOP_N_ANNOTATE) {
+    
+    p_summer <- create_zscore_bubble(data, organism_name, "Summer", title_color, annotate_top_n)
+    p_winter <- create_zscore_bubble(data, organism_name, "Winter", title_color, annotate_top_n)
+    
+    combined <- p_summer + p_winter +
+        plot_layout(ncol = 2, guides = "collect") +
+        plot_annotation(
+            title = organism_label,
+            subtitle = paste0("Top ", annotate_top_n, " significant GO terms annotated | Dashed line = p.adj = 0.05"),
+            theme = theme(
+                plot.title = element_text(size = 14, face = "bold.italic", hjust = 0.5, color = title_color),
+                plot.subtitle = element_text(size = 9, hjust = 0.5, color = "gray50", margin = margin(b = 10))
+            )
+        ) &
+        theme(legend.position = "right")
+    
+    return(combined)
 }
 
-cat("\n=== Simplified Labels (Symbiont Sample) ===\n")
-sym_sample <- symbiont_bubble_data %>%
-    filter(!is.na(annotate_label)) %>%
-    select(go_name, annotate_label, label_fontface) %>%
-    head(20)
-for (i in 1:nrow(sym_sample)) {
-    cat(sprintf("  %-50s -> %s\n", 
-                substr(sym_sample$go_name[i], 1, 50),
-                sym_sample$annotate_label[i]))
+# -----------------------------------------------------------------------------
+# Create gt Publication Table (Updated for gt >= 0.9.0)
+# -----------------------------------------------------------------------------
+
+create_publication_table <- function(data, organism_name, organism_label,
+                                      top_n = TOP_N_ANNOTATE) {
+    
+    # Get top N per season
+    table_data <- data %>%
+        filter(organism == organism_name) %>%
+        group_by(Season) %>%
+        slice_min(order_by = p.adj, n = top_n, with_ties = FALSE) %>%
+        ungroup() %>%
+        arrange(Season, p.adj) %>%
+        mutate(Rank = row_number(), .by = Season) %>%
+        select(
+            Rank,
+            Season,
+            Division,
+            `GO Term` = name,
+            `p.adj` = p.adj,
+            `Z-score` = z_score,
+            Direction = direction,
+            `Gene Count` = nseqs
+        )
+    
+    # Create gt table with updated syntax (fn instead of colors)
+    gt_table <- table_data %>%
+        gt(groupname_col = "Season") %>%
+        
+        # Title
+        tab_header(
+            title = md(paste0("**", organism_label, "**")),
+            subtitle = md(paste0("Top ", top_n, " Significant GO Terms per Season"))
+        ) %>%
+        
+        # Format columns
+        fmt_scientific(columns = `p.adj`, decimals = 2) %>%
+        fmt_number(columns = `Z-score`, decimals = 2) %>%
+        fmt_number(columns = `Gene Count`, decimals = 0) %>%
+        
+        # Color Division column using fn (new syntax)
+        data_color(
+            columns = Division,
+            fn = function(x) {
+                case_when(
+                    x == "BP" ~ "#4DAF4A",
+                    x == "CC" ~ "#E41A1C",
+                    x == "MF" ~ "#377EB8",
+                    TRUE ~ "gray"
+                )
+            }
+        ) %>%
+        
+        # Color Direction column using fn (new syntax)
+        data_color(
+            columns = Direction,
+            fn = function(x) {
+                case_when(
+                    x == "Up" ~ "#B2182B",
+                    x == "Down" ~ "#2166AC",
+                    TRUE ~ "gray"
+                )
+            }
+        ) %>%
+        
+        # Column labels
+        cols_label(
+            Rank = "#",
+            Division = "Div.",
+            `GO Term` = "GO Term Description",
+            `p.adj` = md("p~adj~"),
+            `Z-score` = "Z-score",
+            Direction = "Dir.",
+            `Gene Count` = "Genes"
+        ) %>%
+        
+        # Column widths
+        cols_width(
+            Rank ~ px(40),
+            Division ~ px(50),
+            `GO Term` ~ px(280),
+            `p.adj` ~ px(90),
+            `Z-score` ~ px(70),
+            Direction ~ px(55),
+            `Gene Count` ~ px(60)
+        ) %>%
+        
+        # Styling
+        tab_style(
+            style = cell_text(weight = "bold"),
+            locations = cells_row_groups()
+        ) %>%
+        tab_style(
+            style = cell_text(size = px(11)),
+            locations = cells_body()
+        ) %>%
+        tab_style(
+            style = cell_text(size = px(10), weight = "bold"),
+            locations = cells_column_labels()
+        ) %>%
+        
+        # Options
+        tab_options(
+            table.font.size = px(11),
+            heading.title.font.size = px(14),
+            heading.subtitle.font.size = px(11),
+            row_group.font.size = px(12),
+            row_group.font.weight = "bold",
+            table.border.top.style = "solid",
+            table.border.bottom.style = "solid",
+            heading.border.bottom.style = "solid",
+            row_group.border.top.style = "solid",
+            row_group.border.bottom.style = "solid",
+            column_labels.border.bottom.style = "solid"
+        ) %>%
+        
+        # Footnotes
+        tab_footnote(
+            footnote = "Div: BP = Biological Process, CC = Cellular Component, MF = Molecular Function",
+            locations = cells_column_labels(columns = Division)
+        ) %>%
+        tab_footnote(
+            footnote = "Direction indicates regulation in OA treatment vs control",
+            locations = cells_column_labels(columns = Direction)
+        )
+    
+    return(gt_table)
 }
 
-# Summary stats
-cat("\nHost annotation breakdown:\n")
-host_labels <- host_bubble_data %>% filter(!is.na(annotate_label))
-cat("  Bold-Left:", sum(host_labels$label_fontface == "bold" & host_labels$label_side == "left"), "\n")
-cat("  Bold-Right:", sum(host_labels$label_fontface == "bold" & host_labels$label_side == "right"), "\n")
-cat("  Plain-Left:", sum(host_labels$label_fontface == "plain" & host_labels$label_side == "left"), "\n")
-cat("  Plain-Right:", sum(host_labels$label_fontface == "plain" & host_labels$label_side == "right"), "\n")
-cat("  Total:", nrow(host_labels), "\n")
+# =============================================================================
+# PART A: ALL SIGNIFICANT GO TERMS
+# =============================================================================
 
-cat("\nSymbiont annotation breakdown:\n")
-sym_labels <- symbiont_bubble_data %>% filter(!is.na(annotate_label))
-cat("  Bold-Left:", sum(sym_labels$label_fontface == "bold" & sym_labels$label_side == "left"), "\n")
-cat("  Bold-Right:", sum(sym_labels$label_fontface == "bold" & sym_labels$label_side == "right"), "\n")
-cat("  Plain-Left:", sum(sym_labels$label_fontface == "plain" & sym_labels$label_side == "left"), "\n")
-cat("  Plain-Right:", sum(sym_labels$label_fontface == "plain" & sym_labels$label_side == "right"), "\n")
-cat("  Total:", nrow(sym_labels), "\n")
+cat("##############################################################################\n")
+cat("# PART A: ALL SIGNIFICANT GO TERMS\n")
+cat("##############################################################################\n\n")
 
-cat("\nGenerating Host bubble plot...\n")
-fig4d_host_bubble <- create_gomwu_bubble(
-    host_bubble_data,
-    "M. capitata (Host)",
-    "#E69F00"
+# Set paths (adjust as needed)
+host_dir <- "../10_GO_MWU"
+symbiont_dir <- "../11_symbiont_GO_MWU"
+
+# Load all GO_MWU results
+cat("Loading Host GO_MWU results (all significant terms)...\n")
+host_raw <- load_all_gomwu_results(host_dir, prefix = "", "Host")
+cat("  Total:", nrow(host_raw), "GO terms\n\n")
+
+cat("Loading Symbiont GO_MWU results (all significant terms)...\n")
+symbiont_raw <- load_all_gomwu_results(symbiont_dir, prefix = "symbiont", "Symbiont")
+cat("  Total:", nrow(symbiont_raw), "GO terms\n\n")
+
+# Process data (calculate z-scores)
+cat("Processing Host data...\n")
+host_data <- process_zscore_data(host_raw)
+cat("  Processed:", nrow(host_data), "terms\n")
+cat("  Z-score range:", round(min(host_data$z_score, na.rm = TRUE), 2), "to", 
+    round(max(host_data$z_score, na.rm = TRUE), 2), "\n\n")
+
+cat("Processing Symbiont data...\n")
+symbiont_data <- process_zscore_data(symbiont_raw)
+cat("  Processed:", nrow(symbiont_data), "terms\n")
+cat("  Z-score range:", round(min(symbiont_data$z_score, na.rm = TRUE), 2), "to",
+    round(max(symbiont_data$z_score, na.rm = TRUE), 2), "\n\n")
+
+# Combine for easier handling
+all_data <- bind_rows(host_data, symbiont_data)
+
+# Summary statistics
+cat("=== Summary by Organism × Season × Division (All Terms) ===\n\n")
+summary_stats <- all_data %>%
+    group_by(organism, Season, Division) %>%
+    summarize(
+        n_terms = n(),
+        n_up = sum(direction == "Up"),
+        n_down = sum(direction == "Down"),
+        .groups = "drop"
+    )
+print(summary_stats, n = 30)
+
+# Generate Bubble Plots
+cat("\n\nGenerating bubble plots (All Terms)...\n")
+
+fig_host_all <- create_organism_figure(
+    all_data, "Host", "Montipora capitata (Host)", HOST_COLOR
 )
 
-cat("Generating Symbiont bubble plot...\n")
-fig4e_symbiont_bubble <- create_gomwu_bubble(
-    symbiont_bubble_data,
-    "D. trenchii (Symbiont)",
-    "#56B4E9"
+fig_symbiont_all <- create_organism_figure(
+    all_data, "Symbiont", "Durusdinium trenchii (Symbiont)", SYMBIONT_COLOR
 )
 
-# -----------------------------------------------------------------------------
-# Save Plots - 15 x 11 inches
-# -----------------------------------------------------------------------------
+# Save Bubble Plots
+cat("\nSaving bubble plots (All Terms)...\n")
 
-ggsave("figures/Fig4D_bubble_host_GOMWU.pdf", fig4d_host_bubble,
-       width = 15, height = 11, dpi = 300)
-ggsave("figures/Fig4D_bubble_host_GOMWU.png", fig4d_host_bubble,
-       width = 15, height = 11, dpi = 300)
-cat("✓ Saved: Fig4D_bubble_host_GOMWU.pdf/png (15x11 inches)\n")
+ggsave("figures/Fig4A_Host_GO_zscore_AllTerms.pdf", fig_host_all,
+       width = 14, height = 7, dpi = 300)
+ggsave("figures/Fig4A_Host_GO_zscore_AllTerms.png", fig_host_all,
+       width = 14, height = 7, dpi = 300)
+cat("  ✓ Fig4A_Host_GO_zscore_AllTerms.pdf/png\n")
 
-ggsave("figures/Fig4E_bubble_symbiont_GOMWU.pdf", fig4e_symbiont_bubble,
-       width = 15, height = 11, dpi = 300)
-ggsave("figures/Fig4E_bubble_symbiont_GOMWU.png", fig4e_symbiont_bubble,
-       width = 15, height = 11, dpi = 300)
-cat("✓ Saved: Fig4E_bubble_symbiont_GOMWU.pdf/png (15x11 inches)\n")
+ggsave("figures/Fig4A_Symbiont_GO_zscore_AllTerms.pdf", fig_symbiont_all,
+       width = 14, height = 7, dpi = 300)
+ggsave("figures/Fig4A_Symbiont_GO_zscore_AllTerms.png", fig_symbiont_all,
+       width = 14, height = 7, dpi = 300)
+cat("  ✓ Fig4A_Symbiont_GO_zscore_AllTerms.pdf/png\n")
 
-# -----------------------------------------------------------------------------
-# Save Summary
-# -----------------------------------------------------------------------------
+# Create and Save gt Tables (HTML and DOCX only - no PNG)
+cat("\nGenerating publication tables (All Terms)...\n")
 
-annotated_summary <- bind_rows(
-    host_bubble_data %>%
-        filter(!is.na(annotate_label)) %>%
-        mutate(organism = "Host",
-               annotation_type = ifelse(matches_keyword, "Keyword (bold)", "Top significant")) %>%
-        select(organism, season = season_label, division, go_name, annotate_label, p.adj, delta.rank, 
-               nseqs, matches_keyword, is_top_significant, annotation_type, label_side),
-    symbiont_bubble_data %>%
-        filter(!is.na(annotate_label)) %>%
-        mutate(organism = "Symbiont",
-               annotation_type = ifelse(matches_keyword, "Keyword (bold)", "Top significant")) %>%
-        select(organism, season = season_label, division, go_name, annotate_label, p.adj, delta.rank, 
-               nseqs, matches_keyword, is_top_significant, annotation_type, label_side)
-) %>%
-    arrange(organism, season, division, label_side, p.adj)
+gt_host_all <- create_publication_table(all_data, "Host", "Montipora capitata (Host) - All Significant Terms")
+gt_symbiont_all <- create_publication_table(all_data, "Symbiont", "Durusdinium trenchii (Symbiont) - All Significant Terms")
 
-write.csv(annotated_summary, "data/bubble_plot_annotated_terms.csv", row.names = FALSE)
-cat("✓ Saved: bubble_plot_annotated_terms.csv\n")
+# Save as HTML
+gtsave(gt_host_all, "tables/TableA_Host_Top20_AllTerms.html")
+gtsave(gt_symbiont_all, "tables/TableA_Symbiont_Top20_AllTerms.html")
+cat("  ✓ HTML tables saved\n")
 
-cat("\n=== Summary by Side ===\n")
-cat("\nHost:\n")
-print(table(host_labels$label_side, host_labels$label_fontface))
-cat("\nSymbiont:\n")
-print(table(sym_labels$label_side, sym_labels$label_fontface))
+# Save as DOCX (works natively without Chrome)
+gtsave(gt_host_all, "tables/TableA_Host_Top20_AllTerms.docx")
+gtsave(gt_symbiont_all, "tables/TableA_Symbiont_Top20_AllTerms.docx")
+cat("  ✓ DOCX tables saved\n")
 
-cat("\n✓ Figure 4D-E bubble plots complete!\n")
+# Export Data
+cat("\nExporting data (All Terms)...\n")
+
+top20_all_export <- all_data %>%
+    group_by(organism, Season) %>%
+    slice_min(order_by = p.adj, n = TOP_N_ANNOTATE, with_ties = FALSE) %>%
+    ungroup() %>%
+    select(
+        Organism = organism, Season, Division = division,
+        GO_Term = name, p.adj, z_score, abs_z_score,
+        Direction = direction, Gene_Count = nseqs, delta.rank
+    ) %>%
+    arrange(Organism, Season, p.adj)
+
+write.csv(top20_all_export, "data/Fig4A_Top20_AllTerms.csv", row.names = FALSE)
+cat("  ✓ Fig4A_Top20_AllTerms.csv\n")
+
+# Combined 4-panel figure (All Terms)
+cat("\nCreating combined 4-panel figure (All Terms)...\n")
+
+p_host_summer_all <- create_zscore_bubble(all_data, "Host", "Summer", HOST_COLOR) +
+    labs(title = "Host - Summer")
+p_host_winter_all <- create_zscore_bubble(all_data, "Host", "Winter", HOST_COLOR) +
+    labs(title = "Host - Winter")
+p_sym_summer_all <- create_zscore_bubble(all_data, "Symbiont", "Summer", SYMBIONT_COLOR) +
+    labs(title = "Symbiont - Summer")
+p_sym_winter_all <- create_zscore_bubble(all_data, "Symbiont", "Winter", SYMBIONT_COLOR) +
+    labs(title = "Symbiont - Winter")
+
+fig_combined_all <- (p_host_summer_all + p_host_winter_all) / 
+                    (p_sym_summer_all + p_sym_winter_all) +
+    plot_layout(guides = "collect") +
+    plot_annotation(
+        title = "GO Enrichment: All Significant Terms",
+        subtitle = "Top 20 terms annotated | Dashed line = p.adj = 0.05",
+        theme = theme(
+            plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+            plot.subtitle = element_text(size = 10, hjust = 0.5, color = "gray50")
+        )
+    ) &
+    theme(legend.position = "right")
+
+ggsave("figures/Fig4A_Combined_4panel_AllTerms.pdf", fig_combined_all,
+       width = 16, height = 14, dpi = 300)
+ggsave("figures/Fig4A_Combined_4panel_AllTerms.png", fig_combined_all,
+       width = 16, height = 14, dpi = 300)
+cat("  ✓ Fig4A_Combined_4panel_AllTerms.pdf/png\n")
+
+# =============================================================================
+# PART B: REPRESENTATIVE GOs ONLY (if available)
+# =============================================================================
+
+cat("\n\n##############################################################################\n")
+cat("# PART B: REPRESENTATIVE GOs ONLY (Non-Redundant)\n")
+cat("##############################################################################\n\n")
+
+# Load representative GO results
+cat("Loading Host representative GOs...\n")
+host_rep_raw <- load_representative_gos(host_dir, prefix = "", "Host")
+
+cat("\nLoading Symbiont representative GOs...\n")
+symbiont_rep_raw <- load_representative_gos(symbiont_dir, prefix = "symbiont", "Symbiont")
+
+# Check if representative GOs are available
+host_rep_available <- !is.null(host_rep_raw) && nrow(host_rep_raw) > 0
+symbiont_rep_available <- !is.null(symbiont_rep_raw) && nrow(symbiont_rep_raw) > 0
+
+if (!host_rep_available && !symbiont_rep_available) {
+    cat("\n")
+    cat("================================================================================\n")
+    cat("WARNING: No representative GO files found for either organism!\n")
+    cat("================================================================================\n")
+    cat("\nTo generate representative GOs, run the updated GO_MWU analysis scripts:\n")
+    cat("  - Host: 10_GO_MWU/scripts/10_GO_MWU_analysis_fixed.R\n")
+    cat("  - Symbiont: 11_symbiont_GO_MWU/scripts/11_symbiont_GO_MWU_analysis_fixed.R\n")
+    cat("\nThese scripts will create:\n")
+    cat("  - output/all_representative_GOs.csv (host)\n")
+    cat("  - output/symbiont_all_representative_GOs.csv (symbiont)\n")
+    cat("\nSkipping Part B (Representative GOs)...\n")
+    cat("================================================================================\n")
+    
+} else {
+    
+    # Process whatever data is available
+    cat("\nProcessing representative data...\n")
+    
+    if (host_rep_available) {
+        cat("  Host:", nrow(host_rep_raw), "representative terms\n")
+        host_rep_data <- process_representative_zscore(host_rep_raw)
+    } else {
+        cat("  Host: No data available\n")
+        host_rep_data <- NULL
+    }
+    
+    if (symbiont_rep_available) {
+        cat("  Symbiont:", nrow(symbiont_rep_raw), "representative terms\n")
+        symbiont_rep_data <- process_representative_zscore(symbiont_rep_raw)
+    } else {
+        cat("  Symbiont: No data available\n")
+        symbiont_rep_data <- NULL
+    }
+    
+    # Combine available data
+    all_rep_data <- bind_rows(
+        if (!is.null(host_rep_data)) host_rep_data else NULL,
+        if (!is.null(symbiont_rep_data)) symbiont_rep_data else NULL
+    )
+    
+    if (!is.null(all_rep_data) && nrow(all_rep_data) > 0) {
+        
+        # Summary statistics
+        cat("\n=== Summary by Organism × Season × Division (Representative) ===\n\n")
+        summary_rep <- all_rep_data %>%
+            group_by(organism, Season, Division) %>%
+            summarize(
+                n_terms = n(),
+                n_up = sum(direction == "Up"),
+                n_down = sum(direction == "Down"),
+                .groups = "drop"
+            )
+        print(summary_rep, n = 30)
+        
+        # Determine annotation count
+        rep_annotate_n <- min(TOP_N_ANNOTATE, max(
+            if (!is.null(host_rep_data)) nrow(host_rep_data %>% filter(Season == "Summer")) else 0,
+            if (!is.null(host_rep_data)) nrow(host_rep_data %>% filter(Season == "Winter")) else 0,
+            if (!is.null(symbiont_rep_data)) nrow(symbiont_rep_data %>% filter(Season == "Summer")) else 0,
+            if (!is.null(symbiont_rep_data)) nrow(symbiont_rep_data %>% filter(Season == "Winter")) else 0
+        ))
+        cat("\nAnnotating up to", rep_annotate_n, "terms per panel\n")
+        
+        # Generate and save plots for available organisms
+        cat("\nGenerating bubble plots (Representative)...\n")
+        
+        if (host_rep_available && !is.null(host_rep_data)) {
+            fig_host_rep <- create_organism_figure(
+                all_rep_data, "Host", "Montipora capitata (Host) - Representative GOs",
+                HOST_COLOR, annotate_top_n = rep_annotate_n
+            )
+            
+            ggsave("figures/Fig4B_Host_GO_zscore_Representative.pdf", fig_host_rep,
+                   width = 14, height = 7, dpi = 300)
+            ggsave("figures/Fig4B_Host_GO_zscore_Representative.png", fig_host_rep,
+                   width = 14, height = 7, dpi = 300)
+            cat("  ✓ Fig4B_Host_GO_zscore_Representative.pdf/png\n")
+            
+            # Tables
+            gt_host_rep <- create_publication_table(
+                all_rep_data, "Host", 
+                "Montipora capitata (Host) - Representative GOs",
+                top_n = rep_annotate_n
+            )
+            gtsave(gt_host_rep, "tables/TableB_Host_Top20_Representative.html")
+            gtsave(gt_host_rep, "tables/TableB_Host_Top20_Representative.docx")
+            cat("  ✓ Host representative tables saved\n")
+        }
+        
+        if (symbiont_rep_available && !is.null(symbiont_rep_data)) {
+            fig_symbiont_rep <- create_organism_figure(
+                all_rep_data, "Symbiont", "Durusdinium trenchii (Symbiont) - Representative GOs",
+                SYMBIONT_COLOR, annotate_top_n = rep_annotate_n
+            )
+            
+            ggsave("figures/Fig4B_Symbiont_GO_zscore_Representative.pdf", fig_symbiont_rep,
+                   width = 14, height = 7, dpi = 300)
+            ggsave("figures/Fig4B_Symbiont_GO_zscore_Representative.png", fig_symbiont_rep,
+                   width = 14, height = 7, dpi = 300)
+            cat("  ✓ Fig4B_Symbiont_GO_zscore_Representative.pdf/png\n")
+            
+            # Tables
+            gt_symbiont_rep <- create_publication_table(
+                all_rep_data, "Symbiont",
+                "Durusdinium trenchii (Symbiont) - Representative GOs",
+                top_n = rep_annotate_n
+            )
+            gtsave(gt_symbiont_rep, "tables/TableB_Symbiont_Top20_Representative.html")
+            gtsave(gt_symbiont_rep, "tables/TableB_Symbiont_Top20_Representative.docx")
+            cat("  ✓ Symbiont representative tables saved\n")
+        }
+        
+        # Export data
+        cat("\nExporting data (Representative)...\n")
+        rep_export <- all_rep_data %>%
+            group_by(organism, Season) %>%
+            slice_min(order_by = p.adj, n = rep_annotate_n, with_ties = FALSE) %>%
+            ungroup() %>%
+            select(
+                Organism = organism, Season, Division = division,
+                GO_Term = name, p.adj, z_score, abs_z_score,
+                Direction = direction, Gene_Count = nseqs
+            ) %>%
+            arrange(Organism, Season, p.adj)
+        
+        write.csv(rep_export, "data/Fig4B_Top20_Representative.csv", row.names = FALSE)
+        cat("  ✓ Fig4B_Top20_Representative.csv\n")
+        
+    } else {
+        cat("\nNo valid representative GO data after processing.\n")
+    }
+}
+
+# =============================================================================
+# FINAL SUMMARY
+# =============================================================================
+
+cat("\n\n##############################################################################\n")
+cat("# COMPLETE - OUTPUT SUMMARY\n")
+cat("##############################################################################\n\n")
+
+cat("=== PART A: All Significant Terms ===\n")
+cat("Figures:\n")
+cat("  • figures/Fig4A_Host_GO_zscore_AllTerms.pdf/png\n")
+cat("  • figures/Fig4A_Symbiont_GO_zscore_AllTerms.pdf/png\n")
+cat("  • figures/Fig4A_Combined_4panel_AllTerms.pdf/png\n")
+cat("Tables:\n")
+cat("  • tables/TableA_Host_Top20_AllTerms.html/docx\n")
+cat("  • tables/TableA_Symbiont_Top20_AllTerms.html/docx\n")
+cat("Data:\n")
+cat("  • data/Fig4A_Top20_AllTerms.csv\n")
+
+cat("\n=== PART B: Representative GOs ===\n")
+if (exists("host_rep_available") && (host_rep_available || symbiont_rep_available)) {
+    cat("Figures and tables generated for available organisms.\n")
+} else {
+    cat("SKIPPED - No representative GO files found.\n")
+    cat("Run the fixed GO_MWU analysis scripts to generate these files.\n")
+}
+
+cat("\n=== Term Counts ===\n")
+cat("All Terms:\n")
+cat("  Host:", nrow(host_data), "\n")
+cat("  Symbiont:", nrow(symbiont_data), "\n")
+
+cat("\n==============================================================================\n")
+cat("Figure 4 GO bubble plots complete!\n")
+cat("==============================================================================\n")
+
 
 # ==============================================================================
 # FIGURE 5: Volcano Plots

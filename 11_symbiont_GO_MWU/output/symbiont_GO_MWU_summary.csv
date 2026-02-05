@@ -1,7 +1,7 @@
 "Season","Division","Significant_Terms","Representative_Terms","Upregulated","Downregulated"
-"summer","BP",NA,NA,NA,NA
-"summer","MF",NA,NA,NA,NA
-"summer","CC",NA,NA,NA,NA
-"winter","BP",NA,NA,NA,NA
-"winter","MF",NA,NA,NA,NA
-"winter","CC",NA,NA,NA,NA
+"summer","BP",40,6,21,19
+"summer","MF",14,6,7,7
+"summer","CC",20,5,4,16
+"winter","BP",305,19,181,124
+"winter","MF",115,18,76,39
+"winter","CC",122,12,45,77

@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=symbiont_GO_MWU
+#SBATCH --job-name=s_GO_MWU
 #SBATCH --output=logs/symbiont_GO_MWU_%j.out
 #SBATCH --error=logs/symbiont_GO_MWU_%j.err
 #SBATCH --time=02:00:00

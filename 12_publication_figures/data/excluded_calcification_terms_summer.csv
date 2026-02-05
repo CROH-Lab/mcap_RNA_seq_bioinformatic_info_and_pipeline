@@ -1,11 +1,20 @@
 "organism","division","name","p.adj"
-"host","BP","positive regulation of cell cycle phase transition",0.00380129606100199
+"host","BP","nucleoside triphosphate metabolic process",1.03981754225909e-05
+"host","BP","nucleoside monophosphate metabolic process",0.00236764545864385
 "host","MF","nucleoside-triphosphatase regulator activity",0.00502085083404783
-"host","BP","obsolete regulation of phosphatidylinositol 3-kinase signaling",0.00635920612168291
-"host","CC","transferase complex, transferring phosphorus-containing groups",0.0216290050119912
-"host","BP","developmental growth involved in morphogenesis",0.0399484404538055
-"host","BP","mesenchyme morphogenesis",0.0486564240723727
-"host","BP","morphogenesis of an epithelial sheet",0.0499730156478459
+"host","BP","muscle organ morphogenesis",0.00819744849370709
+"host","BP","sensory organ morphogenesis",0.0119838297648873
+"host","BP","proton motive force-driven ATP synthesis",0.0123643323868261
+"host","BP","head morphogenesis",0.013446873229829
+"host","BP","face morphogenesis",0.0150302704360881
+"host","CC","transferase complex, transferring phosphorus-containing groups",0.01860457767694
+"host","BP","cell morphogenesis",0.0192453506476078
+"host","BP","regulation of anatomical structure morphogenesis",0.0197244124675498
+"host","BP","ribose phosphate metabolic process",0.0288476222884001
+"host","BP","cardiac ventricle morphogenesis",0.0446190417106515
+"host","BP","mesoderm morphogenesis",0.0449764392241621
+"host","BP","morphogenesis of an epithelial sheet",0.0454308012620906
+"host","BP","tube morphogenesis",0.0454308012620906
 "symbiont","BP","positive regulation of phospholipid metabolic process",0.00191830072470469
 "symbiont","MF","phosphatidylinositol bisphosphate binding",0.0173596260499791
 "symbiont","BP","obsolete phytosteroid metabolic process",0.0293551394531029

@@ -1,19 +1,30 @@
 "organism","division","name","p.adj"
-"host","BP","tissue morphogenesis",0.000556477967471867
-"host","CC","potassium channel complex",0.00287269263944453
+"host","BP","cell morphogenesis",9.4569680371028e-07
+"host","BP","nucleoside triphosphate metabolic process",1.22711675056023e-05
+"host","BP","obsolete cell morphogenesis involved in differentiation",2.15539412661644e-05
+"host","BP","regulation of cell morphogenesis",0.00077637463671369
+"host","BP","nucleoside monophosphate metabolic process",0.00159443570281655
+"host","BP","positive regulation of voltage-gated potassium channel activity",0.00327507107319265
 "host","MF","outward rectifier potassium channel activity",0.00403958960339568
-"host","BP","regulation of cell morphogenesis",0.00478887880508977
+"host","BP","obsolete regulation of cell morphogenesis involved in differentiation",0.00473810433341574
+"host","BP","tube morphogenesis",0.00658758774986321
+"host","BP","tissue morphogenesis",0.00978293363336889
 "host","MF","phosphorus-oxygen lyase activity",0.0128317357149329
+"host","BP","bone morphogenesis",0.0181515341394705
 "host","MF","sodium channel activity",0.0184470775891448
 "host","MF","phospholipid binding",0.0184470775891448
-"host","BP","lymph vessel development",0.0222173672188482
-"host","BP","epithelial cell morphogenesis",0.0222173672188482
-"host","BP","positive regulation of cell cycle phase transition",0.0222173672188482
+"host","BP","regulation of anatomical structure morphogenesis",0.0201476474533535
+"host","BP","sensory organ morphogenesis",0.0290245289816502
+"host","BP","lymph vessel development",0.0308534856645341
+"host","BP","epithelial cell morphogenesis",0.0321362291508575
+"host","BP","phagocytosis, engulfment",0.0328853585919933
+"host","BP","embryonic morphogenesis",0.0369767219443218
+"host","BP","negative regulation of muscle hypertrophy",0.0390523605221466
 "host","MF","neurotransmitter:sodium symporter activity",0.0396202213700106
-"host","BP","imaginal disc-derived wing margin morphogenesis",0.0406570337472035
+"host","BP","ribose phosphate metabolic process",0.0427858090956527
 "symbiont","MF","potassium channel activity",0.000285848680963393
 "symbiont","BP","anatomical structure formation involved in morphogenesis",0.000316388615470735
-"symbiont","CC","voltage-gated potassium channel complex",0.00063497613783111
+"symbiont","CC","potassium channel complex",0.00063497613783111
 "symbiont","MF","3',5'-cyclic-AMP phosphodiesterase activity",0.00221530516994667
 "symbiont","CC","proteasome core complex, alpha-subunit complex",0.00282838146673431
 "symbiont","BP","cellular component assembly involved in morphogenesis",0.00290910843248913
@@ -32,8 +43,9 @@
 "symbiont","BP","macroautophagy",0.0236828558748419
 "symbiont","BP","sorocarp morphogenesis",0.0237896803577464
 "symbiont","MF","phosphatidylinositol-4,5-bisphosphate binding",0.0244369395229933
+"symbiont","MF","phosphorus-oxygen lyase activity",0.0258531116581516
 "symbiont","BP","nucleoside triphosphate metabolic process",0.0265538885140157
-"symbiont","BP","muscle hypertrophy",0.0273874977569641
+"symbiont","BP","cardiac muscle hypertrophy",0.0273874977569641
 "symbiont","MF","phosphatase binding",0.0274355950128245
 "symbiont","MF","phospholipid binding",0.0290518789952413
 "symbiont","BP","autophagosome maturation",0.0321252675604871
