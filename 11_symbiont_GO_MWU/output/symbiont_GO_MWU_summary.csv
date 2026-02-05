@@ -1,7 +1,7 @@
-"Organism","Season","Division","Significant_Terms","Upregulated","Downregulated"
-"Symbiont","summer","BP",25,11,14
-"Symbiont","summer","MF",8,3,5
-"Symbiont","summer","CC",13,1,12
-"Symbiont","winter","BP",126,76,50
-"Symbiont","winter","MF",55,43,12
-"Symbiont","winter","CC",76,29,47
+"Season","Division","Significant_Terms","Representative_Terms","Upregulated","Downregulated"
+"summer","BP",NA,NA,NA,NA
+"summer","MF",NA,NA,NA,NA
+"summer","CC",NA,NA,NA,NA
+"winter","BP",NA,NA,NA,NA
+"winter","MF",NA,NA,NA,NA
+"winter","CC",NA,NA,NA,NA
