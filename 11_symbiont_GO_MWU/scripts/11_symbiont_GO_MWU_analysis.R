@@ -95,7 +95,7 @@ config <- list(
 # Representative GO extraction parameters
 rep_GO_config <- list(
     pcut = 0.1,   # p-value cutoff for representative GOs
-    hcut = 0.8     # height to cut tree for independent groups
+    hcut = 0.9     # height to cut tree for independent groups
 )
 
 absValue <- -log10(0.05)
@@ -108,7 +108,7 @@ divisions <- c("BP", "MF", "CC")
 # Row names format: "nseqs/total term_name"
 # ==============================================================================
 
-extract_representative_GOs <- function(results, pcut = 0.1, hcut = 0.8) {
+extract_representative_GOs <- function(results, pcut = 0.1, hcut = 0.9) {
     
     # Check inputs
     if (is.null(results) || length(results) < 2) {
