@@ -297,7 +297,7 @@ plot_combined_dendrogram <- function(data_dir, prefix, season, organism, output_
          axes = FALSE, xlab = "", ylab = "")
     
     # Legend at TOP right (draw first so it's behind if anything overlaps)
-    legend_x <- 1
+    legend_x <- 0.98
     legend_y <- total_height - 0.3
     line_spacing <- 0.45
     
