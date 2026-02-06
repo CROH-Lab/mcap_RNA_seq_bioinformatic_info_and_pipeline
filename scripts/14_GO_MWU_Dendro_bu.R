@@ -1,12 +1,10 @@
 #!/usr/bin/env Rscript
 # =============================================================================
-# Plot Combined Host + Symbiont Representative GO Dendrograms
+# Plot Combined Representative GO Term Dendrograms - GO_MWU Style
 # =============================================================================
-# Creates side-by-side dendrograms for host and symbiont with:
-# - Column headers: "M. capitata (host)" and "D. trenchii (symbiont)"
-# - Panel letters (A, B)
-# - BP, CC, MF stacked vertically in each column
-#
+# Creates clean dendrograms matching GO_MWU aesthetic with tree branches
+# connecting directly to term labels. BP, CC, MF stacked vertically.
+# 
 # Author: Claude (for David Armstrong)
 # Date: 2025-02-06
 # =============================================================================
@@ -28,15 +26,15 @@ dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 
 # Significance thresholds
 level1 <- 0.1   # Italic text
-level2 <- 0.05  # Normal text
+level2 <- 0.05  # Normal text  
 level3 <- 0.01  # Bold text
 
 # Colors (GO_MWU defaults)
 colors <- c("dodgerblue2", "firebrick1", "skyblue2", "lightcoral")
 
 # Division labels
-division_labels <- c("BP" = "Biological Process",
-                     "CC" = "Cellular Component",
+division_labels <- c("BP" = "Biological Process", 
+                     "CC" = "Cellular Component", 
                      "MF" = "Molecular Function")
 
 # =============================================================================
@@ -149,8 +147,8 @@ load_division_data <- function(rep_file, mwu_file, dissim_file, division) {
     plot_data$font[plot_data$pval < level2] <- 1
     plot_data$font[plot_data$pval < level3] <- 2
     
-    plot_data$cex <- 0.65
-    plot_data$cex[plot_data$pval < level3] <- 0.78
+    plot_data$cex <- 0.72
+    plot_data$cex[plot_data$pval < level3] <- 0.85
     
     return(list(
         hc = hc,
@@ -161,47 +159,26 @@ load_division_data <- function(rep_file, mwu_file, dissim_file, division) {
 }
 
 # =============================================================================
-# HELPER: Load all divisions for one organism/season
-# =============================================================================
-
-load_organism_data <- function(data_dir, prefix, season) {
-    
-    divisions <- c("BP", "CC", "MF")
-    div_data <- list()
-    
-    for (div in divisions) {
-        if (prefix == "") {
-            rep_file <- file.path(data_dir, paste0(season, "_", div, "_representative_GOs.csv"))
-            mwu_file <- file.path(data_dir, paste0(season, "_", div, "_MWU_results.csv"))
-            dissim_file <- file.path(data_dir, paste0(season, "_", div, "_dissimilarity.csv"))
-        } else {
-            rep_file <- file.path(data_dir, paste0(prefix, "_", season, "_", div, "_representative_GOs.csv"))
-            mwu_file <- file.path(data_dir, paste0(prefix, "_", season, "_", div, "_MWU_results.csv"))
-            dissim_file <- file.path(data_dir, paste0(prefix, "_", season, "_", div, "_dissimilarity.csv"))
-        }
-        
-        div_data[[div]] <- load_division_data(rep_file, mwu_file, dissim_file, div)
-    }
-    
-    return(div_data)
-}
-
-# =============================================================================
-# HELPER: Draw dendrogram for one division
+# HELPER: Draw single division dendrogram (GO_MWU style)
 # =============================================================================
 
 draw_division_dendrogram <- function(hc, plot_data, y_offset, tree_x_start, tree_x_end, label_x) {
     
     n_terms <- nrow(plot_data)
     
+    # Y positions for terms (evenly spaced within this division)
     y_positions <- y_offset + seq(0.5, n_terms - 0.5, by = 1)
+    
+    # Map labels to y positions in dendrogram order
     obs_y <- setNames(y_positions, hc$labels[hc$order])
     
+    # Tree drawing
     max_height <- max(hc$height)
     if (max_height == 0) max_height <- 1
     
     tree_width <- tree_x_end - tree_x_start
     
+    # Track node positions
     node_y <- numeric(nrow(hc$merge))
     node_x <- numeric(nrow(hc$merge))
     
@@ -209,6 +186,7 @@ draw_division_dendrogram <- function(hc, plot_data, y_offset, tree_x_start, tree
         left <- hc$merge[j, 1]
         right <- hc$merge[j, 2]
         
+        # Get positions of children
         if (left < 0) {
             left_y <- obs_y[hc$labels[-left]]
             left_x <- tree_x_end
@@ -225,14 +203,19 @@ draw_division_dendrogram <- function(hc, plot_data, y_offset, tree_x_start, tree
             right_x <- node_x[right]
         }
         
+        # This node's position
         node_y[j] <- (left_y + right_y) / 2
         node_x[j] <- tree_x_end - (hc$height[j] / max_height) * tree_width
         
-        segments(node_x[j], left_y, left_x, left_y, col = "gray30", lwd = 0.6)
-        segments(node_x[j], right_y, right_x, right_y, col = "gray30", lwd = 0.6)
-        segments(node_x[j], left_y, node_x[j], right_y, col = "gray30", lwd = 0.6)
+        # Draw horizontal lines from node to children
+        segments(node_x[j], left_y, left_x, left_y, col = "gray30", lwd = 0.7)
+        segments(node_x[j], right_y, right_x, right_y, col = "gray30", lwd = 0.7)
+        
+        # Draw vertical connector
+        segments(node_x[j], left_y, node_x[j], right_y, col = "gray30", lwd = 0.7)
     }
     
+    # Draw labels - directly after tree
     for (i in 1:n_terms) {
         label <- sub(" activity$", "", plot_data$label[i])
         
@@ -247,35 +230,96 @@ draw_division_dendrogram <- function(hc, plot_data, y_offset, tree_x_start, tree
 }
 
 # =============================================================================
-# HELPER: Draw one column (organism)
+# MAIN: Plot combined dendrogram
 # =============================================================================
 
-draw_organism_column <- function(div_data, x_offset, x_width, total_height, gap_size) {
+plot_combined_dendrogram <- function(data_dir, prefix, season, organism, output_file) {
+    
+    cat("\n=== Creating combined plot:", organism, season, "===\n")
     
     divisions <- c("BP", "CC", "MF")
-    valid_divs <- divisions[!sapply(div_data[divisions], is.null)]
+    div_data <- list()
     
-    if (length(valid_divs) == 0) return(NULL)
+    for (div in divisions) {
+        if (prefix == "") {
+            rep_file <- file.path(data_dir, paste0(season, "_", div, "_representative_GOs.csv"))
+            mwu_file <- file.path(data_dir, paste0(season, "_", div, "_MWU_results.csv"))
+            dissim_file <- file.path(data_dir, paste0(season, "_", div, "_dissimilarity.csv"))
+        } else {
+            rep_file <- file.path(data_dir, paste0(prefix, "_", season, "_", div, "_representative_GOs.csv"))
+            mwu_file <- file.path(data_dir, paste0(prefix, "_", season, "_", div, "_MWU_results.csv"))
+            dissim_file <- file.path(data_dir, paste0(prefix, "_", season, "_", div, "_dissimilarity.csv"))
+        }
+        
+        cat("  Loading", div, "...\n")
+        div_data[[div]] <- load_division_data(rep_file, mwu_file, dissim_file, div)
+        
+        if (!is.null(div_data[[div]])) {
+            cat("    Terms:", div_data[[div]]$n_terms, "\n")
+        }
+    }
     
-    # Tree coordinates within this column
-    tree_x_start <- x_offset + 0.01 * x_width
-    tree_x_end <- x_offset + 0.12 * x_width
-    label_x <- x_offset + 0.13 * x_width
+    valid_divs <- divisions[!sapply(div_data, is.null)]
+    if (length(valid_divs) == 0) {
+        cat("  No valid divisions - skipping\n")
+        return(NULL)
+    }
+    
+    # Calculate dimensions
+    total_terms <- sum(sapply(div_data[valid_divs], function(x) x$n_terms))
+    n_gaps <- length(valid_divs) - 1
+    gap_size <- 1.2  # Space between divisions
+    total_height <- total_terms + n_gaps * gap_size + 0.5  # Small buffer at top
+    
+    cat("  Total terms:", total_terms, "\n")
+    
+    # Figure dimensions - tight spacing
+    line_height <- 0.19  # inches per unit
+    fig_height <- max(3.5, total_height * line_height)
+    fig_width <- 7  # Reduced width for tighter margins
+    
+    cat("  Figure size:", fig_width, "x", fig_height, "\n")
+    
+    # Create PDF
+    pdf(output_file, width = fig_width, height = fig_height)
+    
+    par(mar = c(0.5, 0.5, 0.5, 0.5))
+    
+    # Coordinates
+    tree_x_start <- 0.01   # Left edge of tree
+    tree_x_end <- 0.14     # Right edge of tree (where leaves are)
+    label_x <- 0.15        # Where labels start (small gap from tree)
+    
+    # Set up plot
+    plot(0, 0, type = "n", 
+         xlim = c(0, 1), 
+         ylim = c(0, total_height),
+         axes = FALSE, xlab = "", ylab = "")
+    
+    # Legend at TOP right (draw first so it's behind if anything overlaps)
+    legend_x <- 0.98
+    legend_y <- total_height - 0.3
+    line_spacing <- 0.45
+    
+    text(legend_x, legend_y, expression(bold("p < 0.01")), cex = 0.6, adj = c(0, 0.5))
+    text(legend_x, legend_y - line_spacing, "p < 0.05", cex = 0.6, adj = c(0, 0.5), font = 1)
+    text(legend_x, legend_y - 2*line_spacing, expression(italic("p < 0.1")), cex = 0.6, adj = c(0, 0.5), col = "grey50")
     
     # Draw divisions from top to bottom
-    y_cursor <- total_height - 0.5
+    y_cursor <- total_height - 0.5  # Start from top
     
     for (i in seq_along(valid_divs)) {
         div <- valid_divs[i]
         d <- div_data[[div]]
         n_terms <- d$n_terms
         
+        # Y offset for this division (terms go from y_offset to y_offset + n_terms)
         y_offset <- y_cursor - n_terms
         
-        # Division label
-        text(tree_x_start, y_cursor + 0.15,
+        # Division label above dendrogram
+        text(tree_x_start, y_cursor + 0.15, 
              division_labels[div],
-             font = 2, cex = 0.55, adj = c(0, 0), col = "gray25")
+             font = 2, cex = 0.65, adj = c(0, 0), col = "gray25")
         
         # Draw dendrogram
         draw_division_dendrogram(
@@ -287,112 +331,9 @@ draw_organism_column <- function(div_data, x_offset, x_width, total_height, gap_
             label_x = label_x
         )
         
+        # Move cursor down for next division
         y_cursor <- y_offset - gap_size
     }
-    
-    return(TRUE)
-}
-
-# =============================================================================
-# MAIN: Plot combined host + symbiont dendrogram
-# =============================================================================
-
-plot_combined_season <- function(season, output_file) {
-    
-    cat("\n=== Creating combined plot for", season, "===\n")
-    
-    # Load data for both organisms
-    cat("  Loading Host data...\n")
-    host_data <- load_organism_data(host_dir, "", season)
-    
-    cat("  Loading Symbiont data...\n")
-    symbiont_data <- load_organism_data(symbiont_dir, "symbiont", season)
-    
-    # Count terms for each organism
-    divisions <- c("BP", "CC", "MF")
-    
-    host_valid <- divisions[!sapply(host_data[divisions], is.null)]
-    symbiont_valid <- divisions[!sapply(symbiont_data[divisions], is.null)]
-    
-    host_terms <- sum(sapply(host_data[host_valid], function(x) x$n_terms))
-    symbiont_terms <- sum(sapply(symbiont_data[symbiont_valid], function(x) x$n_terms))
-    
-    cat("  Host terms:", host_terms, "\n")
-    cat("  Symbiont terms:", symbiont_terms, "\n")
-    
-    # Use max terms to determine height
-    max_terms <- max(host_terms, symbiont_terms)
-    n_gaps <- max(length(host_valid), length(symbiont_valid)) - 1
-    gap_size <- 1.2
-    total_height <- max_terms + n_gaps * gap_size + 2  # +2 for title space
-    
-    # Figure dimensions
-    line_height <- 0.18
-    fig_height <- max(4, total_height * line_height)
-    fig_width <- 14  # Wide for two columns
-    
-    cat("  Figure size:", fig_width, "x", fig_height, "\n")
-    
-    # Create PDF
-    pdf(output_file, width = fig_width, height = fig_height)
-    
-    par(mar = c(0.5, 0.5, 0.5, 0.5))
-    
-    # Set up plot
-    plot(0, 0, type = "n",
-         xlim = c(0, 1),
-         ylim = c(0, total_height),
-         axes = FALSE, xlab = "", ylab = "")
-    
-    # Column widths
-    col_width <- 0.48
-    col1_start <- 0.01
-    col2_start <- 0.51
-    
-    # --- Column titles ---
-    title_y <- total_height - 0.3
-    
-    # Panel A - Host
-    text(col1_start, title_y, "A", font = 2, cex = 1.2, adj = c(0, 0.5))
-    text(col1_start + 0.03, title_y, expression(italic("M. capitata")~"(host)"), 
-         font = 1, cex = 0.9, adj = c(0, 0.5))
-    
-    # Panel B - Symbiont
-    text(col2_start, title_y, "B", font = 2, cex = 1.2, adj = c(0, 0.5))
-    text(col2_start + 0.03, title_y, expression(italic("D. trenchii")~"(symbiont)"), 
-         font = 1, cex = 0.9, adj = c(0, 0.5))
-    
-    # Adjust total_height for drawing (below titles)
-    draw_height <- total_height - 1.5
-    
-    # --- Draw Host column ---
-    cat("  Drawing Host column...\n")
-    draw_organism_column(
-        div_data = host_data,
-        x_offset = col1_start,
-        x_width = col_width,
-        total_height = draw_height,
-        gap_size = gap_size
-    )
-    
-    # --- Draw Symbiont column ---
-    cat("  Drawing Symbiont column...\n")
-    draw_organism_column(
-        div_data = symbiont_data,
-        x_offset = col2_start,
-        x_width = col_width,
-        total_height = draw_height,
-        gap_size = gap_size
-    )
-    
-    # --- Legend at top right ---
-    legend_x <- 0.92
-    legend_y <- total_height - 0.5
-    line_spacing <- 0.4
-    
-    text(legend_x, legend_y, expression(bold("p < 0.01")), cex = 0.55, adj = c(0, 0.5))
-    text(legend_x, legend_y - line_spacing, "p < 0.05", cex = 0.55, adj = c(0, 0.5), font = 1)
-    text(legend_x, legend_y - 2*line_spacing, expression(italic("p < 0.1")), cex = 0.55, adj = c(0, 0.5), col = "grey50")
     
     dev.off()
     
@@ -401,29 +342,37 @@ plot_combined_season <- function(season, output_file) {
 }
 
 # =============================================================================
-# GENERATE COMBINED PLOTS
+# GENERATE ALL FOUR PLOTS
 # =============================================================================
 
 cat("\n", strrep("=", 60), "\n")
-cat("GENERATING COMBINED HOST + SYMBIONT DENDROGRAMS\n")
+cat("GENERATING COMBINED REPRESENTATIVE GO DENDROGRAMS\n")
 cat(strrep("=", 60), "\n")
 
-# Summer
-plot_combined_season(
-    season = "summer",
-    output_file = file.path(output_dir, "Fig4_Summer_Representative_GO_Dendrogram.pdf")
+plot_combined_dendrogram(
+    data_dir = host_dir, prefix = "", season = "summer", organism = "Host",
+    output_file = file.path(output_dir, "Fig4_Host_Summer_Representative_GO_Dendrogram.pdf")
 )
 
-# Winter
-plot_combined_season(
-    season = "winter",
-    output_file = file.path(output_dir, "Fig4_Winter_Representative_GO_Dendrogram.pdf")
+plot_combined_dendrogram(
+    data_dir = host_dir, prefix = "", season = "winter", organism = "Host",
+    output_file = file.path(output_dir, "Fig4_Host_Winter_Representative_GO_Dendrogram.pdf")
+)
+
+plot_combined_dendrogram(
+    data_dir = symbiont_dir, prefix = "symbiont", season = "summer", organism = "Symbiont",
+    output_file = file.path(output_dir, "Fig4_Symbiont_Summer_Representative_GO_Dendrogram.pdf")
+)
+
+plot_combined_dendrogram(
+    data_dir = symbiont_dir, prefix = "symbiont", season = "winter", organism = "Symbiont",
+    output_file = file.path(output_dir, "Fig4_Symbiont_Winter_Representative_GO_Dendrogram.pdf")
 )
 
 cat("\n", strrep("=", 60), "\n")
 cat("COMPLETE\n")
 cat(strrep("=", 60), "\n")
 
-output_files <- list.files(output_dir, pattern = "Fig4_.*_Representative_GO_Dendrogram\\.pdf$", full.names = TRUE)
+output_files <- list.files(output_dir, pattern = "Representative_GO_Dendrogram\\.pdf$", full.names = TRUE)
 cat("\nGenerated figures:\n")
 for (f in output_files) cat("  ", basename(f), "\n")
