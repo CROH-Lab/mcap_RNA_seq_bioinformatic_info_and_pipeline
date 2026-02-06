@@ -269,14 +269,14 @@ plot_combined_dendrogram <- function(data_dir, prefix, season, organism, output_
     total_terms <- sum(sapply(div_data[valid_divs], function(x) x$n_terms))
     n_gaps <- length(valid_divs) - 1
     gap_size <- 1.2  # Space between divisions
-    total_height <- total_terms + n_gaps * gap_size + 1  # +1 for legend space
+    total_height <- total_terms + n_gaps * gap_size + 0.5  # Small buffer at top
     
     cat("  Total terms:", total_terms, "\n")
     
     # Figure dimensions - tight spacing
     line_height <- 0.19  # inches per unit
     fig_height <- max(3.5, total_height * line_height)
-    fig_width <- 9.5
+    fig_width <- 7.5  # Reduced width for tighter margins
     
     cat("  Figure size:", fig_width, "x", fig_height, "\n")
     
@@ -287,14 +287,23 @@ plot_combined_dendrogram <- function(data_dir, prefix, season, organism, output_
     
     # Coordinates
     tree_x_start <- 0.01   # Left edge of tree
-    tree_x_end <- 0.12     # Right edge of tree (where leaves are)
-    label_x <- 0.125       # Where labels start (small gap from tree)
+    tree_x_end <- 0.14     # Right edge of tree (where leaves are)
+    label_x <- 0.15        # Where labels start (small gap from tree)
     
     # Set up plot
     plot(0, 0, type = "n", 
          xlim = c(0, 1), 
          ylim = c(0, total_height),
          axes = FALSE, xlab = "", ylab = "")
+    
+    # Legend at TOP right (draw first so it's behind if anything overlaps)
+    legend_x <- 0.75
+    legend_y <- total_height - 0.3
+    line_spacing <- 0.45
+    
+    text(legend_x, legend_y, expression(bold("p < 0.01")), cex = 0.6, adj = c(0, 0.5))
+    text(legend_x, legend_y - line_spacing, "p < 0.05", cex = 0.6, adj = c(0, 0.5), font = 1)
+    text(legend_x, legend_y - 2*line_spacing, expression(italic("p < 0.1")), cex = 0.6, adj = c(0, 0.5), col = "grey50")
     
     # Draw divisions from top to bottom
     y_cursor <- total_height - 0.5  # Start from top
@@ -325,15 +334,6 @@ plot_combined_dendrogram <- function(data_dir, prefix, season, organism, output_
         # Move cursor down for next division
         y_cursor <- y_offset - gap_size
     }
-    
-    # Legend at bottom right
-    legend_x <- 0.82
-    legend_y <- 0.9
-    line_spacing <- 0.45
-    
-    text(legend_x, legend_y + line_spacing, expression(bold("p < 0.01")), cex = 0.6, adj = c(0, 0.5))
-    text(legend_x, legend_y, "p < 0.05", cex = 0.6, adj = c(0, 0.5), font = 1)
-    text(legend_x, legend_y - line_spacing, expression(italic("p < 0.1")), cex = 0.6, adj = c(0, 0.5), col = "grey50")
     
     dev.off()
     
