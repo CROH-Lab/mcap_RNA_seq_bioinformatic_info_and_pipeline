@@ -149,8 +149,8 @@ load_division_data <- function(rep_file, mwu_file, dissim_file, division) {
     plot_data$font[plot_data$pval < level2] <- 1
     plot_data$font[plot_data$pval < level3] <- 2
     
-    plot_data$cex <- 0.65
-    plot_data$cex[plot_data$pval < level3] <- 0.78
+    plot_data$cex <- 0.72
+    plot_data$cex[plot_data$pval < level3] <- 0.85
     
     return(list(
         hc = hc,
@@ -275,7 +275,7 @@ draw_organism_column <- function(div_data, x_offset, x_width, total_height, gap_
         # Division label
         text(tree_x_start, y_cursor + 0.15,
              division_labels[div],
-             font = 2, cex = 0.55, adj = c(0, 0), col = "gray25")
+             font = 2, cex = 0.62, adj = c(0, 0), col = "gray25")
         
         # Draw dendrogram
         draw_division_dendrogram(
@@ -329,7 +329,7 @@ plot_combined_season <- function(season, output_file) {
     # Figure dimensions
     line_height <- 0.18
     fig_height <- max(4, total_height * line_height)
-    fig_width <- 14  # Wide for two columns
+    fig_width <- 13  # Slightly narrower
     
     cat("  Figure size:", fig_width, "x", fig_height, "\n")
     
@@ -344,23 +344,23 @@ plot_combined_season <- function(season, output_file) {
          ylim = c(0, total_height),
          axes = FALSE, xlab = "", ylab = "")
     
-    # Column widths
-    col_width <- 0.48
+    # Column widths - closer together
+    col_width <- 0.46
     col1_start <- 0.01
-    col2_start <- 0.51
+    col2_start <- 0.47  # Moved closer to host column
     
     # --- Column titles ---
     title_y <- total_height - 0.3
     
     # Panel A - Host
-    text(col1_start, title_y, "A", font = 2, cex = 1.2, adj = c(0, 0.5))
+    text(col1_start, title_y, "A", font = 2, cex = 1.3, adj = c(0, 0.5))
     text(col1_start + 0.03, title_y, expression(italic("M. capitata")~"(host)"), 
-         font = 1, cex = 0.9, adj = c(0, 0.5))
+         font = 1, cex = 1.0, adj = c(0, 0.5))
     
     # Panel B - Symbiont
-    text(col2_start, title_y, "B", font = 2, cex = 1.2, adj = c(0, 0.5))
+    text(col2_start, title_y, "B", font = 2, cex = 1.3, adj = c(0, 0.5))
     text(col2_start + 0.03, title_y, expression(italic("D. trenchii")~"(symbiont)"), 
-         font = 1, cex = 0.9, adj = c(0, 0.5))
+         font = 1, cex = 1.0, adj = c(0, 0.5))
     
     # Adjust total_height for drawing (below titles)
     draw_height <- total_height - 1.5
@@ -385,14 +385,14 @@ plot_combined_season <- function(season, output_file) {
         gap_size = gap_size
     )
     
-    # --- Legend at top right ---
-    legend_x <- 0.92
+    # --- Legend at top right (tighter to content) ---
+    legend_x <- 0.88
     legend_y <- total_height - 0.5
     line_spacing <- 0.4
     
-    text(legend_x, legend_y, expression(bold("p < 0.01")), cex = 0.55, adj = c(0, 0.5))
-    text(legend_x, legend_y - line_spacing, "p < 0.05", cex = 0.55, adj = c(0, 0.5), font = 1)
-    text(legend_x, legend_y - 2*line_spacing, expression(italic("p < 0.1")), cex = 0.55, adj = c(0, 0.5), col = "grey50")
+    text(legend_x, legend_y, expression(bold("p < 0.01")), cex = 0.6, adj = c(0, 0.5))
+    text(legend_x, legend_y - line_spacing, "p < 0.05", cex = 0.6, adj = c(0, 0.5), font = 1)
+    text(legend_x, legend_y - 2*line_spacing, expression(italic("p < 0.1")), cex = 0.6, adj = c(0, 0.5), col = "grey50")
     
     dev.off()
     
