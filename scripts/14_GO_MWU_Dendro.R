@@ -276,7 +276,7 @@ plot_combined_dendrogram <- function(data_dir, prefix, season, organism, output_
     # Figure dimensions - tight spacing
     line_height <- 0.19  # inches per unit
     fig_height <- max(3.5, total_height * line_height)
-    fig_width <- 5  # Reduced width for tighter margins
+    fig_width <- 7  # Reduced width for tighter margins
     
     cat("  Figure size:", fig_width, "x", fig_height, "\n")
     
@@ -297,7 +297,7 @@ plot_combined_dendrogram <- function(data_dir, prefix, season, organism, output_
          axes = FALSE, xlab = "", ylab = "")
     
     # Legend at TOP right (draw first so it's behind if anything overlaps)
-    legend_x <- 0.95
+    legend_x <- 1.5
     legend_y <- total_height - 0.3
     line_spacing <- 0.45
     
