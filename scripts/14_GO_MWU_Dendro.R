@@ -232,8 +232,9 @@ plot_combined_dendrogram <- function(data_dir, prefix, season, organism, output_
     # Create PDF
     pdf(output_file, width = fig_width, height = fig_height)
     
-    # Set up layout: tree | labels | (small margin)
-    layout(matrix(c(1, 2), 1, 2, byrow = TRUE), widths = c(0.35, 0.65))
+    # Set up layout: tree | labels
+    # Tree panel is narrower now that trees are more compact
+    layout(matrix(c(1, 2), 1, 2, byrow = TRUE), widths = c(0.28, 0.72))
     
     # Collect all data for plotting
     all_labels <- c()
@@ -294,7 +295,12 @@ plot_combined_dendrogram <- function(data_dir, prefix, season, organism, output_
         # Simple approach: draw phylo tree horizontally
         hc <- d$hc
         
-        # Normalize merge heights to fit in x = [0, 0.9]
+        # Tree drawing parameters - keep tree compact on left side
+        tree_left <- 0.15    # Left margin for tree
+        tree_right <- 0.65   # Right edge of tree (leaves connect here)
+        tree_width <- tree_right - tree_left
+        
+        # Normalize merge heights
         max_height <- max(hc$height)
         if (max_height == 0) max_height <- 1
         
@@ -324,20 +330,20 @@ plot_combined_dendrogram <- function(data_dir, prefix, season, organism, output_
             # Node y is midpoint of children
             node_y[j] <- (left_y + right_y) / 2
             
-            # X position based on height (reversed so root is at left)
-            x_pos <- 0.9 - (hc$height[j] / max_height) * 0.85
+            # X position based on height (root at left, leaves at right)
+            x_pos <- tree_right - (hc$height[j] / max_height) * tree_width
             
             # Get x positions of children
             if (left < 0) {
-                left_x <- 0.9
+                left_x <- tree_right
             } else {
-                left_x <- 0.9 - (hc$height[left] / max_height) * 0.85
+                left_x <- tree_right - (hc$height[left] / max_height) * tree_width
             }
             
             if (right < 0) {
-                right_x <- 0.9
+                right_x <- tree_right
             } else {
-                right_x <- 0.9 - (hc$height[right] / max_height) * 0.85
+                right_x <- tree_right - (hc$height[right] / max_height) * tree_width
             }
             
             # Draw horizontal lines to children
@@ -348,9 +354,9 @@ plot_combined_dendrogram <- function(data_dir, prefix, season, organism, output_
             segments(x_pos, left_y, x_pos, right_y, col = "gray40", lwd = 0.8)
         }
         
-        # Add division label (top left of this section)
-        text(0.02, y_end - 0.3, division_labels[div], 
-             font = 2, cex = 0.75, adj = c(0, 1), col = "gray30")
+        # Add division label at top left, outside the tree area
+        text(0.02, y_end - 0.5, division_labels[div], 
+             font = 2, cex = 0.7, adj = c(0, 1), col = "gray30")
         
         # Add subtle separator line between divisions (except after last)
         if (i < length(valid_divs)) {
