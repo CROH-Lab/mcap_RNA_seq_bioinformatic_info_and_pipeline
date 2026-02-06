@@ -4,7 +4,7 @@
 "host","MF","Ion Transport",2,0.0185511642097998
 "host","BP","Oxidative Phosphorylation",1,8.295546503277e-08
 "host","BP","Protein Phosphorylation",1,0.0475948316619792
-"host","BP","Proton Transport",1,0.0452689566761511
+"host","BP","Proton Transport",2,0.0288166445314886
 "host","CC","Proton Transport",2,0.0230609537758845
 "host","MF","Proton Transport",1,7.00119531847492e-05
 "symbiont","MF","Calcium Homeostasis",1,0.0324354907951206

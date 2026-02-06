@@ -4,7 +4,6 @@
 "host","BP","obsolete cell morphogenesis involved in differentiation",2.15539412661644e-05
 "host","BP","regulation of cell morphogenesis",0.00077637463671369
 "host","BP","nucleoside monophosphate metabolic process",0.00159443570281655
-"host","BP","positive regulation of voltage-gated potassium channel activity",0.00327507107319265
 "host","MF","outward rectifier potassium channel activity",0.00403958960339568
 "host","BP","obsolete regulation of cell morphogenesis involved in differentiation",0.00473810433341574
 "host","BP","tube morphogenesis",0.00658758774986321
@@ -24,7 +23,7 @@
 "host","BP","ribose phosphate metabolic process",0.0427858090956527
 "symbiont","MF","potassium channel activity",0.000285848680963393
 "symbiont","BP","anatomical structure formation involved in morphogenesis",0.000316388615470735
-"symbiont","CC","potassium channel complex",0.00063497613783111
+"symbiont","CC","voltage-gated potassium channel complex",0.00063497613783111
 "symbiont","MF","3',5'-cyclic-AMP phosphodiesterase activity",0.00221530516994667
 "symbiont","CC","proteasome core complex, alpha-subunit complex",0.00282838146673431
 "symbiont","BP","cellular component assembly involved in morphogenesis",0.00290910843248913
@@ -33,7 +32,8 @@
 "symbiont","BP","cellular anatomical entity morphogenesis",0.00410497293235443
 "symbiont","MF","phosphatidylcholine transporter activity",0.00548188296627977
 "symbiont","MF","phosphotransferase activity, carboxyl group as acceptor",0.00555083251926591
-"symbiont","BP","nucleoside triphosphate biosynthetic process",0.00786634453306966
+"symbiont","CC","azurophil granule",0.00657425982826123
+"symbiont","BP","nucleoside monophosphate biosynthetic process",0.00786634453306966
 "symbiont","BP","purine nucleoside triphosphate biosynthetic process",0.00942278117003277
 "symbiont","CC","azurophil granule lumen",0.00978940235805767
 "symbiont","MF","delayed rectifier potassium channel activity",0.0119429462962718
@@ -45,7 +45,7 @@
 "symbiont","MF","phosphatidylinositol-4,5-bisphosphate binding",0.0244369395229933
 "symbiont","MF","phosphorus-oxygen lyase activity",0.0258531116581516
 "symbiont","BP","nucleoside triphosphate metabolic process",0.0265538885140157
-"symbiont","BP","cardiac muscle hypertrophy",0.0273874977569641
+"symbiont","BP","striated muscle hypertrophy",0.0273874977569641
 "symbiont","MF","phosphatase binding",0.0274355950128245
 "symbiont","MF","phospholipid binding",0.0290518789952413
 "symbiont","BP","autophagosome maturation",0.0321252675604871
@@ -53,5 +53,6 @@
 "symbiont","BP","photosynthetic electron transport chain",0.0456677018198866
 "symbiont","MF","phosphatidylinositol-3,4,5-trisphosphate binding",0.0458646433217963
 "symbiont","BP","negative regulation of cell cycle phase transition",0.0478855216466172
+"symbiont","BP","response to phenylpropanoid",0.0489753062665171
 "symbiont","BP","regulation of photoperiodism, flowering",0.0489753062665171
 "symbiont","BP","phosphatidylinositol-mediated signaling",0.049363923816549

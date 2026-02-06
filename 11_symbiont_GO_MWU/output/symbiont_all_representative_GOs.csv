@@ -1,67 +1,92 @@
 "season","division","term","direction","pval","nseqs","cluster"
 "summer","BP","cytoplasmic translation","down",1.00000186342551e-15,14,1
-"summer","BP","secondary metabolite biosynthetic process","up",0.0012028306723451,0,3
-"summer","BP","positive regulation of phospholipid metabolic process","up",0.00191830072470569,2,4
-"summer","BP","cellular homeostasis","up",0.00447030069725128,15,5
-"summer","BP","sulfur amino acid metabolic process","up",0.00465723536000499,3,2
-"summer","BP","disaccharide biosynthetic process","up",0.00523405641783305,2,6
+"summer","BP","response to cadmium ion","up",0.000819321965778178,1,2
+"summer","BP","positive regulation of phospholipid metabolic process","up",0.00191830072470569,2,7
+"summer","BP","developmental pigmentation","up",0.00439919204300161,2,10
+"summer","BP","negative regulation of protein polymerization","up",0.00447030069725128,0,3
+"summer","BP","disaccharide biosynthetic process","up",0.00523405641783305,2,4
+"summer","BP","metal ion transport","up",0.0489153352315809,11,5
+"summer","BP","dauer entry","up",0.0521110412791415,1,9
+"summer","BP","pancreas development","up",0.0665073137189335,1,8
+"summer","BP","pyrimidine nucleoside diphosphate metabolic process","down",0.0992163824909365,2,6
 "summer","MF","structural constituent of ribosome","down",1e-15,12,1
-"summer","MF","ATP-dependent activity","up",0.000252214654488132,21,2
-"summer","MF","ligase activity","up",0.000846698198709877,14,6
-"summer","MF","phosphatidylinositol transfer activity","up",0.0302251073987561,1,4
-"summer","MF","calcium ion transmembrane transporter activity","up",0.0324354907951216,2,5
-"summer","MF","aspartic-type peptidase activity","down",0.0462268463173149,4,3
-"summer","CC","cytosolic ribosome","down",1.00000000000132e-15,14,1
-"summer","CC","plastid stroma","up",0.00520126474670774,6,3
-"summer","CC","cell pole","up",0.0196664688039386,2,2
-"summer","CC","I band","up",0.0480035477181755,2,4
-"summer","CC","methyltransferase complex","down",0.0480035477181755,2,5
+"summer","MF","ATP-dependent activity","up",0.000252214654488132,21,3
+"summer","MF","ligase activity","up",0.000846698198709877,14,5
+"summer","MF","phosphatidylinositol bisphosphate binding","up",0.0173596260499801,0,7
+"summer","MF","calcium ion transmembrane transporter activity","up",0.0324354907951216,2,6
+"summer","MF","aspartic-type peptidase activity","down",0.0462268463173149,4,4
+"summer","MF","transferase activity, transferring nitrogenous groups","up",0.0805826996994505,1,8
+"summer","MF","protease binding","up",0.0812413589499975,3,2
+"summer","CC","cytosolic ribosome","down",1.00000000000132e-15,14,2
+"summer","CC","external encapsulating structure","down",0.00235767829208677,19,6
+"summer","CC","plastid stroma","up",0.00520126474670774,6,4
+"summer","CC","cell pole","up",0.0196664688039386,2,1
+"summer","CC","I band","up",0.0480035477181755,2,5
+"summer","CC","methyltransferase complex","down",0.0480035477181755,2,7
+"summer","CC","ciliary base","down",0.0835425812345527,1,10
+"summer","CC","lipid droplet","up",0.0885095944731043,1,3
+"summer","CC","respiratory chain complex II (succinate dehydrogenase)","up",0.0928180612869516,2,9
+"summer","CC","DNA polymerase complex","up",0.09404172903417,0,8
 "winter","BP","cytoplasmic translation","down",1e-15,86,1
-"winter","BP","monoatomic cation transport","up",8.20542138403829e-10,59,5
-"winter","BP","protein phosphorylation","up",2.0443077232237e-07,74,3
-"winter","BP","sporulation","up",3.473383987552e-06,16,10
-"winter","BP","protein folding","down",5.18413561069487e-06,42,9
-"winter","BP","protein-containing complex disassembly","down",9.34794563391426e-05,18,11
-"winter","BP","protein trimerization","down",0.00078910849735924,11,2
-"winter","BP","organic cation transport","up",0.00321284766928187,9,7
-"winter","BP","response to interleukin-4","down",0.00561311443942993,3,12
-"winter","BP","lipid homeostasis","up",0.00951729159681719,3,6
-"winter","BP","DNA geometric change","up",0.013362191273109,8,18
-"winter","BP","response to cadmium ion","down",0.015441655963492,19,16
-"winter","BP","pollen germination","up",0.0174117596825587,3,14
-"winter","BP","amine biosynthetic process","up",0.0213533517914616,6,8
-"winter","BP","inflorescence development","down",0.024271122989819,6,15
-"winter","BP","mitochondrial protein catabolic process","up",0.024271122989819,2,17
-"winter","BP","mitochondrial respiratory chain complex assembly","down",0.0265538885140167,2,19
-"winter","BP","peptidyl-proline modification","down",0.0305568425749777,13,4
-"winter","BP","photosynthetic electron transport chain","down",0.0456677018198876,4,13
+"winter","BP","protein-RNA complex organization","down",5.34110320377736e-11,50,4
+"winter","BP","monoatomic cation transport","up",8.20542138403829e-10,59,3
+"winter","BP","sporulation","up",3.473383987552e-06,16,14
+"winter","BP","cyclic nucleotide metabolic process","up",3.50922697317596e-06,8,11
+"winter","BP","lipid localization","up",5.17878270149896e-06,16,9
+"winter","BP","protein folding","down",5.18413561069487e-06,42,12
+"winter","BP","regulation of peptidase activity","down",0.000221870022282063,14,15
+"winter","BP","protein trimerization","down",0.00078910849735924,11,23
+"winter","BP","response to purine-containing compound","up",0.00177900404064614,18,8
+"winter","BP","meiotic cell cycle","up",0.00486351249873019,46,6
+"winter","BP","membrane protein proteolysis","up",0.00786727495773479,4,22
+"winter","BP","supramolecular fiber organization","up",0.0111425213402919,29,7
+"winter","BP","response to cadmium ion","down",0.015441655963492,19,19
+"winter","BP","pollen germination","up",0.0174117596825587,3,17
+"winter","BP","response to amphetamine","up",0.0214321586138616,1,10
+"winter","BP","seedling development","down",0.0232041532243075,7,13
+"winter","BP","mononuclear cell proliferation","down",0.024271122989819,5,16
+"winter","BP","inflorescence development","down",0.024271122989819,6,18
+"winter","BP","mitochondrial protein catabolic process","up",0.024271122989819,2,20
+"winter","BP","mitochondrial respiratory chain complex assembly","down",0.0265538885140167,2,21
+"winter","BP","primary amino compound biosynthetic process","down",0.0276378144375392,4,2
+"winter","BP","peptidyl-proline modification","down",0.0305568425749777,13,5
+"winter","BP","non-proteinogenic amino acid biosynthetic process","down",0.0489753062665181,4,25
 "winter","MF","structural constituent of ribosome","down",1e-15,63,4
 "winter","MF","ATP-dependent activity","up",2.32869085011382e-14,69,1
 "winter","MF","mRNA binding","down",1.98946570089607e-12,92,3
-"winter","MF","monoatomic ion transmembrane transporter activity","up",1.22949735168858e-11,67,13
-"winter","MF","phosphotransferase activity, alcohol group as acceptor","up",7.44614405147954e-08,65,11
-"winter","MF","ABC-type transporter activity","up",1.48801577224436e-05,6,14
-"winter","MF","protein kinase C inhibitor activity","down",0.000299897554807775,3,2
-"winter","MF","adenyl ribonucleotide binding","up",0.00111232859149953,77,7
-"winter","MF","phosphotransferase activity, carboxyl group as acceptor","down",0.00555083251926691,4,10
-"winter","MF","amylase activity","up",0.019142910261724,0,9
-"winter","MF","poly(A)-specific ribonuclease activity","down",0.0230863765269355,1,8
-"winter","MF","phosphatidylinositol-4,5-bisphosphate binding","up",0.0244369395229943,8,16
+"winter","MF","monoatomic ion transmembrane transporter activity","up",1.22949735168858e-11,67,17
+"winter","MF","phosphotransferase activity, alcohol group as acceptor","up",7.44614405147954e-08,65,15
+"winter","MF","ABC-type transporter activity","up",1.48801577224436e-05,6,18
+"winter","MF","protein kinase C inhibitor activity","down",0.000299897554807775,3,14
+"winter","MF","GTPase activity","down",0.0020903769637538,19,7
+"winter","MF","protein-containing complex binding","down",0.00212534271648674,85,2
+"winter","MF","3',5'-cyclic-AMP phosphodiesterase activity","up",0.00221530516994767,3,8
+"winter","MF","phosphotransferase activity, carboxyl group as acceptor","down",0.00555083251926691,4,13
+"winter","MF","amylase activity","up",0.019142910261724,0,12
+"winter","MF","poly(A)-specific ribonuclease activity","down",0.0230863765269355,1,11
+"winter","MF","phosphatidylinositol-4,5-bisphosphate binding","up",0.0244369395229943,8,20
 "winter","MF","peroxidase activity","down",0.0274355950128255,3,5
-"winter","MF","acetyltransferase activity","down",0.035398083915211,9,17
-"winter","MF","aminoacyl-tRNA ligase activity","down",0.0363304724556402,4,12
-"winter","MF","snRNP binding","down",0.0458646433217973,2,18
+"winter","MF","NAD binding","down",0.0286658819160978,3,22
+"winter","MF","acetyltransferase activity","down",0.035398083915211,9,9
+"winter","MF","aminoacyl-tRNA ligase activity","down",0.0363304724556402,4,16
 "winter","MF","oxidoreductase activity, acting on single donors with incorporation of molecular oxygen","up",0.0485930983482604,4,6
-"winter","MF","D-glucose binding","up",0.0485930983482604,2,15
-"winter","CC","ribosome","down",1e-15,77,2
-"winter","CC","spliceosomal complex","down",3.03439679213055e-06,33,4
-"winter","CC","plasmodesma","down",1.95081574780234e-05,64,3
-"winter","CC","mitochondrial protein-containing complex","down",0.000253721667458742,21,5
-"winter","CC","neuron projection membrane","up",0.000253721667458742,4,8
-"winter","CC","enzyme activator complex","down",0.000273578096385256,7,12
-"winter","CC","endosome","up",0.000729512434441728,42,6
-"winter","CC","intracellular protein-containing complex","down",0.00394353915166971,77,1
-"winter","CC","phragmoplast","up",0.00394676465178098,1,7
-"winter","CC","multi-eIF complex","down",0.00736174416240778,6,10
-"winter","CC","new mitotic spindle pole body","up",0.00821899900890147,3,11
-"winter","CC","thylakoid","down",0.0131187952258391,19,9
+"winter","MF","D-glucose binding","up",0.0485930983482604,2,19
+"winter","MF","oxidoreductase activity, acting on paired donors, with oxidation of a pair of donors resulting in the reduction of molecular oxygen to two molecules of water","up",0.0508243736344462,3,21
+"winter","MF","sequence-specific single stranded DNA binding","down",0.0559771932695181,1,24
+"winter","MF","xylosyltransferase activity","down",0.0651290423724862,1,23
+"winter","MF","serine-type exopeptidase activity","down",0.0724847130626918,0,10
+"winter","CC","ribosome","down",1e-15,77,3
+"winter","CC","spliceosomal complex","down",3.03439679213055e-06,33,6
+"winter","CC","plasmodesma","down",1.95081574780234e-05,64,5
+"winter","CC","mitochondrial protein-containing complex","down",0.000253721667458742,21,8
+"winter","CC","neuron projection membrane","up",0.000253721667458742,4,11
+"winter","CC","enzyme activator complex","down",0.000273578096385256,7,7
+"winter","CC","endosome","up",0.000729512434441728,42,1
+"winter","CC","I band","up",0.00147769364016382,15,2
+"winter","CC","phragmoplast","up",0.00394676465178098,1,9
+"winter","CC","extrinsic component of membrane","up",0.00607631955290432,9,12
+"winter","CC","multi-eIF complex","down",0.00736174416240778,6,13
+"winter","CC","new mitotic spindle pole body","up",0.00821899900890147,3,15
+"winter","CC","lateral element","up",0.0580765600518458,3,4
+"winter","CC","axonemal central apparatus","up",0.0635604901170293,3,10
+"winter","CC","protein-DNA complex","down",0.082097908116457,13,14

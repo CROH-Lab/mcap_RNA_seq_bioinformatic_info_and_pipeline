@@ -5,7 +5,7 @@
 "host","MF","Ion Transport",4,0.0182151720746104
 "host","MF","Metal Ion Homeostasis",1,0.0187864327104469
 "symbiont","CC","ATPase Activity",2,0.0211157024504422
-"symbiont","MF","ATPase Activity",2,0.0296395154687747
+"symbiont","MF","ATPase Activity",3,0.0203422832310857
 "symbiont","BP","Calcium Homeostasis",3,0.0159076167323766
 "symbiont","CC","Calcium Homeostasis",1,0.00201088168608599
 "symbiont","MF","Calcium Homeostasis",7,0.0134206268216497
