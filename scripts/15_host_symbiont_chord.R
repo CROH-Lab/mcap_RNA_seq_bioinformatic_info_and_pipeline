@@ -285,7 +285,7 @@ draw_chord_diagram <- function(shared_terms, season_label, show_legend = FALSE) 
     n_go <- length(go_sectors)
     n_div <- length(division_sectors)
     
-    go_gap <- ifelse(n_terms > 50, 0.75, 1.7)
+    go_gap <- ifelse(n_terms > 50, 0.8, 1.8)
     
     gaps <- c(
         rep(go_gap, n_go - 1),
@@ -326,7 +326,7 @@ draw_chord_diagram <- function(shared_terms, season_label, show_legend = FALSE) 
             if (sector.name %in% go_sectors) {
                 # GO ID label
                 clean_id <- shared_terms$go_id_clean[shared_terms$go_id == sector.name]
-                label_cex <- ifelse(n_terms > 80, 0.42, ifelse(n_terms > 50, 0.45, 0.6))
+                label_cex <- ifelse(n_terms > 80, 0.48, ifelse(n_terms > 50, 0.45, 0.6))
                 circos.text(
                     CELL_META$xcenter, 0.1,
                     as.character(clean_id),
@@ -389,9 +389,9 @@ draw_chord_diagram <- function(shared_terms, season_label, show_legend = FALSE) 
     
     # Legend (only if requested)
     if (show_legend) {
-        legend_x <- 0.85
-        legend_y <- 0.85
-        legend_spacing <- 0.1
+        legend_x <- 0.9
+        legend_y <- 0.80
+        legend_spacing <- 0.08
         
         text(legend_x, legend_y + 0.08, "Interaction Type", cex = 0.6, font = 2, adj = c(0, 0.5))
         
