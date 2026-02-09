@@ -30,8 +30,8 @@ sig_threshold <- 0.1
 
 # Interaction type colors
 interaction_colors <- c(
-    "Synergistic Up" = "#907AD6",
-    "Synergistic Down" = "#FBD1A2",
+    "Synergistic Up" = "#FBD1A2",
+    "Synergistic Down" = "#7DCFB6",
     "Antagonistic (Host Up)" = "#F79256",
     "Antagonistic (Host Down)" = "#6BBF59"
 )
