@@ -30,10 +30,10 @@ sig_threshold <- 0.1
 
 # Interaction type colors
 interaction_colors <- c(
-    "Synergistic Up" = "#E41A1C",
-    "Synergistic Down" = "#377EB8",
-    "Antagonistic (Host Up)" = "#90EE90",
-    "Antagonistic (Host Down)" = "#228B22"
+    "Synergistic Up" = "#00B2CA",
+    "Synergistic Down" = "#FBD1A2",
+    "Antagonistic (Host Up)" = "#F79256",
+    "Antagonistic (Host Down)" = "#6BBF59"
 )
 
 # Division full names
