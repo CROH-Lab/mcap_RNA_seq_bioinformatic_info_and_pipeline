@@ -1,12 +1,11 @@
 #!/usr/bin/env Rscript
 # =============================================================================
-# Chord Diagram: Host-Symbiont Shared GO Terms (Redesigned)
+# Chord Diagram: Host-Symbiont Shared GO Terms (Simplified)
 # =============================================================================
 # Layout:
-# - LEFT: Individual GO terms (labeled by GO ID), colored by division
-# - RIGHT: 6 nodes (Host_BP, Host_CC, Host_MF, Symbiont_BP, Symbiont_CC, Symbiont_MF)
-# - OUTER RING: Interaction type grouping (Synergistic Up/Down, Antagonistic)
-# - Each GO term has 2 chords: one to host division, one to symbiont division
+# - LEFT: Individual GO terms (labeled by GO ID), colored by interaction type
+# - RIGHT: 3 nodes (BP, MF, CC)
+# - Chords connect GO terms to their division, colored by interaction type
 #
 # Author: Claude (for David Armstrong)
 # Date: 2025-02-06
@@ -27,7 +26,7 @@ dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 
 sig_threshold <- 0.1
 
-# Interaction type colors (for outer ring)
+# Interaction type colors
 interaction_colors <- c(
     "Synergistic Up" = "#E41A1C",
     "Synergistic Down" = "#377EB8",
@@ -35,21 +34,18 @@ interaction_colors <- c(
     "Antagonistic (Host Down)" = "#228B22"
 )
 
-# Division colors
+# Division colors (neutral grey tones for the 3 nodes)
 division_colors <- c(
-    "BP" = "#FDB462",
-    "CC" = "#80B1D3",
-    "MF" = "#FB8072"
+    "BP" = "#D9D9D9",
+    "CC" = "#BDBDBD",
+    "MF" = "#969696"
 )
 
-# Organism-division colors (for right side nodes)
-org_division_colors <- c(
-    "Host_BP" = "#FDB462",
-    "Host_CC" = "#80B1D3", 
-    "Host_MF" = "#FB8072",
-    "Symbiont_BP" = "#B3DE69",
-    "Symbiont_CC" = "#BEBADA",
-    "Symbiont_MF" = "#FCCDE5"
+# Division full names
+division_names <- c(
+    "BP" = "Biological\nProcess",
+    "CC" = "Cellular\nComponent",
+    "MF" = "Molecular\nFunction"
 )
 
 # =============================================================================
@@ -117,15 +113,16 @@ classify_shared_terms <- function(host_terms, symbiont_terms) {
                 host_direction == "up" & symbiont_direction == "down" ~ "Antagonistic (Host Up)",
                 host_direction == "down" & symbiont_direction == "up" ~ "Antagonistic (Host Down)"
             ),
-            # Order factor for sorting
             interaction_order = case_when(
                 interaction_type == "Synergistic Up" ~ 1,
                 interaction_type == "Synergistic Down" ~ 2,
                 interaction_type == "Antagonistic (Host Up)" ~ 3,
                 interaction_type == "Antagonistic (Host Down)" ~ 4
-            )
+            ),
+            # Use host division as the primary division for connecting
+            division = host_division
         ) %>%
-        arrange(interaction_order, host_division, go_id)
+        arrange(interaction_order, division, go_id)
     
     return(shared_data)
 }
@@ -175,20 +172,6 @@ create_supplementary_table <- function(shared_terms, season, output_dir) {
                           "Antagonistic (Host Up)", "Antagonistic (Host Down)")
             )
         ) %>%
-        data_color(
-            columns = `Host Division`,
-            colors = scales::col_factor(
-                palette = c("#FDB462", "#80B1D3", "#FB8072"),
-                domain = c("BP", "CC", "MF")
-            )
-        ) %>%
-        data_color(
-            columns = `Symbiont Division`,
-            colors = scales::col_factor(
-                palette = c("#FDB462", "#80B1D3", "#FB8072"),
-                domain = c("BP", "CC", "MF")
-            )
-        ) %>%
         tab_style(
             style = cell_text(weight = "bold"),
             locations = cells_column_labels()
@@ -203,12 +186,10 @@ create_supplementary_table <- function(shared_terms, season, output_dir) {
             heading.subtitle.font.size = 12
         )
     
-    # Save as HTML
     html_file <- file.path(output_dir, paste0("Table_S_", season, "_Shared_GO_Terms.html"))
     gtsave(gt_table, html_file)
     cat("  Saved:", basename(html_file), "\n")
     
-    # Save as CSV
     csv_file <- file.path(output_dir, paste0("Table_S_", season, "_Shared_GO_Terms.csv"))
     write.csv(table_data, csv_file, row.names = FALSE)
     cat("  Saved:", basename(csv_file), "\n")
@@ -233,7 +214,6 @@ create_chord_diagram <- function(season, output_file) {
     symbiont_terms <- load_significant_terms(symbiont_dir, "symbiont", season, sig_threshold)
     cat("    Significant terms:", nrow(symbiont_terms), "\n")
     
-    # Classify shared terms
     cat("  Identifying shared terms...\n")
     shared_terms <- classify_shared_terms(host_terms, symbiont_terms)
     cat("    Shared terms:", nrow(shared_terms), "\n")
@@ -243,7 +223,6 @@ create_chord_diagram <- function(season, output_file) {
         return(NULL)
     }
     
-    # Print summary
     cat("    - Synergistic Up:", sum(shared_terms$interaction_type == "Synergistic Up"), "\n")
     cat("    - Synergistic Down:", sum(shared_terms$interaction_type == "Synergistic Down"), "\n")
     cat("    - Antagonistic (Host Up):", sum(shared_terms$interaction_type == "Antagonistic (Host Up)"), "\n")
@@ -259,39 +238,33 @@ create_chord_diagram <- function(season, output_file) {
     
     n_terms <- nrow(shared_terms)
     
-    # Sectors: GO terms on left, organism-divisions on right
-    # GO term sectors are small and equal-sized
-    # Division sectors are sized by how many connections they receive
-    
     # Count connections to each division
-    host_div_counts <- shared_terms %>% count(host_division) %>% 
-        mutate(sector = paste0("Host_", host_division))
-    symbiont_div_counts <- shared_terms %>% count(symbiont_division) %>% 
-        mutate(sector = paste0("Symbiont_", symbiont_division))
+    div_counts <- shared_terms %>% count(division)
     
-    # Create sector sizes
-    go_term_size <- 1  # Each GO term gets size 1
+    # Sector sizes
+    go_term_size <- 1
     
-    # Sector order: GO terms (ordered by interaction type), then divisions
+    # Sector order: Divisions on LEFT (BP, CC, MF), GO terms on RIGHT
+    # But we want GO terms on LEFT - so we reverse the start degree
+    division_sectors <- c("BP", "CC", "MF")
+    division_sectors <- division_sectors[division_sectors %in% div_counts$division]
     go_sectors <- shared_terms$go_id
     
-    # Right side: Host divisions then Symbiont divisions
-    right_sectors <- c("Host_BP", "Host_CC", "Host_MF", "Symbiont_MF", "Symbiont_CC", "Symbiont_BP")
-    right_sectors <- right_sectors[right_sectors %in% c(host_div_counts$sector, symbiont_div_counts$sector)]
-    
-    all_sectors <- c(go_sectors, right_sectors)
+    # Order: GO terms first (will be on left with start.degree = 270), then divisions
+    all_sectors <- c(go_sectors, division_sectors)
     
     # Sector sizes
     sector_sizes <- c(
         setNames(rep(go_term_size, n_terms), go_sectors),
-        setNames(host_div_counts$n, host_div_counts$sector),
-        setNames(symbiont_div_counts$n, symbiont_div_counts$sector)
+        setNames(div_counts$n[match(division_sectors, div_counts$division)], division_sectors)
     )
-    sector_sizes <- sector_sizes[all_sectors]
     
-    # Sector colors
-    go_colors <- setNames(division_colors[shared_terms$host_division], go_sectors)
-    sector_colors <- c(go_colors, org_division_colors[right_sectors])
+    # Sector colors - GO terms colored by interaction type
+    go_colors <- setNames(
+        interaction_colors[shared_terms$interaction_type],
+        go_sectors
+    )
+    sector_colors <- c(go_colors, division_colors[division_sectors])
     
     # ==========================================================================
     # Create the diagram
@@ -299,26 +272,25 @@ create_chord_diagram <- function(season, output_file) {
     
     cat("  Generating chord diagram...\n")
     
-    pdf(output_file, width = 12, height = 10)
+    pdf(output_file, width = 11, height = 9)
     
     circos.clear()
     
-    # Calculate gaps
-    # Small gaps between GO terms, larger gap between GO terms and divisions
+    # Gaps: small between GO terms, large between GO terms and divisions
     n_go <- length(go_sectors)
-    n_right <- length(right_sectors)
+    n_div <- length(division_sectors)
     
     gaps <- c(
-        rep(0.5, n_go - 1),  # Small gaps between GO terms
-        15,                   # Large gap between GO terms and divisions
-        rep(3, n_right - 1), # Medium gaps between divisions
-        15                    # Large gap back to GO terms
+        rep(0.3, n_go - 1),   # Tiny gaps between GO terms
+        20,                    # Large gap between GO terms and divisions
+        rep(4, n_div - 1),    # Medium gaps between divisions
+        20                     # Large gap back to GO terms
     )
     
     circos.par(
-        start.degree = 90,
+        start.degree = 270,    # Start from bottom, GO terms will be on left
         gap.degree = gaps,
-        track.margin = c(0.01, 0.01),
+        track.margin = c(0.005, 0.005),
         cell.padding = c(0, 0, 0, 0)
     )
     
@@ -332,97 +304,52 @@ create_chord_diagram <- function(season, output_file) {
     )
     
     # --------------------------------------------------------------------------
-    # Track 1: Outer ring - Interaction type (only for GO terms)
-    # --------------------------------------------------------------------------
-    
-    circos.track(
-        ylim = c(0, 1),
-        track.height = 0.06,
-        bg.border = NA,
-        panel.fun = function(x, y) {
-            sector.name <- CELL_META$sector.index
-            
-            # Only draw for GO term sectors
-            if (sector.name %in% go_sectors) {
-                interaction <- shared_terms$interaction_type[shared_terms$go_id == sector.name]
-                bg_col <- interaction_colors[interaction]
-                
-                circos.rect(
-                    CELL_META$xlim[1], 0,
-                    CELL_META$xlim[2], 1,
-                    col = bg_col,
-                    border = bg_col
-                )
-            }
-        }
-    )
-    
-    # --------------------------------------------------------------------------
-    # Track 2: Main sectors with labels
+    # Track 1: Main colored sectors
     # --------------------------------------------------------------------------
     
     circos.track(
         ylim = c(0, 1),
         track.height = 0.08,
         bg.col = sector_colors[all_sectors],
-        bg.border = "grey50",
+        bg.border = "grey40",
         bg.lwd = 0.5,
         panel.fun = function(x, y) {
             sector.name <- CELL_META$sector.index
             
-            # Label GO terms with GO ID
             if (sector.name %in% go_sectors) {
-                # Short label - just the number part
+                # GO ID label (just the number)
                 short_id <- sub("GO:", "", sector.name)
                 circos.text(
                     CELL_META$xcenter, 0.5,
                     as.character(short_id),
                     facing = "clockwise",
                     niceFacing = TRUE,
-                    cex = 0.35,
+                    cex = 0.3,
                     adj = c(0, 0.5)
-                )
-            } else {
-                # Division labels
-                div_name <- sub(".*_", "", sector.name)
-                org_name <- sub("_.*", "", sector.name)
-                circos.text(
-                    CELL_META$xcenter, 0.5,
-                    as.character(div_name),
-                    facing = "bending.inside",
-                    niceFacing = TRUE,
-                    cex = 0.8,
-                    font = 2
                 )
             }
         }
     )
     
     # --------------------------------------------------------------------------
-    # Track 3: Organism labels for right side
+    # Track 2: Division labels (only for division sectors)
     # --------------------------------------------------------------------------
     
     circos.track(
         ylim = c(0, 1),
-        track.height = 0.05,
+        track.height = 0.12,
         bg.border = NA,
         panel.fun = function(x, y) {
             sector.name <- CELL_META$sector.index
             
-            if (!(sector.name %in% go_sectors)) {
-                org_name <- sub("_.*", "", sector.name)
-                if (org_name == "Host") {
-                    label <- "Host"
-                } else {
-                    label <- "Symbiont"
-                }
+            if (sector.name %in% division_sectors) {
                 circos.text(
                     CELL_META$xcenter, 0.5,
-                    as.character(label),
+                    as.character(division_names[sector.name]),
                     facing = "bending.inside",
                     niceFacing = TRUE,
-                    cex = 0.6,
-                    col = "grey30"
+                    cex = 0.85,
+                    font = 2
                 )
             }
         }
@@ -432,90 +359,53 @@ create_chord_diagram <- function(season, output_file) {
     # Draw chords
     # --------------------------------------------------------------------------
     
-    # Track positions for right side sectors
-    right_positions <- list()
-    for (s in right_sectors) {
-        right_positions[[s]] <- 0
-    }
+    # Track positions for division sectors
+    div_positions <- setNames(rep(0, length(division_sectors)), division_sectors)
     
     for (i in 1:n_terms) {
         term <- shared_terms[i, ]
         go_id <- term$go_id
+        div <- term$division
         
-        host_sector <- paste0("Host_", term$host_division)
-        symbiont_sector <- paste0("Symbiont_", term$symbiont_division)
+        # Chord color based on interaction type
+        chord_col <- adjustcolor(interaction_colors[term$interaction_type], alpha.f = 0.6)
+        chord_border <- adjustcolor(interaction_colors[term$interaction_type], alpha.f = 0.8)
         
-        # Chord color based on interaction type (with transparency)
-        chord_col <- adjustcolor(interaction_colors[term$interaction_type], alpha.f = 0.5)
-        chord_border <- adjustcolor(interaction_colors[term$interaction_type], alpha.f = 0.7)
-        
-        # Draw chord to host division
-        if (host_sector %in% right_sectors) {
-            host_pos <- right_positions[[host_sector]]
-            circos.link(
-                go_id, c(0, go_term_size),
-                host_sector, c(host_pos, host_pos + 1),
-                col = chord_col,
-                border = chord_border,
-                lwd = 0.5
-            )
-            right_positions[[host_sector]] <- host_pos + 1
-        }
-        
-        # Draw chord to symbiont division
-        if (symbiont_sector %in% right_sectors) {
-            symbiont_pos <- right_positions[[symbiont_sector]]
-            circos.link(
-                go_id, c(0, go_term_size),
-                symbiont_sector, c(symbiont_pos, symbiont_pos + 1),
-                col = chord_col,
-                border = chord_border,
-                lwd = 0.5
-            )
-            right_positions[[symbiont_sector]] <- symbiont_pos + 1
-        }
+        # Draw chord from GO term to division
+        div_pos <- div_positions[[div]]
+        circos.link(
+            go_id, c(0, go_term_size),
+            div, c(div_pos, div_pos + 1),
+            col = chord_col,
+            border = chord_border,
+            lwd = 0.3
+        )
+        div_positions[[div]] <- div_pos + 1
     }
     
     # --------------------------------------------------------------------------
-    # Legends and annotations
+    # Legend
     # --------------------------------------------------------------------------
     
-    # Title
-    title(main = paste0(tools::toTitleCase(season), " - Shared GO Terms"),
-          line = -2, cex.main = 1.4, font.main = 2)
+    # Interaction type legend
+    legend_x <- -1.2
+    legend_y <- 0.5
+    legend_spacing <- 0.1
     
-    # Interaction type legend (top left)
-    legend_x <- -1.15
-    legend_y <- 0.95
-    legend_spacing <- 0.08
-    
-    text(legend_x, legend_y + 0.08, "Interaction Type", cex = 0.75, font = 2, adj = c(0, 0.5))
+    text(legend_x, legend_y + 0.15, "Interaction Type", cex = 0.85, font = 2, adj = c(0, 0.5))
     
     for (i in seq_along(interaction_colors)) {
         y_pos <- legend_y - (i - 1) * legend_spacing
-        points(legend_x, y_pos, pch = 15, col = interaction_colors[i], cex = 1.5)
-        text(legend_x + 0.05, y_pos, names(interaction_colors)[i], cex = 0.65, adj = c(0, 0.5))
+        points(legend_x, y_pos, pch = 15, col = interaction_colors[i], cex = 2)
+        text(legend_x + 0.06, y_pos, names(interaction_colors)[i], cex = 0.7, adj = c(0, 0.5))
     }
     
-    # Division legend (bottom left)
-    legend_y2 <- legend_y - 5 * legend_spacing
-    text(legend_x, legend_y2 + 0.08, "GO Division", cex = 0.75, font = 2, adj = c(0, 0.5))
+    # Title
+    title(main = paste0(tools::toTitleCase(season), " - Shared GO Terms Between Host and Symbiont"),
+          line = -1.5, cex.main = 1.3, font.main = 2)
     
-    for (i in seq_along(division_colors)) {
-        y_pos <- legend_y2 - (i - 1) * legend_spacing
-        points(legend_x, y_pos, pch = 15, col = division_colors[i], cex = 1.5)
-        text(legend_x + 0.05, y_pos, names(division_colors)[i], cex = 0.65, adj = c(0, 0.5))
-    }
-    
-    # Organism labels
-    text(0.85, 0.6, expression(italic("M. capitata")), cex = 0.9, font = 2)
-    text(0.85, 0.55, "(Host)", cex = 0.75)
-    
-    text(0.85, -0.55, expression(italic("D. trenchii")), cex = 0.9, font = 2)
-    text(0.85, -0.6, "(Symbiont)", cex = 0.75)
-    
-    # N terms annotation
-    text(0, -1.15, paste0("n = ", n_terms, " shared GO terms"), cex = 0.8)
+    # Subtitle with count
+    mtext(paste0("n = ", n_terms, " shared GO terms"), side = 1, line = -1.5, cex = 0.9)
     
     circos.clear()
     dev.off()
