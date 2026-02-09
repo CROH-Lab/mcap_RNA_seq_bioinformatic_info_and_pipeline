@@ -285,7 +285,7 @@ draw_chord_diagram <- function(shared_terms, season_label, show_legend = FALSE) 
     n_go <- length(go_sectors)
     n_div <- length(division_sectors)
     
-    go_gap <- ifelse(n_terms > 50, 0.85, 1.85)
+    go_gap <- ifelse(n_terms > 50, 0.9, 1.9)
     
     gaps <- c(
         rep(go_gap, n_go - 1),
@@ -389,9 +389,9 @@ draw_chord_diagram <- function(shared_terms, season_label, show_legend = FALSE) 
     
     # Legend (only if requested)
     if (show_legend) {
-        legend_x <- 0.9
+        legend_x <- 0.87
         legend_y <- 0.80
-        legend_spacing <- 0.06
+        legend_spacing <- 0.05
         
         text(legend_x, legend_y + 0.08, "Interaction Type", cex = 0.6, font = 2, adj = c(0, 0.5))
         
