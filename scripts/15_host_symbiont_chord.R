@@ -159,23 +159,33 @@ create_chord_diagram <- function(season, output_file) {
         cat("    - Synergistic down:", sum(shared_terms$pattern == "synergistic_down"), "\n")
         cat("    - Antagonistic (host up):", sum(shared_terms$pattern == "antagonistic_host_up"), "\n")
         cat("    - Antagonistic (host down):", sum(shared_terms$pattern == "antagonistic_host_down"), "\n")
+    } else {
+        cat("  No shared terms found - skipping diagram\n")
+        return(list(
+            season = season,
+            host_total = nrow(host_terms),
+            symbiont_total = nrow(symbiont_terms),
+            shared_total = 0,
+            shared_details = NULL
+        ))
     }
     
-    # Create sector data
-    # Each sector represents a division within an organism
-    # Sector size proportional to number of significant terms
+    # Create sector data - ONLY for shared terms
+    # Count shared terms by division for each organism
     
-    host_sectors <- host_terms %>%
-        group_by(division) %>%
+    host_sectors <- shared_terms %>%
+        group_by(host_division) %>%
         summarise(n_terms = n(), .groups = "drop") %>%
+        rename(division = host_division) %>%
         mutate(
             sector = paste0("Host_", division),
             organism = "host"
         )
     
-    symbiont_sectors <- symbiont_terms %>%
-        group_by(division) %>%
+    symbiont_sectors <- shared_terms %>%
+        group_by(symbiont_division) %>%
         summarise(n_terms = n(), .groups = "drop") %>%
+        rename(division = symbiont_division) %>%
         mutate(
             sector = paste0("Symbiont_", division),
             organism = "symbiont"
@@ -190,9 +200,20 @@ create_chord_diagram <- function(season, output_file) {
     )
     
     # Define sector order: Host on left (BP, CC, MF), Symbiont on right (MF, CC, BP)
-    # This creates a mirror layout
-    sector_order <- c("Host_BP", "Host_CC", "Host_MF", "Symbiont_MF", "Symbiont_CC", "Symbiont_BP")
-    sector_order <- sector_order[sector_order %in% all_sectors$sector]
+    # This creates a mirror layout - only include sectors that have shared terms
+    possible_order <- c("Host_BP", "Host_CC", "Host_MF", "Symbiont_MF", "Symbiont_CC", "Symbiont_BP")
+    sector_order <- possible_order[possible_order %in% all_sectors$sector]
+    
+    if (length(sector_order) == 0) {
+        cat("  No sectors with shared terms - skipping diagram\n")
+        return(list(
+            season = season,
+            host_total = nrow(host_terms),
+            symbiont_total = nrow(symbiont_terms),
+            shared_total = nrow(shared_terms),
+            shared_details = shared_terms
+        ))
+    }
     
     # Create the chord diagram
     cat("  Generating chord diagram...\n")
@@ -201,9 +222,24 @@ create_chord_diagram <- function(season, output_file) {
     
     # Set up circos parameters
     circos.clear()
+    
+    # Calculate gaps - small between divisions within organism, large between organisms
+    n_host_sectors <- sum(grepl("^Host_", sector_order))
+    n_symbiont_sectors <- sum(grepl("^Symbiont_", sector_order))
+    
+    # Create gap vector: small gaps within organism, large gap between organisms
+    gaps <- c()
+    for (i in seq_along(sector_order)) {
+        if (i == n_host_sectors || i == length(sector_order)) {
+            gaps <- c(gaps, 10)  # Large gap between organisms
+        } else {
+            gaps <- c(gaps, 2)   # Small gap within organism
+        }
+    }
+    
     circos.par(
         start.degree = 90,
-        gap.degree = c(rep(2, 2), 8, rep(2, 2), 8),  # Larger gap between organisms
+        gap.degree = gaps,
         track.margin = c(0.01, 0.01)
     )
     
@@ -259,36 +295,38 @@ create_chord_diagram <- function(season, output_file) {
     )
     
     # Add chords for shared terms
-    if (nrow(shared_terms) > 0) {
+    # Track position within each sector for placing chord endpoints
+    host_positions <- list(BP = 0, CC = 0, MF = 0)
+    symbiont_positions <- list(BP = 0, CC = 0, MF = 0)
+    
+    for (i in 1:nrow(shared_terms)) {
+        term <- shared_terms[i, ]
         
-        # Track position within each sector for placing chord endpoints
-        host_positions <- list(BP = 0, CC = 0, MF = 0)
-        symbiont_positions <- list(BP = 0, CC = 0, MF = 0)
+        # Get sectors
+        host_sector <- paste0("Host_", term$host_division)
+        symbiont_sector <- paste0("Symbiont_", term$symbiont_division)
         
-        for (i in 1:nrow(shared_terms)) {
-            term <- shared_terms[i, ]
-            
-            # Get sectors
-            host_sector <- paste0("Host_", term$host_division)
-            symbiont_sector <- paste0("Symbiont_", term$symbiont_division)
-            
-            # Get positions (increment for each term)
-            host_pos <- host_positions[[term$host_division]]
-            symbiont_pos <- symbiont_positions[[term$symbiont_division]]
-            
-            # Draw chord
-            circos.link(
-                host_sector, c(host_pos, host_pos + 1),
-                symbiont_sector, c(symbiont_pos, symbiont_pos + 1),
-                col = adjustcolor(term$chord_color, alpha.f = 0.6),
-                border = adjustcolor(term$chord_color, alpha.f = 0.8),
-                lwd = 0.5
-            )
-            
-            # Increment positions
-            host_positions[[term$host_division]] <- host_pos + 1
-            symbiont_positions[[term$symbiont_division]] <- symbiont_pos + 1
+        # Skip if sectors don't exist (shouldn't happen but safety check)
+        if (!(host_sector %in% sector_order) || !(symbiont_sector %in% sector_order)) {
+            next
         }
+        
+        # Get positions (increment for each term)
+        host_pos <- host_positions[[term$host_division]]
+        symbiont_pos <- symbiont_positions[[term$symbiont_division]]
+        
+        # Draw chord
+        circos.link(
+            host_sector, c(host_pos, host_pos + 1),
+            symbiont_sector, c(symbiont_pos, symbiont_pos + 1),
+            col = adjustcolor(term$chord_color, alpha.f = 0.6),
+            border = adjustcolor(term$chord_color, alpha.f = 0.8),
+            lwd = 0.5
+        )
+        
+        # Increment positions
+        host_positions[[term$host_division]] <- host_pos + 1
+        symbiont_positions[[term$symbiont_division]] <- symbiont_pos + 1
     }
     
     # Add organism labels
@@ -322,8 +360,10 @@ create_chord_diagram <- function(season, output_file) {
     text(legend_x + 0.03, legend_y - 3*legend_spacing, "Antagonistic (host down, symbiont up)", cex = 0.7, adj = c(0, 0.5))
     
     # Season title
-    title(main = paste0(tools::toTitleCase(season), " - Shared GO Term Expression Patterns"),
-          line = -1, cex.main = 1.3)
+    title(main = paste0(tools::toTitleCase(season), " - Shared GO Terms Between Host and Symbiont"),
+          line = -1, cex.main = 1.2)
+    title(sub = paste0("n = ", nrow(shared_terms), " shared terms"),
+          line = -0.5, cex.sub = 0.9)
     
     circos.clear()
     dev.off()
