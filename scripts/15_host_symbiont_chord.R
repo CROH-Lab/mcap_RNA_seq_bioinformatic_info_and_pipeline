@@ -253,7 +253,6 @@ draw_chord_diagram <- function(shared_terms, season_label) {
         group_by(division) %>%
         summarise(
             n_terms = n(),
-            # Sum of sqrt-scaled widths (must match chord widths exactly)
             total_width = sum(sqrt(total_genes + 1)),
             .groups = "drop"
         )
@@ -265,46 +264,44 @@ draw_chord_diagram <- function(shared_terms, season_label) {
     
     all_sectors <- c(go_sectors, division_sectors)
     
-    # Sector sizes - use sqrt of gene count to reduce extreme size differences
+    # Sector sizes
     go_sizes <- setNames(sqrt(shared_terms$total_genes + 1), go_sectors)
-    
-    # Division sizes must equal sum of chord widths connecting to them
     div_sizes <- setNames(
         div_stats$total_width[match(division_sectors, div_stats$division)],
         division_sectors
     )
-    
     sector_sizes <- c(go_sizes, div_sizes)
     
-    # Sector colors
+    # GO term colors only
     go_colors <- setNames(
         interaction_colors[shared_terms$interaction_type],
         go_sectors
     )
-    div_colors <- setNames(rep("grey80", length(division_sectors)), division_sectors)
-    sector_colors <- c(go_colors, div_colors)
     
     # Initialize circos
     circos.clear()
     
-    # Gaps - more space between GO terms for readability
+    # Gaps - scale based on number of terms
     n_go <- length(go_sectors)
     n_div <- length(division_sectors)
     
+    # More gap between GO terms when there are many
+    go_gap <- ifelse(n_terms > 50, 0.5, 1.2)
+    
     gaps <- c(
-        rep(1.0, n_go - 1),  # Increased gap between GO terms
-        25,                   # Large gap to divisions
-        rep(4, n_div - 1),   # Gap between divisions
-        25                    # Large gap back
+        rep(go_gap, n_go - 1),
+        25,
+        rep(8, n_div - 1),
+        25
     )
     
     circos.par(
         start.degree = 270,
         gap.degree = gaps,
-        track.margin = c(0.005, 0.005),
+        track.margin = c(0.002, 0.002),
         cell.padding = c(0, 0, 0, 0),
-        canvas.xlim = c(-1.05, 1.05),
-        canvas.ylim = c(-1.05, 1.05)
+        canvas.xlim = c(-1.1, 1.1),
+        canvas.ylim = c(-1.1, 1.1)
     )
     
     # Initialize sectors
@@ -317,32 +314,37 @@ draw_chord_diagram <- function(shared_terms, season_label) {
     )
     
     # --------------------------------------------------------------------------
-    # Track 1 (innermost): Colored node sectors - thin, close to chords
+    # Track 1: GO term nodes ONLY (no division arcs)
     # --------------------------------------------------------------------------
     
     circos.track(
         ylim = c(0, 1),
-        track.height = 0.08,
+        track.height = 0.05,
         bg.border = NA,
         panel.fun = function(x, y) {
             sector.name <- CELL_META$sector.index
-            circos.rect(
-                CELL_META$xlim[1], 0,
-                CELL_META$xlim[2], 1,
-                col = sector_colors[sector.name],
-                border = "grey40",
-                lwd = 0.5
-            )
+            
+            # Only draw GO term sectors
+            if (sector.name %in% go_sectors) {
+                circos.rect(
+                    CELL_META$xlim[1], 0,
+                    CELL_META$xlim[2], 1,
+                    col = go_colors[sector.name],
+                    border = "grey30",
+                    lwd = 0.4
+                )
+            }
+            # Division sectors: nothing drawn (invisible)
         }
     )
     
     # --------------------------------------------------------------------------
-    # Track 2 (outer): Labels - outside the nodes
+    # Track 2: Labels outside nodes
     # --------------------------------------------------------------------------
     
     circos.track(
         ylim = c(0, 1),
-        track.height = 0.35,
+        track.height = 0.20,
         bg.border = NA,
         panel.fun = function(x, y) {
             sector.name <- CELL_META$sector.index
@@ -350,28 +352,29 @@ draw_chord_diagram <- function(shared_terms, season_label) {
             if (sector.name %in% go_sectors) {
                 # GO ID label
                 clean_id <- shared_terms$go_id_clean[shared_terms$go_id == sector.name]
+                label_cex <- ifelse(n_terms > 80, 0.22, ifelse(n_terms > 50, 0.28, 0.38))
                 circos.text(
                     CELL_META$xcenter, 0.1,
                     as.character(clean_id),
                     facing = "clockwise",
                     niceFacing = TRUE,
-                    cex = 0.4,
+                    cex = label_cex,
                     adj = c(0, 0.5),
                     font = 1
                 )
             } else {
-                # Division labels - use shorter single-line versions
+                # Division labels only
                 short_names <- c(
                     "BP" = "Biological Process",
                     "CC" = "Cellular Component", 
                     "MF" = "Molecular Function"
                 )
                 circos.text(
-                    CELL_META$xcenter, 0.3,
+                    CELL_META$xcenter, 0.5,
                     as.character(short_names[sector.name]),
                     facing = "bending.inside",
                     niceFacing = TRUE,
-                    cex = 0.75,
+                    cex = 0.7,
                     font = 2
                 )
             }
@@ -379,10 +382,9 @@ draw_chord_diagram <- function(shared_terms, season_label) {
     )
     
     # --------------------------------------------------------------------------
-    # Draw chords - connect to track 1 (innermost)
+    # Draw chords
     # --------------------------------------------------------------------------
     
-    # Track positions for division sectors
     div_positions <- setNames(rep(0, length(division_sectors)), division_sectors)
     
     for (i in 1:n_terms) {
@@ -390,10 +392,9 @@ draw_chord_diagram <- function(shared_terms, season_label) {
         go_id <- term$go_id
         div <- term$division
         
-        chord_col <- adjustcolor(interaction_colors[term$interaction_type], alpha.f = 0.6)
-        chord_border <- adjustcolor(interaction_colors[term$interaction_type], alpha.f = 0.8)
+        chord_col <- adjustcolor(interaction_colors[term$interaction_type], alpha.f = 0.55)
+        chord_border <- adjustcolor(interaction_colors[term$interaction_type], alpha.f = 0.75)
         
-        # Chord width based on sqrt of gene count (matching sector sizes)
         chord_width <- sqrt(term$total_genes + 1)
         div_pos <- div_positions[[div]]
         
@@ -402,17 +403,15 @@ draw_chord_diagram <- function(shared_terms, season_label) {
             div, c(div_pos, div_pos + chord_width),
             col = chord_col,
             border = chord_border,
-            lwd = 0.3
+            lwd = 0.2
         )
         
         div_positions[[div]] <- div_pos + chord_width
     }
     
-    # Season label (center top)
-    text(0, 0, season_label, cex = 1.1, font = 2)
-    
-    # N terms annotation (center bottom, smaller)
-    text(0, -0.15, paste0("n = ", n_terms), cex = 0.7)
+    # Season label (center)
+    text(0, 0.02, season_label, cex = 1.0, font = 2)
+    text(0, -0.1, paste0("n = ", n_terms), cex = 0.6)
     
     circos.clear()
 }
@@ -434,43 +433,43 @@ output_file <- file.path(output_dir, "Fig_Shared_GO_Chord_Diagram.pdf")
 
 cat("\n  Creating combined figure...\n")
 
-pdf(output_file, width = 9, height = 12)
+pdf(output_file, width = 8, height = 11)
 
 # Layout: 2 rows (diagrams) x 2 cols (diagram + legend space)
 layout(matrix(c(1, 3, 2, 3), nrow = 2, ncol = 2, byrow = TRUE), 
-       widths = c(4, 1.2), heights = c(1, 1))
+       widths = c(4, 1), heights = c(1, 1))
 
 # Summer diagram
-par(mar = c(0.5, 0.5, 1, 0.5))
+par(mar = c(0.2, 0.2, 0.5, 0.2))
 draw_chord_diagram(summer_data$shared_terms, "Summer")
 
 # Winter diagram
-par(mar = c(0.5, 0.5, 1, 0.5))
+par(mar = c(0.2, 0.2, 0.5, 0.2))
 draw_chord_diagram(winter_data$shared_terms, "Winter")
 
 # Legend panel (right side, spans both rows)
-par(mar = c(2, 0.5, 2, 1))
+par(mar = c(2, 0, 2, 0.5))
 plot.new()
 plot.window(xlim = c(0, 1), ylim = c(0, 1))
 
-# Draw legend vertically
-text(0.1, 0.75, "Interaction\nType", cex = 0.85, font = 2, adj = c(0, 0.5))
+# Draw legend vertically - more compact
+text(0.05, 0.65, "Interaction Type", cex = 0.75, font = 2, adj = c(0, 0.5))
 
-legend_y_start <- 0.6
-legend_spacing <- 0.1
+legend_y_start <- 0.55
+legend_spacing <- 0.08
 
 for (i in seq_along(interaction_colors)) {
     y_pos <- legend_y_start - (i - 1) * legend_spacing
-    points(0.1, y_pos, pch = 15, col = interaction_colors[i], cex = 2)
+    points(0.05, y_pos, pch = 15, col = interaction_colors[i], cex = 1.5)
     
-    # Shorter labels for space
+    # Single line labels
     short_labels <- c(
-        "Synergistic Up" = "Synergistic\nUp",
-        "Synergistic Down" = "Synergistic\nDown", 
-        "Antagonistic (Host Up)" = "Antagonistic\n(Host Up)",
-        "Antagonistic (Host Down)" = "Antagonistic\n(Host Down)"
+        "Synergistic Up" = "Synergistic Up",
+        "Synergistic Down" = "Synergistic Down", 
+        "Antagonistic (Host Up)" = "Antag. (Host Up)",
+        "Antagonistic (Host Down)" = "Antag. (Host Down)"
     )
-    text(0.2, y_pos, short_labels[names(interaction_colors)[i]], cex = 0.65, adj = c(0, 0.5))
+    text(0.15, y_pos, short_labels[names(interaction_colors)[i]], cex = 0.55, adj = c(0, 0.5))
 }
 
 dev.off()
