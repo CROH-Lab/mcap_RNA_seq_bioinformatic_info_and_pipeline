@@ -285,7 +285,7 @@ draw_chord_diagram <- function(shared_terms, season_label, show_legend = FALSE) 
     n_go <- length(go_sectors)
     n_div <- length(division_sectors)
     
-    go_gap <- ifelse(n_terms > 50, 0.8, 1.8)
+    go_gap <- ifelse(n_terms > 50, 0.85, 1.85)
     
     gaps <- c(
         rep(go_gap, n_go - 1),
@@ -391,15 +391,15 @@ draw_chord_diagram <- function(shared_terms, season_label, show_legend = FALSE) 
     if (show_legend) {
         legend_x <- 0.9
         legend_y <- 0.80
-        legend_spacing <- 0.08
+        legend_spacing <- 0.06
         
         text(legend_x, legend_y + 0.08, "Interaction Type", cex = 0.6, font = 2, adj = c(0, 0.5))
         
         short_labels <- c(
-            "Synergistic Up" = "Synergistic Up",
-            "Synergistic Down" = "Synergistic Down", 
-            "Antagonistic (Host Up)" = "Antag. (Host Up)",
-            "Antagonistic (Host Down)" = "Antag. (Host Down)"
+            "Synergistic Up" = "Synergy All Up",
+            "Synergistic Down" = "Synergy All Down", 
+            "Antagonistic (Host Up)" = "Antag. (Host Up / Sym Down)",
+            "Antagonistic (Host Down)" = "Antag. (Host Down / Sym. Up)"
         )
         
         for (i in seq_along(interaction_colors)) {
