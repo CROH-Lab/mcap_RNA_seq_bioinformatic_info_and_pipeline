@@ -299,8 +299,8 @@ draw_chord_diagram <- function(shared_terms, season_label, show_legend = FALSE) 
         gap.degree = gaps,
         track.margin = c(0.002, 0.002),
         cell.padding = c(0, 0, 0, 0),
-        canvas.xlim = c(-1.25, 1.25),
-        canvas.ylim = c(-1.25, 1.25)
+        canvas.xlim = c(-1.0, 1.0),
+        canvas.ylim = c(-1.0, 1.0)
     )
     
     # Initialize sectors
@@ -435,11 +435,11 @@ pdf(output_file, width = 8, height = 14)
 layout(matrix(c(1, 2), nrow = 2, ncol = 1), heights = c(1, 1))
 
 # Summer diagram (with legend)
-par(mar = c(0.35, 0.35, 0.35, 0.35))
+par(mar = c(0.5, 0.5, 0.5, 0.5))
 draw_chord_diagram(summer_data$shared_terms, "Summer", show_legend = TRUE)
 
 # Winter diagram (no legend)
-par(mar = c(0.35, 0.35, 0.35, 0.35))
+par(mar = c(0.5, 0.5, 0.5, 0.5))
 draw_chord_diagram(winter_data$shared_terms, "Winter", show_legend = FALSE)
 
 dev.off()
