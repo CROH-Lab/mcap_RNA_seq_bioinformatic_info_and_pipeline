@@ -435,11 +435,11 @@ pdf(output_file, width = 8, height = 14)
 layout(matrix(c(1, 2), nrow = 2, ncol = 1), heights = c(1, 1))
 
 # Summer diagram (with legend)
-par(mar = c(0.5, 0.5, 0.5, 0.5))
+par(mar = c(0.35, 0.35, 0.35, 0.35))
 draw_chord_diagram(summer_data$shared_terms, "Summer", show_legend = TRUE)
 
 # Winter diagram (no legend)
-par(mar = c(0.5, 0.5, 0.5, 0.5))
+par(mar = c(0.35, 0.35, 0.35, 0.35))
 draw_chord_diagram(winter_data$shared_terms, "Winter", show_legend = FALSE)
 
 dev.off()
