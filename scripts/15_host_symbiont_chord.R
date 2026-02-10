@@ -326,7 +326,7 @@ draw_chord_diagram <- function(shared_terms, season_label, show_legend = FALSE) 
             if (sector.name %in% go_sectors) {
                 # GO ID label
                 clean_id <- shared_terms$go_id_clean[shared_terms$go_id == sector.name]
-                label_cex <- ifelse(n_terms > 80, 0.48, ifelse(n_terms > 50, 0.45, 0.6))
+                label_cex <- ifelse(n_terms > 60, 0.58, ifelse(n_terms > 50, 0.45, 0.6))
                 circos.text(
                     CELL_META$xcenter, 0.1,
                     as.character(clean_id),
