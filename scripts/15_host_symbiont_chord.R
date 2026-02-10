@@ -30,7 +30,7 @@ sig_threshold <- 0.1
 
 # Interaction type colors
 interaction_colors <- c(
-    "Synergistic Up" = "#FBD1A2",
+    "Synergistic Up" = "#907AD6",
     "Synergistic Down" = "#7DCFB6",
     "Antagonistic (Host Up)" = "#F79256",
     "Antagonistic (Host Down)" = "#6BBF59"
@@ -399,7 +399,7 @@ draw_chord_diagram <- function(shared_terms, season_label, show_legend = FALSE) 
             "Synergistic Up" = "Synergy All Up",
             "Synergistic Down" = "Synergy All Down", 
             "Antagonistic (Host Up)" = "Antag. (Host Up / Sym Down)",
-            "Antagonistic (Host Down)" = "Antag. (Host Down / Sym. Up)"
+            "Antagonistic (Host Down)" = "Antag. (Sym. Up / Host Down)"
         )
         
         for (i in seq_along(interaction_colors)) {
