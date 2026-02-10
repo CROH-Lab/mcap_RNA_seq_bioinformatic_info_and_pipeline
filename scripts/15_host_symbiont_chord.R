@@ -191,10 +191,12 @@ create_supplementary_table <- function(shared_terms, season, output_dir) {
         )
     
     html_file <- file.path(output_dir, paste0("Table_S_", season, "_Shared_GO_Terms.html"))
-    doc_file <- file.path(output_dir, paste0("Table_S_", season, "_Shared_GO_Terms.docx"))
-    gtsave(gt_table, html_file, doc_file)
+    gtsave(gt_table, html_file)
     cat("    Saved:", basename(html_file), "\n")
-    cat("    Saved:", basename(doc_file), "\n")
+
+    docx_file <- file.path(output_dir, paste0("Table_S_", season, "_Shared_GO_Terms.docx"))
+    gtsave(gt_table, docx_file)
+    cat("    Saved:", basename(docx_file), "\n")
     
     csv_file <- file.path(output_dir, paste0("Table_S_", season, "_Shared_GO_Terms.csv"))
     write.csv(table_data, csv_file, row.names = FALSE)
@@ -468,6 +470,6 @@ cat("  Shared terms:", nrow(winter_data$shared_terms), "\n")
 
 cat("\nOutput files:\n")
 cat("  ", basename(output_file), "\n")
-cat("  Table_S_summer_Shared_GO_Terms.html/csv\n")
-cat("  Table_S_winter_Shared_GO_Terms.html/csv\n")
+cat("  Table_S_summer_Shared_GO_Terms.html/csv/docx\n")
+cat("  Table_S_winter_Shared_GO_Terms.html/csv/docx\n")
 cat("\nOutput directory:", output_dir, "\n")
