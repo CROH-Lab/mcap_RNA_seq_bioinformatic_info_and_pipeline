@@ -26,7 +26,7 @@ symbiont_dir <- "/home/darmstrong4/mc_rework/11_symbiont_GO_MWU/output"
 output_dir <- "/home/darmstrong4/mc_rework/12_publication_figures/figures"
 dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 
-sig_threshold <- 0.1
+sig_threshold <- 0.05
 
 # Interaction type colors
 interaction_colors <- c(
