@@ -62,9 +62,9 @@ echo ""
 echo "=== Calculating Read Retention Statistics ==="
 echo -e "Sample\tRaw_Reads\tTrimmed_Reads\tRetention_Pct" > 03_qc_trimmed/read_retention_stats.txt
 
-for SAMPLE in 1AS 1AW 1BS 1BW 1CS 1CW 1DS 1DW 2AS 2AW 2BS 2BW 2CS 2CW 2DS 2DW 3AS 3AW 3BS 3BW 3CS 3CW 3DS 3DW; do
+for SAMPLE in 1BS 1BW 1DS 1DW 2BS 2BW 2DS 2DW 3BS 3BW 3DS 3DW; do
     echo "Processing ${SAMPLE}..."
-    
+
     # Get raw read count from FastQC data (R1 only, since PE)
     RAW_ZIP="01_qc_raw/${SAMPLE}_R1_001_fastqc.zip"
     if [[ -f "${RAW_ZIP}" ]]; then
@@ -72,7 +72,7 @@ for SAMPLE in 1AS 1AW 1BS 1BW 1CS 1CW 1DS 1DW 2AS 2AW 2BS 2BW 2CS 2CW 2DS 2DW 3A
     else
         RAW_READS="NA"
     fi
-    
+
     # Get trimmed read count from FastQC data
     TRIM_ZIP="03_qc_trimmed/${SAMPLE}_R1_trimmed_fastqc.zip"
     if [[ -f "${TRIM_ZIP}" ]]; then
@@ -80,14 +80,14 @@ for SAMPLE in 1AS 1AW 1BS 1BW 1CS 1CW 1DS 1DW 2AS 2AW 2BS 2BW 2CS 2CW 2DS 2DW 3A
     else
         TRIM_READS="NA"
     fi
-    
+
     # Calculate retention
     if [[ "${RAW_READS}" != "NA" ]] && [[ "${TRIM_READS}" != "NA" ]] && [[ ${RAW_READS} -gt 0 ]]; then
         RETENTION=$(echo "scale=2; ${TRIM_READS} * 100 / ${RAW_READS}" | bc)
     else
         RETENTION="NA"
     fi
-    
+
     echo -e "${SAMPLE}\t${RAW_READS}\t${TRIM_READS}\t${RETENTION}%"
 done >> 03_qc_trimmed/read_retention_stats.txt
 

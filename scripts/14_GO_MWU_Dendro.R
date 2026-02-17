@@ -19,7 +19,7 @@ library(tidyverse)
 # =============================================================================
 
 # Directories
-host_dir <- "/home/darmstrong4/mc_rework/10_GO_MWU/output"
+host_dir <- "/home/darmstrong4/mc_rework/10_host_GO_MWU/output"
 symbiont_dir <- "/home/darmstrong4/mc_rework/11_symbiont_GO_MWU/output"
 
 # Output directory

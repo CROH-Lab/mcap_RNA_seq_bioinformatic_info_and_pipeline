@@ -5,7 +5,7 @@
 #SBATCH --partition=normal           # Use the normal partition
 #SBATCH --nodes=1                    # Use a single node per task
 #SBATCH --cpus-per-task=8            # Allocate 8 CPUs
-#SBATCH --array=1-24                 # Job array for 24 samples
+#SBATCH --array=1-12                 # Job array for 24 samples
 #SBATCH --time=0-06:00:00            # Runtime (6 hours)
 #SBATCH --mail-user=darmstrong4@islander.tamucc.edu
 #SBATCH --mail-type=BEGIN,END,FAIL   # Notifications for job status
@@ -28,7 +28,7 @@ eval "$(conda shell.bash hook)"
 conda activate mcap_rnaseq
 
 # --- Sample array ---
-SAMPLES=(1AS 1AW 1BS 1BW 1CS 1CW 1DS 1DW 2AS 2AW 2BS 2BW 2CS 2CW 2DS 2DW 3AS 3AW 3BS 3BW 3CS 3CW 3DS 3DW)
+SAMPLES=(1BS 1BW 1DS 1DW 2BS 2BW 2DS 2DW 3BS 3BW 3DS 3DW)
 SAMPLE=${SAMPLES[$((SLURM_ARRAY_TASK_ID - 1))]}
 
 echo "=== Trimming Sample: ${SAMPLE} ==="

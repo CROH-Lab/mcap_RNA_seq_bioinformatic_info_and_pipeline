@@ -1,0 +1,19 @@
+"GO ID","Term Name","Interaction Type","Host Division","Host Direction","Host DEGs","Host p.adj","Symbiont Division","Symbiont Direction","Symbiont DEGs","Symbiont p.adj"
+"GO:0008574","plus-end-directed microtubule motor activity","Synergistic Up","MF","up",20,0.00403735772469799,"MF","up",42,0.00968982726412238
+"GO:0000028","ribosomal small subunit assembly","Synergistic Down","BP","down",17,0.003950917638115,"BP","down",37,0.0109166661686249
+"GO:0000184","nuclear-transcribed mRNA catabolic process, nonsense-mediated decay","Synergistic Down","BP","down",80,7.34717963570051e-06,"BP","down",204,2.35467200419935e-12
+"GO:0002181","cytoplasmic translation","Synergistic Down","BP","down",89,1.09730530901093e-15,"BP","down",275,1.86342551319675e-21
+"GO:0006364","rRNA metabolic process","Synergistic Down","BP","down",195,0.0378267352922442,"BP","down",333,0.00447030069725028
+"GO:0006413","translational initiation","Synergistic Down","BP","down",107,1.89925859548279e-11,"BP","down",212,2.05382340218051e-13
+"GO:0022613","ribonucleoprotein complex biogenesis","Synergistic Down","BP","down",389,2.17015182728698e-05,"BP","down",610,0.00447030069725028
+"GO:0042254","ribosome biogenesis","Synergistic Down","BP","down",244,0.0040922707968902,"BP","down",419,0.000334096574448678
+"GO:0042255","ribosome assembly","Synergistic Down","BP","down",49,0.003950917638115,"BP","down",118,0.000317518801410677
+"GO:0051668","localization within membrane","Synergistic Down","BP","down",386,0.00268456805926768,"BP","down",414,2.71271012072873e-10
+"GO:0090150","establishment of protein localization to membrane","Synergistic Down","BP","down",164,0.000120426581822226,"BP","down",224,8.89440201554283e-13
+"GO:0005791","rough endoplasmic reticulum","Synergistic Down","CC","down",73,0.0154219464069485,"CC","down",86,4.31589959416512e-05
+"GO:0005844","obsolete polysome","Synergistic Down","CC","down",60,0.00482878255012776,"CC","down",205,4.66892005262714e-14
+"GO:0042788","obsolete polysomal ribosome","Synergistic Down","CC","down",23,8.03444332869776e-05,"CC","down",125,7.36496792034678e-21
+"GO:0044445","obsolete cytosolic part","Synergistic Down","CC","down",172,4.40177219744864e-09,"CC","down",345,2.72637455208739e-21
+"GO:0003735","structural constituent of ribosome","Synergistic Down","MF","down",124,5.34561226678741e-15,"MF","down",201,6.08594521319049e-39
+"GO:0005198","structural molecule activity","Synergistic Down","MF","down",314,0.000175962678027779,"MF","down",341,1.72935099233131e-30
+"GO:0019843","rRNA binding","Synergistic Down","MF","down",43,0.0133510650404387,"MF","down",62,0.000252214654487132

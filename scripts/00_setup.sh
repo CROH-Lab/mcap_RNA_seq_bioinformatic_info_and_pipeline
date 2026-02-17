@@ -1,7 +1,6 @@
 #!/bin/bash
 # ============================================================================
 # M. capitata RNA-seq Holobiont Pipeline - Initial Setup
-# Run this INTERACTIVELY (not as SLURM job) to set up the environment
 #
 # Pipeline Overview:
 #   00 - Setup (this script)
@@ -85,28 +84,16 @@ echo "=== Creating sample info file ==="
 if [[ ! -f ${BASE_DIR}/sample_info.txt ]]; then
     cat > ${BASE_DIR}/sample_info.txt << 'EOF'
 sample	genotype	treatment	season
-1AS	1	A	Summer
-1AW	1	A	Winter
 1BS	1	B	Summer
 1BW	1	B	Winter
-1CS	1	C	Summer
-1CW	1	C	Winter
 1DS	1	D	Summer
 1DW	1	D	Winter
-2AS	2	A	Summer
-2AW	2	A	Winter
 2BS	2	B	Summer
 2BW	2	B	Winter
-2CS	2	C	Summer
-2CW	2	C	Winter
 2DS	2	D	Summer
 2DW	2	D	Winter
-3AS	3	A	Summer
-3AW	3	A	Winter
 3BS	3	B	Summer
 3BW	3	B	Winter
-3CS	3	C	Summer
-3CW	3	C	Winter
 3DS	3	D	Summer
 3DW	3	D	Winter
 EOF

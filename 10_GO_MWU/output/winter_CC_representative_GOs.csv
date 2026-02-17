@@ -1,8 +1,0 @@
-"cluster","term","pval","direction","nseqs","season","division"
-4,"mitochondrial envelope",8.99491343596838e-12,"up",25,"winter","CC"
-2,"cilium",9.69737669587398e-11,"down",24,"winter","CC"
-3,"anchoring junction",2.94001810378207e-08,"down",15,"winter","CC"
-5,"ribonucleoprotein complex",2.63524578706219e-05,"up",22,"winter","CC"
-7,"guanylate cyclase complex, soluble",0.000681544495262317,"down",0,"winter","CC"
-6,"coated membrane",0.00406196618554483,"up",2,"winter","CC"
-1,"histone deacetylase complex",0.0121626981092022,"down",3,"winter","CC"

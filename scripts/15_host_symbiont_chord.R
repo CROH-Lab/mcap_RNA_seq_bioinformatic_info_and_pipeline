@@ -21,7 +21,7 @@ library(gt)
 # CONFIGURATION
 # =============================================================================
 
-host_dir <- "/home/darmstrong4/mc_rework/10_GO_MWU/output"
+host_dir <- "/home/darmstrong4/mc_rework/10_host_GO_MWU/output"
 symbiont_dir <- "/home/darmstrong4/mc_rework/11_symbiont_GO_MWU/output"
 output_dir <- "/home/darmstrong4/mc_rework/12_publication_figures/figures"
 dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)

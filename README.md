@@ -1009,7 +1009,7 @@ mc_rework/
 ├── 07_deseq2/              # DESeq2 analysis (pending)
 ├── 08_host_deg_annotation/ # Host BLASTx annotation
 ├── 09_symbiont_deg_annotation/ # Symbiont BLASTx annotation
-├── 10_GO_MWU/              # Host GO enrichment analysis
+├── 10_host_GO_MWU/              # Host GO enrichment analysis
 │   ├── input/
 │   │   ├── go_annotations.tab         # Gene-to-GO mapping (13.7 MB)
 │   │   ├── go.obo                      # GO database (31.4 MB)
@@ -1035,7 +1035,7 @@ mc_rework/
 │   │   ├── winter_CC_GO_MWU.pdf
 │   │   └── winter_combined_GO_MWU.pdf
 │   ├── scripts/
-│   │   └── 10_GO_MWU_analysis.R
+│   │   └── 10_host_GO_MWU_analysis.R
 │   ├── gomwu_a.pl
 │   ├── gomwu_b.pl
 │   └── gomwu.functions.R

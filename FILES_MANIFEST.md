@@ -47,13 +47,13 @@
   - `results/all_annotations_full.tsv` - Combined annotations (163 genes)
   - `results/unannotated_degs.txt` - DEGs with no BLAST hits (118 genes)
 
-- `10_GO_MWU/` - Host GO enrichment analysis
+- `10_host_GO_MWU/` - Host GO enrichment analysis
   - `input/go_annotations.tab` - Gene-to-GO mapping
   - `input/*_signed_logP.csv` - GO_MWU input files
   - `output/*_MWU_results.csv` - Full enrichment results
   - `output/GO_MWU_summary.csv` - Summary statistics
   - `figures/*_GO_MWU.pdf` - Enrichment plots
-  - `scripts/10_GO_MWU_analysis.R` - Analysis script
+  - `scripts/10_host_GO_MWU_analysis.R` - Analysis script
   - `gomwu.functions.R` - GO_MWU R functions
   - `gomwu_a.pl`, `gomwu_b.pl` - GO_MWU Perl scripts
 
@@ -89,8 +89,8 @@
   - `star_index_holobiont/` - STAR index (50GB)
 - `05_star_align/*/*.bam` - BAM files (~150GB)
 - `06_featurecounts/*_counts_raw.txt` - Raw featureCounts output with metadata
-- `10_GO_MWU/input/go.obo` - GO database (31MB)
-- `10_GO_MWU/output/*_dissimilarity.csv` - Large clustering matrices
+- `10_host_GO_MWU/input/go.obo` - GO database (31MB)
+- `10_host_GO_MWU/output/*_dissimilarity.csv` - Large clustering matrices
 - `11_symbiont_GO_MWU/input/go.obo` - GO database
 - `11_symbiont_GO_MWU/output/*_dissimilarity.csv` - Large clustering matrices
 
@@ -119,6 +119,6 @@ GO database:
 | 07_deseq2 | All (~20 MB) | - |
 | 08_host_deg_annotation | All (~15 MB) | - |
 | 09_symbiont_deg_annotation | All (~5 MB) | - |
-| 10_GO_MWU | Results (~2 MB) | Dissimilarity (~15 MB) |
+| 10_host_GO_MWU | Results (~2 MB) | Dissimilarity (~15 MB) |
 | 11_symbiont_GO_MWU | Results (~2 MB) | Dissimilarity (~160 MB) |
 | 12_publication_figures | All (~50 MB) | - |

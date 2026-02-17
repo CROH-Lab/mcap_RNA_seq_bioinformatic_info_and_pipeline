@@ -49,7 +49,7 @@ dir.create(file.path(OUT_DIR, "objects"), showWarnings = FALSE, recursive = TRUE
 
 cat("=== SECTION 1: Loading Data ===\n\n")
 
-sample_info <- read.delim(file.path(BASE_DIR, "sample_info_with_chemistry.txt"))
+sample_info <- read.delim(file.path(BASE_DIR, "sample_info.txt"))
 rownames(sample_info) <- sample_info$sample_id
 
 # Subset to treatments B and D only (Ocean acidification analysis)
@@ -63,21 +63,6 @@ cat("Samples:", nrow(sample_info_BD), "\n")
 cat("  Treatment D (control):", sum(sample_info_BD$treatment == "D"), "\n")
 cat("  Treatment B (high CO2):", sum(sample_info_BD$treatment == "B"), "\n\n")
 
-# Show design
-cat("=== Experimental Design ===\n\n")
-print(table(sample_info_BD$treatment, sample_info_BD$season))
-
-cat("\n\n=== Chemistry by Group ===\n\n")
-sample_info_BD %>%
-    group_by(treatment, season) %>%
-    summarise(
-        n = n(),
-        H_nmol = round(mean(H_nmol), 2),
-        pH = round(-log10(mean(H_nmol) * 1e-9), 2),
-        DIC = round(mean(DIC), 0),
-        .groups = "drop"
-    ) %>%
-    print()
 
 # Load counts
 counts_mcap <- read.delim(file.path(COUNTS_DIR, "Mcap_counts.txt"),

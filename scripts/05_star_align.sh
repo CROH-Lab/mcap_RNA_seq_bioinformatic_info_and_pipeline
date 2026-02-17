@@ -7,7 +7,7 @@
 #SBATCH --exclusive
 #SBATCH --cpus-per-task=64
 #SBATCH --mem=320G
-#SBATCH --array=1-24                 # 24 samples
+#SBATCH --array=1-12                 # 24 samples
 #SBATCH --time=12:00:00
 #SBATCH --mail-user=darmstrong4@islander.tamucc.edu
 #SBATCH --mail-type=BEGIN,END,FAIL
@@ -50,9 +50,9 @@ conda activate mcap_rnaseq
 
 # --- Sample array (24 samples) ---
 SAMPLES=(
-    1AS 1AW 1BS 1BW 1CS 1CW 1DS 1DW
-    2AS 2AW 2BS 2BW 2CS 2CW 2DS 2DW
-    3AS 3AW 3BS 3BW 3CS 3CW 3DS 3DW
+    1BS 1BW 1DS 1DW
+    2BS 2BW 2DS 2DW
+    3BS 3BW 3DS 3DW
 )
 SAMPLE=${SAMPLES[$((SLURM_ARRAY_TASK_ID - 1))]}
 
